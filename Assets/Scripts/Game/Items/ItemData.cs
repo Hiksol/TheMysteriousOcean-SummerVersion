@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
@@ -7,7 +8,9 @@ public class ItemData : ScriptableObject
     public string itemName;
     public string itemDescription;
     public GameObject modelPrefab;
+    public int slotCount = 1;
     public ItemFuelType itemFuelType;
+    [SerializeReference, SubclassSelector] public List<ItemProperty> itemProperties;
 }
 
 public enum ItemFuelType {

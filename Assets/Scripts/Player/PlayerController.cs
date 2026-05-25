@@ -50,7 +50,9 @@ public class PlayerController : NetworkBehaviour
     }
 
     void Update() {
+        if (!isLocalPlayer) return;
         lookInput = lookAction.ReadValue<Vector2>();
+        HandleCamera();
         moveInput = moveAction.ReadValue<Vector2>();
         if (jumpAction.WasPressedThisFrame()) currentJumpBuffer = jumpBuffer;
         else currentJumpBuffer = Mathf.Max(currentJumpBuffer - Time.deltaTime, 0);
@@ -58,14 +60,13 @@ public class PlayerController : NetworkBehaviour
 
     void FixedUpdate() {
         if (!isLocalPlayer) return;
-        HandleCamera();
         HandleMovement();
         HandleJump();
         HandleGravity();
     }
 
     void HandleCamera() {
-        Vector2 lookVector = lookInput * (cameraSensivity * Time.fixedDeltaTime);
+        Vector2 lookVector = lookInput * (cameraSensivity * Time.deltaTime);
         transform.Rotate(transform.up, lookVector.x);
 
         Vector3 camEuler = cam.transform.localEulerAngles;

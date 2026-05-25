@@ -8,6 +8,10 @@ public class ItemSpawnZone : NetworkBehaviour
     public ItemWeightedList possibleItems;
     public bool drawGizmosOnSelected;
 
+    public override void OnStartServer() {
+        SpawnRandomItem();
+    }
+
     [Server]
     [ContextMenu(nameof(SpawnRandomItem))]
     public void SpawnRandomItem() {

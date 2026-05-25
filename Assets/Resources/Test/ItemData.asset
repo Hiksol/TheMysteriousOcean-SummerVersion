@@ -15,4 +15,9 @@ MonoBehaviour:
   itemName: name
   itemDescription: desc
   modelPrefab: {fileID: 4284086390480741403, guid: 4bcc05d0743b5ad41a5aa6c9b78dc988, type: 3}
+  slotCount: 1
   itemFuelType: 1
+  itemProperties: []
+  references:
+    version: 2
+    RefIds: []

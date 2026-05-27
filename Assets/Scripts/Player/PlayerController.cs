@@ -1,14 +1,16 @@
 using UnityEngine;
 using Mirror;
 using UnityEngine.InputSystem;
+using KinematicCharacterController;
 
-[RequireComponent(typeof(CharacterController))]
-public class PlayerController : NetworkBehaviour
+[RequireComponent(typeof(KinematicCharacterMotor))]
+public class PlayerController : NetworkBehaviour, ICharacterController
 {
     [Header("Movement")]
     public float playerSpeed = 5f;
     public float playerGravityMult = 2f;
-    public float jumpVelocity = 3f;
+    public float jumpSpeed = 5f;
+    public float airDrag = 0.1f;
 
     [Header("Camera")]
     public float cameraSensivity = 100f;
@@ -18,29 +20,33 @@ public class PlayerController : NetworkBehaviour
     public float jumpBuffer = 0.1f;
 
     [Header("Debug")]
-    public float currentYVelocity = -1f;
+    public float currentJumpBuffer = 0f;
     float cameraXRotation = 0f;
-    public bool wasGrounded = false;
     Vector2 lookInput;
     Vector2 moveInput;
-    public float currentJumpBuffer = 0f;
     bool JumpPressed => currentJumpBuffer > 0f;
 
-    CharacterController characterController;
+    KinematicCharacterMotor characterMotor;
     Camera cam;
     InputAction moveAction;
     InputAction lookAction;
     InputAction jumpAction;
 
     void Awake() {
-        characterController = GetComponent<CharacterController>();
+        characterMotor = GetComponent<KinematicCharacterMotor>();
+        characterMotor.CharacterController = this;
         moveAction = InputSystem.actions.FindAction("Move");
         lookAction = InputSystem.actions.FindAction("Look");
         jumpAction = InputSystem.actions.FindAction("Jump");
     }
 
     public override void OnStartClient() {
-        if (!isLocalPlayer) enabled = false;
+        if (isLocalPlayer) {
+            characterMotor.CharacterController = this;
+        } else {
+            enabled = false;
+            characterMotor.enabled = false;
+        }
     }
 
     public override void OnStartLocalPlayer() {
@@ -58,46 +64,78 @@ public class PlayerController : NetworkBehaviour
         else currentJumpBuffer = Mathf.Max(currentJumpBuffer - Time.deltaTime, 0);
     }
 
-    void FixedUpdate() {
-        if (!isLocalPlayer) return;
-        HandleMovement();
-        HandleJump();
-        HandleGravity();
+    public void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
+        Vector2 lookVector = lookInput * (cameraSensivity * deltaTime);
+        currentRotation *= Quaternion.AngleAxis(lookVector.x, characterMotor.CharacterUp);
+    }
+
+    public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
+        HandleMovement(ref currentVelocity, deltaTime);
+        HandleGravity(ref currentVelocity, deltaTime);
+        HandleJump(ref currentVelocity, deltaTime);
     }
 
     void HandleCamera() {
         Vector2 lookVector = lookInput * (cameraSensivity * Time.deltaTime);
-        transform.Rotate(transform.up, lookVector.x);
-
         Vector3 camEuler = cam.transform.localEulerAngles;
         cameraXRotation = Mathf.Clamp(cameraXRotation - lookVector.y, -cameraVertialClamp, cameraVertialClamp);
         camEuler.x = cameraXRotation;
         cam.transform.localEulerAngles = camEuler;
     }
 
-    void HandleMovement() {
-        Vector3 moveInputLocal = transform.forward * moveInput.y + transform.right * moveInput.x;
-        Vector3 moveVector = Vector3.ClampMagnitude(moveInputLocal, playerSpeed * Time.fixedDeltaTime);
-        characterController.Move(moveVector);
+    void HandleMovement(ref Vector3 currentVelocity, float deltaTime) {
+        Vector3 moveInputNormal = (transform.forward * moveInput.y + transform.right * moveInput.x).normalized;
+        Vector3 targetMovementVelocity;
+        if (characterMotor.GroundingStatus.IsStableOnGround) {
+            // Reorient velocity on slope
+            currentVelocity = characterMotor.GetDirectionTangentToSurface(currentVelocity, characterMotor.GroundingStatus.GroundNormal) * currentVelocity.magnitude;
+
+            // Calculate target velocity
+            Vector3 inputRight = Vector3.Cross(moveInputNormal, characterMotor.CharacterUp);
+            Vector3 reorientedInput = Vector3.Cross(characterMotor.GroundingStatus.GroundNormal, inputRight).normalized * moveInputNormal.magnitude;
+            targetMovementVelocity = reorientedInput * playerSpeed;
+
+            // Smooth movement Velocity
+            currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1 - Mathf.Exp(-15 * deltaTime));
+        } else if (moveInputNormal.sqrMagnitude > 0f) {
+            // Add move input
+            targetMovementVelocity = moveInputNormal * playerSpeed;
+
+            // Prevent climbing on un-stable slopes with air movement
+            if (characterMotor.GroundingStatus.FoundAnyGround) {
+                Vector3 perpenticularObstructionNormal = Vector3.Cross(Vector3.Cross(characterMotor.CharacterUp, characterMotor.GroundingStatus.GroundNormal), characterMotor.CharacterUp).normalized;
+                // targetMovementVelocity = Vector3.ProjectOnPlane(targetMovementVelocity, perpenticularObstructionNormal);
+            }
+
+            Vector3 velocity = Vector3.ProjectOnPlane(targetMovementVelocity, Physics.gravity);
+            currentVelocity = velocity + new Vector3(0, currentVelocity.y, 0);
+        }
     }
 
-    void HandleJump() {
-        if (wasGrounded && JumpPressed) {
-            currentYVelocity = jumpVelocity;
+    void HandleGravity(ref Vector3 currentVelocity, float deltaTime) {
+        if (!characterMotor.GroundingStatus.IsStableOnGround) {
+            // Gravity
+            currentVelocity += Physics.gravity * (playerGravityMult * deltaTime);
+            // Drag
+            currentVelocity.y *= 1f / (1f + (airDrag * deltaTime));
+        }
+    }
+
+    void HandleJump(ref Vector3 currentVelocity, float deltaTime) {
+        if (JumpPressed && characterMotor.GroundingStatus.IsStableOnGround) {
+            Vector3 jumpDirection = characterMotor.CharacterUp;
+            characterMotor.ForceUnground(0.1f);
+            currentVelocity += (jumpDirection * jumpSpeed) - Vector3.Project(currentVelocity, characterMotor.CharacterUp);
             currentJumpBuffer = 0f;
         }
     }
 
-    void HandleGravity() {
-        currentYVelocity += Physics.gravity.y * playerGravityMult * Time.fixedDeltaTime;
-        characterController.Move(Vector3.up * (currentYVelocity * Time.fixedDeltaTime));
-        if (characterController.isGrounded && currentYVelocity < -1f) currentYVelocity = -1f;
-        wasGrounded = characterController.isGrounded;
-
-        // move character up to avoid jitter with skin width
-        float maxDistance = characterController.height / 2 + characterController.skinWidth;
-        if (currentYVelocity < 0 && Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, characterController.height / 2 + characterController.skinWidth, Utils.GetPhysicsLayerMask(gameObject.layer))) {
-            characterController.Move(Vector3.up * (maxDistance - hit.distance));
-        }
-    }
+    public void BeforeCharacterUpdate(float deltaTime) {}
+    public void PostGroundingUpdate(float deltaTime) {}
+    public void AfterCharacterUpdate(float deltaTime) {}
+    public bool IsColliderValidForCollisions(Collider coll) { return true; }
+    public void OnGroundHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport) {}
+    public void OnMovementHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport) {}
+    public void ProcessHitStabilityReport(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, Vector3 atCharacterPosition, Quaternion atCharacterRotation, ref HitStabilityReport hitStabilityReport) {}
+    public void OnDiscreteCollisionDetected(Collider hitCollider) {}
 }

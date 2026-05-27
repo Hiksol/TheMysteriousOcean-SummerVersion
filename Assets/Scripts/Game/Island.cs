@@ -1,8 +1,9 @@
+using KinematicCharacterController;
 using Mirror;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
-public class Island : NetworkBehaviour
+[RequireComponent(typeof(PhysicsMover))]
+public class Island : NetworkBehaviour, IMoverController
 {
     public Vector3 velocity;
     public float timeToLive = 60f;
@@ -10,20 +11,37 @@ public class Island : NetworkBehaviour
     [Header("Debug")]
     public float currentTimeLiving = 0f;
 
-    Rigidbody rb;
+    PhysicsMover mover;
+    WobbleWaves wobbleWaves;
 
     void Awake() {
-        rb = GetComponent<Rigidbody>();
+        mover = GetComponent<PhysicsMover>();
+        mover.SetPosition(transform.position);
+        mover.MoverController = this;
+        TryGetComponent(out wobbleWaves);
     }
 
-    void FixedUpdate() {
+    public override void OnStartClient() {
+        if (!isServer) {
+            enabled = false;
+            mover.enabled = false;
+        }
+    }
+
+    void Update() {
         if (!isServer) return;
-        rb.MovePosition(transform.position + velocity * Time.fixedDeltaTime);
         currentTimeLiving += Time.deltaTime;
         if (currentTimeLiving >= timeToLive) {
             NetworkServer.UnSpawn(gameObject);
             Destroy(gameObject);
         }
+    }
+
+    public void UpdateMovement(out Vector3 goalPosition, out Quaternion goalRotation, float deltaTime) {
+        Vector3 position = wobbleWaves && currentTimeLiving > 0.1f ? wobbleWaves.targetSmoothPosition : transform.position;
+        goalPosition = position + velocity * deltaTime;
+        Quaternion rotation = wobbleWaves && currentTimeLiving > 0.1f ? Quaternion.Euler(wobbleWaves.targetRotation) : transform.rotation;
+        goalRotation = rotation;
     }
 
     void OnCollisionEnter(Collision collision) {

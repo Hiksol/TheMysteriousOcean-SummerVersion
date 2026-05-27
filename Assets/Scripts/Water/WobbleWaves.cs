@@ -6,6 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class WobbleWaves : NetworkBehaviour
 {
+    public bool applyPositionAndRotation = true;
+
     [Header("Wave Detection")]
     public float sampleDistance = 1f;
     public List<Transform> samplePoints;
@@ -18,7 +20,11 @@ public class WobbleWaves : NetworkBehaviour
 
     [Header("Height Settings")]
     public float heightOffset = 1f;
-    public float heightSmoothness = 0.1f; 
+    public float heightSmoothness = 0.1f;
+
+    [Header("Debug")]
+    public Vector3 targetRotation;
+    public Vector3 targetSmoothPosition;
 
     Rigidbody rb;
 
@@ -37,12 +43,15 @@ public class WobbleWaves : NetworkBehaviour
         currentSampleHeights = new(new float[samplePoints.Count]);
         targetEulerAngles = transform.eulerAngles;
         len = sampleDistance * 2;
+        targetRotation = transform.rotation.eulerAngles;
+        targetSmoothPosition = transform.position;
     }
 
     void Update() {
         SampleWaveHeights();
         CalculateTilt();
-        ApplyRotationAndHeight();
+        CalculatePositionAndRotation();
+        if (applyPositionAndRotation) rb.Move(targetSmoothPosition, Quaternion.Euler(targetRotation));
     }
 
     void CreateSamplePoints() {
@@ -102,18 +111,17 @@ public class WobbleWaves : NetworkBehaviour
         targetHeight = averageHeight + heightOffset;
     }
 
-    void ApplyRotationAndHeight() {
+    void CalculatePositionAndRotation() {
         // Плавно поворачиваем корабль
         Vector3 currentEuler = transform.localEulerAngles;
         if (currentEuler.x > 180) currentEuler.x -= 360;
         if (currentEuler.z > 180) currentEuler.z -= 360;
-        Vector3 targetRotation = Vector3.MoveTowards(currentEuler, targetEulerAngles, rotationSpeed * Time.deltaTime);
+        targetRotation = Vector3.MoveTowards(currentEuler, targetEulerAngles, rotationSpeed * Time.deltaTime);
         // print($"{currentEuler} {targetEulerAngles} {rotationSpeed * Time.deltaTime}");
 
         // Плавно изменяем высоту корабля
         Vector3 targetPosition = new(transform.position.x, targetHeight, transform.position.z);
-        Vector3 smoothPosition = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, heightSmoothness);
-        rb.Move(smoothPosition, Quaternion.Euler(targetRotation));
+        targetSmoothPosition = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, heightSmoothness);
     }
 
     // Визуализация точек измерения в редакторе

@@ -10,6 +10,7 @@ public class ItemData : ScriptableObject
     public GameObject modelPrefab;
     public int slotCount = 1;
     public ItemFuelType itemFuelType;
+    public float itemFuelAmount;
     [SerializeReference, SubclassSelector] public List<ItemProperty> itemProperties;
 }
 

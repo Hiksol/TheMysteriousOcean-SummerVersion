@@ -96,7 +96,7 @@ public class PlayerController : NetworkBehaviour
 
         // move character up to avoid jitter with skin width
         float maxDistance = characterController.height / 2 + characterController.skinWidth;
-        if (currentYVelocity < 0 && Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, characterController.height / 2 + characterController.skinWidth)) {
+        if (currentYVelocity < 0 && Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, characterController.height / 2 + characterController.skinWidth, Utils.GetPhysicsLayerMask(gameObject.layer))) {
             characterController.Move(Vector3.up * (maxDistance - hit.distance));
         }
     }

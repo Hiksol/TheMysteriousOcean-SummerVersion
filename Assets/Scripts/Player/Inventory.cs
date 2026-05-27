@@ -51,8 +51,11 @@ public class Inventory : NetworkBehaviour
     void HandleInteract() {
         if (interactAction.WasPressedThisFrame()) {
             if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, interactionRange)) {
-                if (hit.collider.gameObject.TryGetComponent(out ItemInstance item)) {
+                GameObject go = hit.collider.gameObject;
+                if (go.TryGetComponent(out ItemInstance item)) {
                     CmdTryPickupItem(item);
+                } else if (go.TryGetComponent(out IInteractable interactable)) {
+                    interactable.CmdInteract(player);
                 }
             }
         }
@@ -140,10 +143,20 @@ public class Inventory : NetworkBehaviour
     void ParentItemToPlayer(ItemInstance item, bool hide, Vector3 pos) {
         item.transform.SetParent(hiddenRoot);
         item.transform.position = hide ? Vector3.zero : pos;
+        item.transform.localRotation = Quaternion.identity;
         item.gameObject.SetActive(!hide);
         item.GetComponent<Rigidbody>().isKinematic = true;
         item.GetComponent<Collider>().enabled = false;
     }
+
+    public ItemInstance GetItemInRightHand() {
+        return hands.GetItem(RIGHT_HAND_IND);
+    }
+
+    [Server]
+    public void DestroyItemInRightHand() {
+        hands.DestroyItem(RIGHT_HAND_IND);
+    } 
 
     [Serializable] public class ItemContainer {
         public ItemInstance containerItem;
@@ -203,6 +216,14 @@ public class Inventory : NetworkBehaviour
             int startInd = ind - containerSlots[ind].occupiedByDelta;
             for (int i = startInd; i < startInd + item.itemData.slotCount; i++) containerSlots[i].Reset();
             return item;
+        }
+
+        public void DestroyItem(int ind) {
+            if (ind < 0 || ind > capacity) return;
+            ItemInstance item = FreeSlot(ind);
+            if (item == null) return;
+            NetworkServer.UnSpawn(item.gameObject);
+            Destroy(item.gameObject);
         }
 
         public bool IsSlotFreeForPotentialItem(int ind, ItemInstance potentialItem) {

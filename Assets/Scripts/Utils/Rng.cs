@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = System.Random;
 
@@ -19,11 +21,20 @@ public class Rng {
     public int RangeInt(int minInc, int maxExc) {
         return random.Next(minInc, maxExc);
     }
+    public int RangeInt(int maxExc) {
+        return random.Next(0, maxExc);
+    }
 
     public Vector3 Vector3Abs(float x, float y, float z) {
         return new(Range(-x, x), Range(-y, y), Range(-z, z));
     }
     public Vector3 Vector3Abs(Vector3 v) {
         return Vector3Abs(v.x, v.y, v.z);
+    }
+
+    public T RandomItem<T>(IEnumerable<T> values) {
+        int count = values.Count();
+        if (count == 0) return default;
+        return values.ElementAt(RangeInt(count));
     }
 }

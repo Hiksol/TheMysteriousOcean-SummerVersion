@@ -1,13 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
+using Mirror;
 using UnityEngine;
 
-public class WobbleWaves : MonoBehaviour
+[RequireComponent(typeof(Rigidbody))]
+public class WobbleWaves : NetworkBehaviour
 {
     [Header("Wave Detection")]
-    public float sampleDistance = 5f;
+    public float sampleDistance = 1f;
     public List<Transform> samplePoints;
-    public LayerMask waterLayer = 1;
+    public LayerMask waterLayer = 1 << 4;
     public float raycastDistance = 10f;
 
     [Header("Rotation Settings")]
@@ -18,12 +20,17 @@ public class WobbleWaves : MonoBehaviour
     public float heightOffset = 1f;
     public float heightSmoothness = 0.1f; 
 
+    Rigidbody rb;
 
     private List<float> currentSampleHeights;
     private Vector3 targetEulerAngles;
     private float targetHeight;
     private Vector3 velocity;
     float len;
+
+    void Awake() {
+        rb = GetComponent<Rigidbody>();
+    }
 
     void Start() {
         CreateSamplePoints();
@@ -100,12 +107,13 @@ public class WobbleWaves : MonoBehaviour
         Vector3 currentEuler = transform.localEulerAngles;
         if (currentEuler.x > 180) currentEuler.x -= 360;
         if (currentEuler.z > 180) currentEuler.z -= 360;
-        transform.localEulerAngles = Vector3.MoveTowards(currentEuler, targetEulerAngles, rotationSpeed * Time.deltaTime);
+        Vector3 targetRotation = Vector3.MoveTowards(currentEuler, targetEulerAngles, rotationSpeed * Time.deltaTime);
         // print($"{currentEuler} {targetEulerAngles} {rotationSpeed * Time.deltaTime}");
 
         // Плавно изменяем высоту корабля
         Vector3 targetPosition = new(transform.position.x, targetHeight, transform.position.z);
-        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, heightSmoothness);
+        Vector3 smoothPosition = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, heightSmoothness);
+        rb.Move(smoothPosition, Quaternion.Euler(targetRotation));
     }
 
     // Визуализация точек измерения в редакторе

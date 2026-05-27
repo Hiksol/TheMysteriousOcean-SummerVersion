@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public static class Utils
 {
@@ -15,5 +16,13 @@ public static class Utils
         for (int i = 0; i < count; i++) {
             yield return creator();
         }
+    }
+
+    public static int GetPhysicsLayerMask(int layer) {
+        int layerMask = 0;
+        for (int i = 0; i < 32; i++) {
+            if (!Physics.GetIgnoreLayerCollision(layer, i)) layerMask |= 1 << i;
+        }
+        return layerMask;
     }
 }

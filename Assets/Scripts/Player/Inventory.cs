@@ -22,6 +22,7 @@ public class Inventory : NetworkBehaviour
     Transform hiddenRoot;
 
     InputAction interactAction;
+    InputAction useAction;
     List<KeyControl> inventoryKeys;
 
     void Awake() {
@@ -32,6 +33,7 @@ public class Inventory : NetworkBehaviour
         hiddenRoot.SetParent(transform);
         hiddenRoot.localPosition = Vector3.zero;
         interactAction = InputSystem.actions.FindAction("Interact");
+        useAction = InputSystem.actions.FindAction("Attack");
         inventoryKeys = new() {
             Keyboard.current.digit1Key, Keyboard.current.digit2Key,
             Keyboard.current.digit3Key, Keyboard.current.digit4Key,
@@ -49,15 +51,15 @@ public class Inventory : NetworkBehaviour
 
     [Client]
     void HandleInteract() {
-        if (interactAction.WasPressedThisFrame()) {
-            if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, interactionRange)) {
-                GameObject go = hit.collider.gameObject;
-                if (go.TryGetComponent(out ItemInstance item)) {
-                    CmdTryPickupItem(item);
-                } else if (go.TryGetComponent(out IInteractable interactable)) {
-                    interactable.CmdInteract(player);
-                }
-            }
+        bool interactWasPressed = interactAction.WasPressedThisFrame();
+        bool useWasPressed = useAction.WasPressedThisFrame();
+        if (!interactWasPressed && !useWasPressed) return;
+        bool wasHit = Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, interactionRange);
+        GameObject go = wasHit ? hit.collider.gameObject : null;
+        if (wasHit && interactWasPressed && go.TryGetComponent(out ItemInstance item)) CmdTryPickupItem(item);
+        else if (useWasPressed) {
+            if (wasHit && go.TryGetComponent(out IInteractable interactable)) interactable.CmdInteract(player);
+            else if (GetItemInRightHand() is ItemInstance rightHandItem && rightHandItem != null) rightHandItem.Use(player, null);
         }
     }
 

@@ -4,31 +4,41 @@ using UnityEngine;
 
 public class Generator : NetworkBehaviour, IInteractable
 {
-    public float baseMaxCharge = 10f;
+    public float maxFuel = 100f;
     public List<ItemFuelType> acceptableFuels = new() { ItemFuelType.Fuel };
+    public Battery battery;
+    public float fuelConsumptionPerSecond = 1;
+    public float energyGenerationPerSecond = 1;
 
     [Header("Debug")]
-    public float currentCharge;
+    [SyncVar] public float currentFuel = 0;
 
-    void Awake() {
-        currentCharge = baseMaxCharge;
-    }
-
-    public void Interact(Player player) {
-        Inventory inventory = player.Inventory;
-        ItemInstance item = inventory.GetItemInRightHand();
-        if (item != null && acceptableFuels.Contains(item.itemData.itemFuelType)) {
-            AddCharge(item.itemData.itemFuelAmount);
-            inventory.DestroyItemInRightHand();
+    void Update() {
+        if (!isServer) return;
+        if (currentFuel > 0 && battery) {
+            currentFuel = Mathf.Max(currentFuel - Time.deltaTime * fuelConsumptionPerSecond, 0);
+            battery.AddCharge(energyGenerationPerSecond * Time.deltaTime);
         }
     }
 
-    void AddCharge(float charge) {
-        currentCharge = Mathf.Min(currentCharge + charge, EvaluateMaxCharge());
+    [Server]
+    public void Interact(Player player, ItemInstance item) {
+        Inventory inventory = player.Inventory;
+        if (item == null) return;
+        if (acceptableFuels.Contains(item.itemData.itemFuelType)) {
+            AddFuel(item.itemData.itemFuelAmount);
+            inventory.DestroyItemInRightHand();
+        } else {
+            item.Use(player, this);
+        }
     }
 
-    float EvaluateMaxCharge() {
-        // TODO: implement battaries
-        return baseMaxCharge;
+    [Server]
+    public void AddFuel(float fuel) {
+        currentFuel = Mathf.Min(currentFuel + fuel, maxFuel);
+    }
+
+    public float GetFuelMissing() {
+        return maxFuel - currentFuel;
     }
 }

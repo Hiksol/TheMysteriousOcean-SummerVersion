@@ -2,7 +2,7 @@ using Mirror;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
-public class ItemInstance : NetworkBehaviour
+public class ItemInstance : NetworkBehaviour, IInteractable
 {
     [SyncVar] public ItemData itemData;
 
@@ -27,5 +27,16 @@ public class ItemInstance : NetworkBehaviour
     void UpdateModel() {
         if (model) Destroy(model);
         if (itemData) model = Instantiate(itemData.modelPrefab, transform);
+    }
+
+    [Command]
+    public void CmdUse(Player player, NetworkBehaviour target) {
+        Use(player, target);
+    }
+
+    [Server]
+    public void Use(Player player, NetworkBehaviour target) {
+        IInteractable interactable = (IInteractable)target;
+        itemData.itemProperties.ForEach(itemProperty => itemProperty.OnUse(this, player, interactable));
     }
 }

@@ -62,6 +62,10 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         moveInput = moveAction.ReadValue<Vector2>();
         if (jumpAction.WasPressedThisFrame()) currentJumpBuffer = jumpBuffer;
         else currentJumpBuffer = Mathf.Max(currentJumpBuffer - Time.deltaTime, 0);
+        if (Keyboard.current.rKey.wasPressedThisFrame) {
+            Cursor.lockState = Cursor.visible ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = !Cursor.visible;
+        }
     }
 
     public void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {

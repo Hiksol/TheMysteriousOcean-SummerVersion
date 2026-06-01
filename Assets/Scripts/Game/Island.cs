@@ -43,8 +43,4 @@ public class Island : NetworkBehaviour, IMoverController
         Quaternion rotation = wobbleWaves && currentTimeLiving > 0.1f ? Quaternion.Euler(wobbleWaves.targetRotation) : transform.rotation;
         goalRotation = rotation;
     }
-
-    void OnCollisionEnter(Collision collision) {
-        print(collision.gameObject);
-    }
 }

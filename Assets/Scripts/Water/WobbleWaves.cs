@@ -23,8 +23,8 @@ public class WobbleWaves : NetworkBehaviour
     public float heightSmoothness = 0.1f;
 
     [Header("Debug")]
-    public Vector3 targetRotation;
-    public Vector3 targetSmoothPosition;
+    [SyncVar] public Vector3 targetRotation;
+    [SyncVar] public Vector3 targetSmoothPosition;
 
     Rigidbody rb;
 
@@ -48,10 +48,15 @@ public class WobbleWaves : NetworkBehaviour
     }
 
     void Update() {
-        SampleWaveHeights();
-        CalculateTilt();
-        CalculatePositionAndRotation();
-        if (applyPositionAndRotation) rb.Move(targetSmoothPosition, Quaternion.Euler(targetRotation));
+        if (isServer) {
+            SampleWaveHeights();
+            CalculateTilt();
+            CalculatePositionAndRotation();
+        }
+    }
+
+    void FixedUpdate() {
+        if (applyPositionAndRotation) rb.Move(targetSmoothPosition, Quaternion.Euler(targetRotation));        
     }
 
     void CreateSamplePoints() {

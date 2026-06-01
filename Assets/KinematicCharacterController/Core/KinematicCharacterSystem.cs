@@ -203,9 +203,11 @@ namespace KinematicCharacterController
             {
                 PhysicsMover mover = movers[i];
 
-                mover.Transform.SetPositionAndRotation(mover.TransientPosition, mover.TransientRotation);
-                mover.Rigidbody.position = mover.TransientPosition;
-                mover.Rigidbody.rotation = mover.TransientRotation;
+                if (!mover.MoveWithPhysics) {
+                    mover.Transform.SetPositionAndRotation(mover.TransientPosition, mover.TransientRotation);
+                    mover.Rigidbody.position = mover.TransientPosition;
+                    mover.Rigidbody.rotation = mover.TransientRotation;
+                }
             }
 
             // Character controller update phase 2 and move

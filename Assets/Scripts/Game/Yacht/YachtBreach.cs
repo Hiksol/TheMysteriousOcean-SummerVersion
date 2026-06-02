@@ -1,7 +1,7 @@
 using Mirror;
 using UnityEngine;
 
-public class YachtBreach : NetworkBehaviour, IInteractable
+public class YachtBreach : Interactable
 {
     public float sinkingSpeed = 1f;
     public bool sinkingActive = true;

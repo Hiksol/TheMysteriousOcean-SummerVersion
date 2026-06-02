@@ -2,7 +2,7 @@ using Mirror;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
-public class ItemInstance : NetworkBehaviour, IInteractable
+public class ItemInstance : Interactable
 {
     [SyncVar(hook = nameof(OnItemDataChanged))] public ItemData itemData;
 
@@ -34,7 +34,7 @@ public class ItemInstance : NetworkBehaviour, IInteractable
 
     [Server]
     public void Use(Player player, NetworkBehaviour target) {
-        IInteractable interactable = (IInteractable)target;
+        Interactable interactable = (Interactable)target;
         itemData.itemProperties.ForEach(itemProperty => itemProperty.OnUse(this, player, interactable));
     }
 }

@@ -10,6 +10,8 @@ public class Island : NetworkBehaviour, IMoverController
 
     [Header("Debug")]
     public float currentTimeLiving = 0f;
+    [SyncVar] public Vector3 targetPosition;
+    [SyncVar] public Quaternion targetRotation;
 
     PhysicsMover mover;
     WobbleWaves wobbleWaves;
@@ -19,13 +21,8 @@ public class Island : NetworkBehaviour, IMoverController
         mover.SetPosition(transform.position);
         mover.MoverController = this;
         TryGetComponent(out wobbleWaves);
-    }
-
-    public override void OnStartClient() {
-        if (!isServer) {
-            enabled = false;
-            mover.enabled = false;
-        }
+        targetPosition = transform.position;
+        targetRotation = transform.rotation;
     }
 
     void Update() {
@@ -37,10 +34,16 @@ public class Island : NetworkBehaviour, IMoverController
         }
     }
 
-    public void UpdateMovement(out Vector3 goalPosition, out Quaternion goalRotation, float deltaTime) {
+    void FixedUpdate() {
+        if (!isServer) return;
         Vector3 position = wobbleWaves && currentTimeLiving > 0.1f ? wobbleWaves.targetSmoothPosition : transform.position;
-        goalPosition = position + velocity * deltaTime;
+        targetPosition = position + velocity * Time.fixedDeltaTime;
         Quaternion rotation = wobbleWaves && currentTimeLiving > 0.1f ? Quaternion.Euler(wobbleWaves.targetRotation) : transform.rotation;
-        goalRotation = rotation;
+        targetRotation = rotation;
+    }
+
+    public void UpdateMovement(out Vector3 goalPosition, out Quaternion goalRotation, float deltaTime) {
+        goalPosition = targetPosition;
+        goalRotation = targetRotation;
     }
 }

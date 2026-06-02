@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
-public class Generator : NetworkBehaviour, IInteractable
+public class Generator : Interactable
 {
     public float maxFuel = 100f;
     public List<ItemFuelType> acceptableFuels = new() { ItemFuelType.Fuel };
@@ -22,7 +22,7 @@ public class Generator : NetworkBehaviour, IInteractable
     }
 
     [Server]
-    public void Interact(Player player, ItemInstance item) {
+    override public void Interact(Player player, ItemInstance item) {
         Inventory inventory = player.Inventory;
         if (item == null) return;
         if (acceptableFuels.Contains(item.itemData.itemFuelType)) {

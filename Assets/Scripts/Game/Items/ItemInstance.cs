@@ -2,29 +2,27 @@ using Mirror;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
-public class ItemInstance : NetworkBehaviour, IInteractable
+public class ItemInstance : Interactable
 {
-    [SyncVar] public ItemData itemData;
+    [SyncVar(hook = nameof(OnItemDataChanged))] public ItemData itemData;
 
     GameObject model;
 
     public override void OnStartClient() {
-        UpdateModel();
+        UpdateModel(itemData);
     }
 
     [Server]
     public void SetItemData(ItemData itemData) {
         this.itemData = itemData;
-        RpcUpdateModel();
     }
 
-    [ClientRpc]
-    void RpcUpdateModel() {
-        UpdateModel();
+    void OnItemDataChanged(ItemData _, ItemData newItemData) {
+        UpdateModel(newItemData);
     }
 
     [Client]
-    void UpdateModel() {
+    void UpdateModel(ItemData itemData) {
         if (model) Destroy(model);
         if (itemData) model = Instantiate(itemData.modelPrefab, transform);
     }
@@ -36,7 +34,7 @@ public class ItemInstance : NetworkBehaviour, IInteractable
 
     [Server]
     public void Use(Player player, NetworkBehaviour target) {
-        IInteractable interactable = (IInteractable)target;
+        Interactable interactable = (Interactable)target;
         itemData.itemProperties.ForEach(itemProperty => itemProperty.OnUse(this, player, interactable));
     }
 }

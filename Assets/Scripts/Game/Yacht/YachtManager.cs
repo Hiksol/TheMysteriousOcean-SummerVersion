@@ -13,7 +13,7 @@ public class YachtManager : SingletonNetworkBehaviour<YachtManager>
 
     WobbleWaves wobbleWaves;
 
-    void Awake() {
+    override protected void AwakeNew() {
         wobbleWaves = GetComponent<WobbleWaves>();
     }
 

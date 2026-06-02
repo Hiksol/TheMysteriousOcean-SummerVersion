@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
-public class GeneratorWithInventory : NetworkBehaviour, IInteractable
+public class GeneratorWithInventory : Interactable
 {
     public int slotsCount = 9;
     public List<ItemFuelType> acceptableFuels = new() { ItemFuelType.Fuel };
@@ -39,7 +39,7 @@ public class GeneratorWithInventory : NetworkBehaviour, IInteractable
     }
 
     [Server]
-    public void Interact(Player player, ItemInstance item) {
+    override public void Interact(Player player, ItemInstance item) {
         Inventory inventory = player.Inventory;
         if (item == null) return;
         if (acceptableFuels.Contains(item.itemData.itemFuelType)) {

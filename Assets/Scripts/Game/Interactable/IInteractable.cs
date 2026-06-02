@@ -1,16 +1,16 @@
 using Mirror;
 
-public interface IInteractable
+public class Interactable : NetworkBehaviour
 {
-    [Command]
-    sealed public void CmdInteract(Player player) {
+    [Command(requiresAuthority = false)]
+    public void CmdInteract(Player player) {
         ItemInstance item = player.Inventory.GetItemInRightHand();
         Interact(player, item);
     }
 
     [Server]
-    public void Interact(Player player, ItemInstance item) {
+    public virtual void Interact(Player player, ItemInstance item) {
         if (item == null) return;
-        item.Use(player, (NetworkBehaviour)this);
+        item.Use(player, this);
     }
 }

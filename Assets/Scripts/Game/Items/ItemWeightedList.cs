@@ -12,10 +12,10 @@ public class ItemWeightedList : ScriptableObject
 
 public static class ItemWeightedListSerializer {
     public static void WriteItemWeightedList(this NetworkWriter writer, ItemWeightedList value) {
-        if (value) writer.WriteString(value.name);
+        SONetworkSerializer<ItemWeightedList>.WriteSO(writer, value);
     }
 
     public static ItemWeightedList ReadItemWeightedList(this NetworkReader reader) {
-        return Resources.Load<ItemWeightedList>(reader.ReadString());
+        return SONetworkSerializer<ItemWeightedList>.ReadSO(reader);
     }
 }

@@ -1,8 +1,7 @@
-using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
-public class YachtPump : NetworkBehaviour, IInteractable
+public class YachtPump : Interactable
 {
     public Battery battery;
     public float energyConsumptionPerSecond = 5;
@@ -13,13 +12,13 @@ public class YachtPump : NetworkBehaviour, IInteractable
 
     void Update() {
         if (!isServer) return;
-        if (battery && battery.TryConsumeCharge(energyConsumptionPerSecond * Time.deltaTime)) {
+        if (pumpEnabled && battery && battery.TryConsumeCharge(energyConsumptionPerSecond * Time.deltaTime)) {
             YachtManager.I.AddSinkingProgress(-sinkingProgressDecreasePerSecond * Time.deltaTime);
         }
     }
 
     [Server]
-    public void Interact(Player player, ItemInstance item) {
+    override public void Interact(Player player, ItemInstance item) {
         pumpEnabled = !pumpEnabled;
     }
 }

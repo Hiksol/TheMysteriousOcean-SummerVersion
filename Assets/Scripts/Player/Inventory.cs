@@ -58,7 +58,7 @@ public class Inventory : NetworkBehaviour
         GameObject go = wasHit ? hit.collider.gameObject : null;
         if (wasHit && interactWasPressed && go.TryGetComponent(out ItemInstance item)) CmdTryPickupItem(item);
         else if (useWasPressed) {
-            if (wasHit && go.TryGetComponent(out IInteractable interactable)) interactable.CmdInteract(player);
+            if (wasHit && go.TryGetComponent(out Interactable interactable)) interactable.CmdInteract(player);
             else if (GetItemInRightHand() is ItemInstance rightHandItem && rightHandItem != null) rightHandItem.Use(player, null);
         }
     }

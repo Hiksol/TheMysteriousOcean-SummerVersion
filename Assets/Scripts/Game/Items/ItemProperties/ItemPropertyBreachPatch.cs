@@ -8,7 +8,7 @@ public class ItemPropertyBreachPatch : ItemProperty
     public float currentFuel = 50;
 
     [Server]
-    public override void OnUse(ItemInstance item, Player player, IInteractable interactable) {
+    public override void OnUse(ItemInstance item, Player player, Interactable interactable) {
         YachtBreach breach = (YachtBreach)interactable;
         if (breach) {
             breach.Patch();

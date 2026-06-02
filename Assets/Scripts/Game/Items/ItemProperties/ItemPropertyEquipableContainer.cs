@@ -7,7 +7,7 @@ public class ItemPropertyEquipableContainer : ItemProperty
     public int capacity = 1;
 
     [Server]
-    public override void OnUse(ItemInstance item, Player player, IInteractable interactable) {
+    public override void OnUse(ItemInstance item, Player player, Interactable interactable) {
         player.Inventory.CmdEquipContainer(item);
     }
 }

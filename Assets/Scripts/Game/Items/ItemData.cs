@@ -23,10 +23,10 @@ public enum ItemFuelType {
 
 public static class ItemDataSerializer {
     public static void WriteItemData(this NetworkWriter writer, ItemData value) {
-        if (value) writer.WriteString(value.name);
+        SONetworkSerializer<ItemData>.WriteSO(writer, value);
     }
 
     public static ItemData ReadItemData(this NetworkReader reader) {
-        return Resources.Load<ItemData>(reader.ReadString());
+        return SONetworkSerializer<ItemData>.ReadSO(reader);
     }
 }

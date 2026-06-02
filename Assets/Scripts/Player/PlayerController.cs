@@ -108,7 +108,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
             // Prevent climbing on un-stable slopes with air movement
             if (characterMotor.GroundingStatus.FoundAnyGround) {
                 Vector3 perpenticularObstructionNormal = Vector3.Cross(Vector3.Cross(characterMotor.CharacterUp, characterMotor.GroundingStatus.GroundNormal), characterMotor.CharacterUp).normalized;
-                // targetMovementVelocity = Vector3.ProjectOnPlane(targetMovementVelocity, perpenticularObstructionNormal);
+                targetMovementVelocity = Vector3.ProjectOnPlane(targetMovementVelocity, perpenticularObstructionNormal);
             }
 
             Vector3 velocity = Vector3.ProjectOnPlane(targetMovementVelocity, Physics.gravity);
@@ -125,7 +125,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         }
     }
 
-    void HandleJump(ref Vector3 currentVelocity, float deltaTime) {
+    void HandleJump(ref Vector3 currentVelocity, float _) {
         if (JumpPressed && characterMotor.GroundingStatus.IsStableOnGround) {
             Vector3 jumpDirection = characterMotor.CharacterUp;
             characterMotor.ForceUnground(0.1f);

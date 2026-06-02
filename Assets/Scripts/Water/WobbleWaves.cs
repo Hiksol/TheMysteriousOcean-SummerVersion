@@ -13,6 +13,7 @@ public class WobbleWaves : NetworkBehaviour
     public List<Transform> samplePoints;
     public LayerMask waterLayer = 1 << 4;
     public float raycastDistance = 10f;
+    public float waveCastHeight = 2f;
 
     [Header("Rotation Settings")]
     public float maxTiltAngle = 15f;
@@ -77,10 +78,11 @@ public class WobbleWaves : NetworkBehaviour
     }
 
     void SampleWaveHeights() {
-        float maxHeight = samplePoints.Max(tr => tr.position.y);
+        // float targetHeight = samplePoints.Max(tr => tr.position.y);
+        float targetHeight = waveCastHeight;
         for (int i = 0; i < samplePoints.Count; i++) {
             Vector3 worldPos = samplePoints[i].position;
-            Vector3 rayStart = new(worldPos.x, maxHeight, worldPos.z);
+            Vector3 rayStart = new(worldPos.x, targetHeight, worldPos.z);
 
             if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, raycastDistance, waterLayer)) currentSampleHeights[i] = hit.point.y;
             else currentSampleHeights[i] = 0;

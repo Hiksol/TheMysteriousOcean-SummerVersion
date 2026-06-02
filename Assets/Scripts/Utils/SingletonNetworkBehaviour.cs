@@ -3,7 +3,7 @@ using Mirror;
 public class SingletonNetworkBehaviour<T> : NetworkBehaviour where T: SingletonNetworkBehaviour<T>
 {
     public static T I { get; private set; }
-    protected virtual bool ShouldDontDestroyOnLoad => true;
+    protected virtual bool ShouldDontDestroyOnLoad => false;
 
     void Awake() {
         if (I != null) {

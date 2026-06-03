@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Mirror;
 using UnityEngine;
 
@@ -5,11 +7,12 @@ using UnityEngine;
 public class ItemInstance : Interactable
 {
     [SyncVar(hook = nameof(OnItemDataChanged))] public ItemData itemData;
+    [SerializeReference] public List<ItemProperty> itemProperties;
 
     GameObject model;
 
     public override void OnStartClient() {
-        UpdateModel(itemData);
+        OnItemDataChanged(null, itemData);
     }
 
     [Server]
@@ -19,6 +22,8 @@ public class ItemInstance : Interactable
 
     void OnItemDataChanged(ItemData _, ItemData newItemData) {
         UpdateModel(newItemData);
+        // itemProperties = new(newItemData.itemProperties);
+        itemProperties = newItemData.itemProperties.Clone().ToList();
     }
 
     [Client]
@@ -35,6 +40,6 @@ public class ItemInstance : Interactable
     [Server]
     public void Use(Player player, NetworkBehaviour target) {
         Interactable interactable = (Interactable)target;
-        itemData.itemProperties.ForEach(itemProperty => itemProperty.OnUse(this, player, interactable));
+        itemProperties.ForEach(itemProperty => itemProperty.OnUse(this, player, interactable));
     }
 }

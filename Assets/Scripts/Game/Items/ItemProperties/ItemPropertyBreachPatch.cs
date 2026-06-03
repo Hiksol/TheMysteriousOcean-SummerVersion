@@ -6,10 +6,9 @@ public class ItemPropertyBreachPatch : ItemProperty
 {
     [Server]
     public override void OnUse(ItemInstance item, Player player, Interactable interactable) {
+        if (interactable is not YachtBreach) return;
         YachtBreach breach = (YachtBreach)interactable;
-        if (breach) {
-            breach.Patch();
-            player.Inventory.DestroyItemInRightHand();
-        }
+        breach.Patch();
+        player.Inventory.DestroyItemInRightHand();
     }
 }

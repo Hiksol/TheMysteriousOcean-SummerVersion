@@ -4,9 +4,6 @@ using Mirror;
 [Serializable]
 public class ItemPropertyBreachPatch : ItemProperty
 {
-    public float maxFuel = 50;
-    public float currentFuel = 50;
-
     [Server]
     public override void OnUse(ItemInstance item, Player player, Interactable interactable) {
         YachtBreach breach = (YachtBreach)interactable;

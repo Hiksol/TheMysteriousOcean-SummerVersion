@@ -2,6 +2,7 @@ using Mirror;
 using UnityEngine;
 
 [RequireComponent(typeof(WobbleWaves))]
+[RequireComponent(typeof(Collider))]
 public class YachtManager : SingletonNetworkBehaviour<YachtManager>
 {
     public float maxSinkingProgress = 100f;
@@ -12,9 +13,13 @@ public class YachtManager : SingletonNetworkBehaviour<YachtManager>
     [SyncVar] public float currentSinkingProgress = 0f; // 0 - ok, maxSinkingProgress - defeat
 
     WobbleWaves wobbleWaves;
+    Collider _collider;
+
+    public float HalfWidth => _collider.bounds.extents.x;
 
     override protected void AwakeNew() {
         wobbleWaves = GetComponent<WobbleWaves>();
+        _collider = GetComponent<Collider>();
     }
 
     void Update() {

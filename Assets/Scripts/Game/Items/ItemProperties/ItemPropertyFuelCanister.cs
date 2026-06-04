@@ -10,11 +10,14 @@ public class ItemPropertyFuelCanister : ItemProperty
 
     [Server]
     public override void OnUse(ItemInstance item, Player player, Interactable interactable) {
+        if (interactable is not Generator) return;
         Generator generator = (Generator)interactable;
-        if (generator) {
-            float fuelToAdd = Mathf.Min(generator.GetFuelMissing(), currentFuel);
-            currentFuel -= fuelToAdd;
-            generator.AddFuel(fuelToAdd);
-        }
+        float fuelToAdd = Mathf.Min(generator.GetFuelMissing(), currentFuel);
+        currentFuel -= fuelToAdd;
+        generator.AddFuel(fuelToAdd);
     }
+
+    // public override object Clone() {
+    //     return new ItemPropertyFuelCanister() { maxFuel = maxFuel, currentFuel = currentFuel };
+    // }
 }

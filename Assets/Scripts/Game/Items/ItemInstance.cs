@@ -22,7 +22,6 @@ public class ItemInstance : Interactable
 
     void OnItemDataChanged(ItemData _, ItemData newItemData) {
         UpdateModel(newItemData);
-        // itemProperties = new(newItemData.itemProperties);
         itemProperties = newItemData.itemProperties.Clone().ToList();
     }
 

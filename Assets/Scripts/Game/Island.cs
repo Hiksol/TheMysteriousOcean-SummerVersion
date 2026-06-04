@@ -3,10 +3,12 @@ using Mirror;
 using UnityEngine;
 
 [RequireComponent(typeof(PhysicsMover))]
+[RequireComponent(typeof(Collider))]
 public class Island : NetworkBehaviour, IMoverController
 {
     public Vector3 velocity;
     public float timeToLive = 60f;
+    public float halfDiagonal;
 
     [Header("Debug")]
     public float currentTimeLiving = 0f;
@@ -15,6 +17,7 @@ public class Island : NetworkBehaviour, IMoverController
 
     PhysicsMover mover;
     WobbleWaves wobbleWaves;
+
 
     void Awake() {
         mover = GetComponent<PhysicsMover>();

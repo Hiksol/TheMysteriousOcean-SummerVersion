@@ -17,7 +17,7 @@ public class ItemSpawnZone : NetworkBehaviour
     public void SpawnRandomItem() {
         ItemData itemData = possibleItems.items[0].itemDatas[0];
         ItemInstance item = Instantiate(itemPrefab);
-        item.transform.position = transform.position + GameManager.I.Rng.Vector3Abs(spawnAreaSize / 2);
+        item.transform.SetPositionAndRotation(transform.position + transform.rotation * GameManager.I.Rng.Vector3Abs(spawnAreaSize / 2), transform.rotation);
         StickToGround(item.gameObject);
         NetworkServer.Spawn(item.gameObject);
         item.SetItemData(itemData);
@@ -36,7 +36,9 @@ public class ItemSpawnZone : NetworkBehaviour
 
     void BaseDrawGizmos() {
         Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(transform.position, spawnAreaSize);
+        Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, transform.lossyScale);
+        Gizmos.DrawWireCube(Vector3.zero, spawnAreaSize);
+        Gizmos.matrix = Matrix4x4.identity;
     }
 
     void OnDrawGizmos() { if (!drawGizmosOnSelected) BaseDrawGizmos(); }

@@ -3,13 +3,18 @@ using System.Linq;
 using Mirror;
 using UnityEngine;
 
-[RequireComponent(typeof(Collider))]
+[RequireComponent(typeof(BoxCollider))]
 public class ItemInstance : Interactable
 {
     [SyncVar(hook = nameof(OnItemDataChanged))] public ItemData itemData;
     [SerializeReference] public List<ItemProperty> itemProperties;
 
     GameObject model;
+    BoxCollider _collider;
+
+    void Awake() {
+        _collider = GetComponent<BoxCollider>();
+    }
 
     public override void OnStartClient() {
         OnItemDataChanged(null, itemData);
@@ -18,6 +23,7 @@ public class ItemInstance : Interactable
     [Server]
     public void SetItemData(ItemData itemData) {
         this.itemData = itemData;
+        UpdateModel(itemData);
     }
 
     void OnItemDataChanged(ItemData _, ItemData newItemData) {
@@ -25,10 +31,15 @@ public class ItemInstance : Interactable
         itemProperties = newItemData.itemProperties.Clone().ToList();
     }
 
-    [Client]
     void UpdateModel(ItemData itemData) {
         if (model) Destroy(model);
-        if (itemData) model = Instantiate(itemData.modelPrefab, transform);
+        if (itemData) {
+            model = Instantiate(itemData.modelPrefab, transform);
+            if (model.TryGetComponent(out Collider collider)) {
+                _collider.size = collider.bounds.size;
+                collider.enabled = false;
+            }
+        }
     }
 
     [Command]

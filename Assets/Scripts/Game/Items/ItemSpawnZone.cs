@@ -29,7 +29,7 @@ public class ItemSpawnZone : NetworkBehaviour
         rayStart.y = transform.position.y + spawnAreaSize.y / 2;
         if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hitInfo, spawnAreaSize.y)) {
             Vector3 newPosition = hitInfo.point;
-            newPosition.y += collider.bounds.size.y / 2;
+            newPosition.y += collider.bounds.size.y / 2 + 0.1f;
             go.transform.position = newPosition;
         }
     }

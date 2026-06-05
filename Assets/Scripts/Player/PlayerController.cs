@@ -3,6 +3,7 @@ using Mirror;
 using UnityEngine.InputSystem;
 using KinematicCharacterController;
 
+[RequireComponent(typeof(Player))]
 [RequireComponent(typeof(KinematicCharacterMotor))]
 public class PlayerController : NetworkBehaviour, ICharacterController
 {
@@ -11,6 +12,10 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     public float playerGravityMult = 2f;
     public float jumpSpeed = 5f;
     public float airDrag = 0.1f;
+    public float maxStamina = 10f;
+    public float staminaSprintigPerSecond = 2f;
+    public float staminaRegenPerSecond = 1.5f;
+    public float speedMultSprinting = 1.5f;
 
     [Header("Camera")]
     public float cameraSensivity = 100f;
@@ -21,23 +26,30 @@ public class PlayerController : NetworkBehaviour, ICharacterController
 
     [Header("Debug")]
     public float currentJumpBuffer = 0f;
+    public float currentStamina = 10f;
+    public bool isSprinting = false;
+
     float cameraXRotation = 0f;
     Vector2 lookInput;
     Vector2 moveInput;
     bool JumpPressed => currentJumpBuffer > 0f;
 
+    Player player;
     KinematicCharacterMotor characterMotor;
     Camera cam;
     InputAction moveAction;
     InputAction lookAction;
     InputAction jumpAction;
+    InputAction sprintAction;
 
     void Awake() {
+        player = GetComponent<Player>();
         characterMotor = GetComponent<KinematicCharacterMotor>();
         characterMotor.CharacterController = this;
         moveAction = InputSystem.actions.FindAction("Move");
         lookAction = InputSystem.actions.FindAction("Look");
         jumpAction = InputSystem.actions.FindAction("Jump");
+        sprintAction = InputSystem.actions.FindAction("Sprint");
     }
 
     public override void OnStartClient() {
@@ -66,6 +78,19 @@ public class PlayerController : NetworkBehaviour, ICharacterController
             Cursor.lockState = Cursor.visible ? CursorLockMode.Locked : CursorLockMode.None;
             Cursor.visible = !Cursor.visible;
         }
+        isSprinting = sprintAction.IsPressed();
+        if (isSprinting && moveInput.sqrMagnitude != 0) AddStamina(-staminaSprintigPerSecond * Time.deltaTime);
+        else AddStamina(staminaRegenPerSecond / GetStaminaRegenDenominator(player.Hunger) * Time.deltaTime);
+    }
+
+    void AddStamina(float stamina) {
+        currentStamina = Mathf.Clamp(currentStamina + stamina, 0f, maxStamina);
+    }
+
+    float GetStaminaRegenDenominator(float hunger) {
+        if (hunger <= 0) return 1;
+        return 9 * Mathf.Pow(hunger / 10, 5) + 1;
+        // 0 => 1, 5 => ~1.28, 8 => ~3.95, 10 => 10
     }
 
     public void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
@@ -89,6 +114,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
 
     void HandleMovement(ref Vector3 currentVelocity, float deltaTime) {
         Vector3 moveInputNormal = (transform.forward * moveInput.y + transform.right * moveInput.x).normalized;
+        float currentPlayerSpeed = playerSpeed * (isSprinting && currentStamina > 0 ? speedMultSprinting : 1f);
         Vector3 targetMovementVelocity;
         if (characterMotor.GroundingStatus.IsStableOnGround) {
             // Reorient velocity on slope
@@ -97,13 +123,13 @@ public class PlayerController : NetworkBehaviour, ICharacterController
             // Calculate target velocity
             Vector3 inputRight = Vector3.Cross(moveInputNormal, characterMotor.CharacterUp);
             Vector3 reorientedInput = Vector3.Cross(characterMotor.GroundingStatus.GroundNormal, inputRight).normalized * moveInputNormal.magnitude;
-            targetMovementVelocity = reorientedInput * playerSpeed;
+            targetMovementVelocity = reorientedInput * currentPlayerSpeed;
 
             // Smooth movement Velocity
             currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1 - Mathf.Exp(-15 * deltaTime));
         } else if (moveInputNormal.sqrMagnitude > 0f) {
             // Add move input
-            targetMovementVelocity = moveInputNormal * playerSpeed;
+            targetMovementVelocity = moveInputNormal * currentPlayerSpeed;
 
             // Prevent climbing on un-stable slopes with air movement
             if (characterMotor.GroundingStatus.FoundAnyGround) {

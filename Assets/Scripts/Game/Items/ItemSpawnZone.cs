@@ -15,7 +15,8 @@ public class ItemSpawnZone : NetworkBehaviour
     [Server]
     [ContextMenu(nameof(SpawnRandomItem))]
     public void SpawnRandomItem() {
-        ItemData itemData = possibleItems.items[0].itemDatas[0];
+        ItemWeightedList.ItemTier itemTier = GameManager.I.Rng.RandomWeightedItem(possibleItems.items, tier => tier.weight);
+        ItemData itemData = GameManager.I.Rng.RandomItem(itemTier.itemDatas);
         ItemInstance item = Instantiate(itemPrefab);
         item.transform.SetPositionAndRotation(transform.position + transform.rotation * GameManager.I.Rng.Vector3Abs(spawnAreaSize / 2), transform.rotation);
         StickToGround(item.gameObject);

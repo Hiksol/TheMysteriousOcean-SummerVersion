@@ -407,7 +407,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 6.0463014, y: 1.3765666, z: -3.40444}
-  m_LocalScale: {x: 5.471328, y: 1, z: 5.6412725}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6323515481306527339}
@@ -427,7 +427,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  spawnAreaSize: {x: 1, y: 1, z: 1}
+  spawnAreaSize: {x: 5.5, y: 1, z: 5.5}
   itemPrefab: {fileID: 6558904777754820750, guid: 7ab3a7c85f69b5a45afb70bc8d10a0a9, type: 3}
   possibleItems: {fileID: 11400000, guid: 1e2d36ce4e0ab6f47b64ac00ad026df7, type: 2}
   drawGizmosOnSelected: 0
@@ -628,7 +628,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0.64853996, y: 2.481429, z: 2.652504}
-  m_LocalScale: {x: 1, y: 1, z: 2.2632296}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6323515481306527339}
@@ -648,7 +648,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  spawnAreaSize: {x: 1, y: 1, z: 1}
+  spawnAreaSize: {x: 1, y: 1, z: 2.25}
   itemPrefab: {fileID: 6558904777754820750, guid: 7ab3a7c85f69b5a45afb70bc8d10a0a9, type: 3}
   possibleItems: {fileID: 11400000, guid: c9e4dda0e0322004d8cc1cad1fd50ea3, type: 2}
   drawGizmosOnSelected: 0

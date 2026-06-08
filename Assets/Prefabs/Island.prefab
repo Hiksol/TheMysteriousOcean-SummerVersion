@@ -389,6 +389,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6323515481306527339}
+  - component: {fileID: 4957374286556200739}
+  - component: {fileID: 7820985311973323124}
+  - component: {fileID: 2965779476648454745}
+  - component: {fileID: 8165148999071316813}
+  - component: {fileID: 2718646417605933834}
+  - component: {fileID: 8924393145936045490}
   m_Layer: 0
   m_Name: Island
   m_TagString: Untagged
@@ -413,6 +419,135 @@ Transform:
   - {fileID: 9176152060609665105}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &4957374286556200739
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8487492477131812558}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 30, y: 1, z: 30}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &7820985311973323124
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8487492477131812558}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 0
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &2965779476648454745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8487492477131812558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 075ccbe9837b0744985e09ba3f015b9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KinematicCharacterController.PhysicsMover
+  Rigidbody: {fileID: 7820985311973323124}
+  MoveWithPhysics: 1
+--- !u!114 &8165148999071316813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8487492477131812558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Mirror::Mirror.NetworkIdentity
+  sceneId: 0
+  _assetId: 708982851
+  serverOnly: 0
+  visibility: 0
+  hasSpawned: 0
+--- !u!114 &2718646417605933834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8487492477131812558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 022414de388a33a4daa32d75bc95e732, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Island
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  velocity: {x: 0, y: 0, z: 0}
+  timeToLive: 60
+  halfDiagonal: 22
+  currentTimeLiving: 0
+  targetPosition: {x: 0, y: 0, z: 0}
+  targetRotation: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &8924393145936045490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8487492477131812558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 368a56b1a65b7624c9bca3416bc0166f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WobbleWaves
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  applyPositionAndRotation: 0
+  sampleDistance: 0.5
+  samplePoints: []
+  waterLayer:
+    serializedVersion: 2
+    m_Bits: 16
+  raycastDistance: 10
+  waveCastHeight: 2
+  maxTiltAngle: 5
+  rotationSpeed: 2
+  heightOffset: 1
+  heightSmoothness: 0.1
+  targetRotation: {x: 0, y: 0, z: 0}
+  targetSmoothPosition: {x: 0, y: 0, z: 0}
 --- !u!1001 &8706167075580084154
 PrefabInstance:
   m_ObjectHideFlags: 0

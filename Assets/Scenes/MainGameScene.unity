@@ -2382,7 +2382,7 @@ MonoBehaviour:
     - scName: Common
       scWeight: 1
       islandPrefabs:
-      - {fileID: 2938727497169288669, guid: fc86980a2c81d20458a6f24bfeb7af3e, type: 3}
+      - {fileID: 2718646417605933834, guid: a842dc919f1a9364aa169255626df644, type: 3}
     categoryTimer: 20
     currentCategoryTimer: 0
   spawnInterval: 10

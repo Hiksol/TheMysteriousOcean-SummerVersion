@@ -507,7 +507,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   battery: {fileID: 940029748}
-  energyConsumptionPerSecond: 5
+  energyConsumptionPerSecond: 0.2
   sinkingProgressDecreasePerSecond: 5
   pumpEnabled: 0
 --- !u!65 &216613195
@@ -1854,7 +1854,7 @@ MonoBehaviour:
   playerSpawnMethod: 0
   spawnPrefabs:
   - {fileID: 2617934218488871334, guid: 7ab3a7c85f69b5a45afb70bc8d10a0a9, type: 3}
-  - {fileID: 3656162983283954379, guid: fc86980a2c81d20458a6f24bfeb7af3e, type: 3}
+  - {fileID: 8487492477131812558, guid: a842dc919f1a9364aa169255626df644, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2

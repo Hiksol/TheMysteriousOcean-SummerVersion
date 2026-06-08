@@ -10,15 +10,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 19e8f422e2cb44146aee9cb1c86fbb38, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.5931168
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 19e8f422e2cb44146aee9cb1c86fbb38, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.0000002
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 19e8f422e2cb44146aee9cb1c86fbb38, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.89082414
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 19e8f422e2cb44146aee9cb1c86fbb38, type: 3}
       propertyPath: m_LocalRotation.w
@@ -50,7 +50,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 19e8f422e2cb44146aee9cb1c86fbb38, type: 3}
       propertyPath: m_Name
-      value: tripo_convert_f0fb49cb-140c-451c-82e6-155b8f273354
+      value: BreadPrefab
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

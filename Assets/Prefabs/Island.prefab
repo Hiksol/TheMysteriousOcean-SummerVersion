@@ -428,7 +428,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   spawnAreaSize: {x: 1, y: 1, z: 1}
-  itemPrefab: {fileID: 0}
+  itemPrefab: {fileID: 6558904777754820750, guid: 7ab3a7c85f69b5a45afb70bc8d10a0a9, type: 3}
   possibleItems: {fileID: 11400000, guid: 1e2d36ce4e0ab6f47b64ac00ad026df7, type: 2}
   drawGizmosOnSelected: 0
 --- !u!1 &8487492477131812558
@@ -649,7 +649,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   spawnAreaSize: {x: 1, y: 1, z: 1}
-  itemPrefab: {fileID: 0}
+  itemPrefab: {fileID: 6558904777754820750, guid: 7ab3a7c85f69b5a45afb70bc8d10a0a9, type: 3}
   possibleItems: {fileID: 11400000, guid: c9e4dda0e0322004d8cc1cad1fd50ea3, type: 2}
   drawGizmosOnSelected: 0
 --- !u!1001 &8706167075580084154

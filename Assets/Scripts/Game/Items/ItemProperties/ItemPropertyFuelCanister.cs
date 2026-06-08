@@ -16,8 +16,4 @@ public class ItemPropertyFuelCanister : ItemProperty
         currentFuel -= fuelToAdd;
         generator.AddFuel(fuelToAdd);
     }
-
-    // public override object Clone() {
-    //     return new ItemPropertyFuelCanister() { maxFuel = maxFuel, currentFuel = currentFuel };
-    // }
 }

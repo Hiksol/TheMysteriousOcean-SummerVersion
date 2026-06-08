@@ -507,7 +507,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   battery: {fileID: 940029748}
-  energyConsumptionPerSecond: 0.2
+  energyConsumptionPerSecond: 0.1
   sinkingProgressDecreasePerSecond: 5
   pumpEnabled: 0
 --- !u!65 &216613195
@@ -996,7 +996,7 @@ MonoBehaviour:
   syncInterval: 0
   maxSinkingProgress: 100
   startHeightOffset: 1
-  endHeightOffset: 0
+  endHeightOffset: -2
   currentSinkingProgress: 0
 --- !u!1 &345761511
 GameObject:

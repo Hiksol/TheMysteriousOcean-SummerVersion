@@ -97,7 +97,10 @@ public class ItemContainer {
 public class ItemSlotInfo {
     public ItemInstance item;
     public int occupiedByDelta = -1;
+
     public bool IsOccupied => occupiedByDelta >= 0;
+    public bool IsOccupiedByItself => occupiedByDelta == 0;
+    public bool IsOccupiedByAnotherSlot => occupiedByDelta >= 1;
 
     public ItemSlotInfo() {}
 

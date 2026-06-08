@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Mirror;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
@@ -12,11 +13,11 @@ public class Inventory : NetworkBehaviour
     public float interactionRange = 3f;
     const int RIGHT_HAND_IND = 0;
     const int LEFT_HAND_IND = 1;
-    const int HANDS_COUNT = 2;
-    [SyncVar] public ItemContainer hands;
+    public const int HANDS_COUNT = 2;
+    [SyncVar(hook = nameof(OnHandsChanged))] public ItemContainer hands;
     public List<Transform> handPoints;
     public int baseInventorySize = 2;
-    [SyncVar] public List<ItemContainer> inventoryContainers = new();
+    [SyncVar(hook = nameof(OnInventoryContainersChanged))] public List<ItemContainer> inventoryContainers = new();
 
     Player player;
     Transform hiddenRoot;
@@ -24,6 +25,10 @@ public class Inventory : NetworkBehaviour
     InputAction interactAction;
     InputAction useAction;
     List<KeyControl> inventoryKeys;
+
+    public UnityEvent<ItemContainer> onHandsChange;
+    public UnityEvent<List<ItemContainer>> onInventoryChange;
+    public UnityEvent<int> onInventoryCapacityChange;
 
     void Awake() {
         player = GetComponent<Player>();
@@ -125,6 +130,10 @@ public class Inventory : NetworkBehaviour
             ParentItemToPlayer(item, !isHands, pos);
             RpcParentItemToPlayer(item, !isHands, pos);
         }
+        if (isLocalPlayer) {
+            OnHandsChanged(null, hands);
+            OnInventoryContainersChanged(null, inventoryContainers);
+        }
     }
 
     [Command]
@@ -135,6 +144,7 @@ public class Inventory : NetworkBehaviour
         item.transform.SetParent(hiddenRoot);
         // item.netIdentity.AssignClientAuthority(connectionToClient);
         RpcParentItemToPlayer(item, true, Vector3.zero);
+        onInventoryCapacityChange.Invoke(GetInventoryCapacity());
     }
 
     [ClientRpc]
@@ -180,5 +190,17 @@ public class Inventory : NetworkBehaviour
     [Server]
     public void DestroyItemInRightHand() {
         hands.DestroyItem(RIGHT_HAND_IND);
+    }
+
+    void OnHandsChanged(ItemContainer _, ItemContainer newValue) {
+        onHandsChange.Invoke(newValue);
+    }
+
+    void OnInventoryContainersChanged(List<ItemContainer> _, List<ItemContainer> newValue) {
+        onInventoryChange.Invoke(newValue);
+    }
+
+    public int GetInventoryCapacity() {
+        return inventoryContainers.Sum(ic => ic.capacity);
     }
 }

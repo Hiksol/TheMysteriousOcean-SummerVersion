@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemName: "\u041A\u0430\u043D\u0438\u0441\u0442\u0440\u0430"
   itemDescription: '-'
-  modelPrefab: {fileID: 919132149155446097, guid: 14db6ce7b90082c439c236530b2a13b9, type: 3}
+  modelPrefab: {fileID: 784175960879635188, guid: 755cbbf1a5d64fb4a812be42b07852e2, type: 3}
   slotCount: 1
   itemFuelType: 0
   itemFuelAmount: 0
@@ -27,4 +27,4 @@ MonoBehaviour:
       type: {class: ItemPropertyFuelCanister, ns: , asm: Assembly-CSharp}
       data:
         maxFuel: 50
-        currentFuel: 50
+        currentFuel: 10

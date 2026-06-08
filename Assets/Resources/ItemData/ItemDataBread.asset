@@ -18,7 +18,12 @@ MonoBehaviour:
   slotCount: 1
   itemFuelType: 3
   itemFuelAmount: 5
-  itemProperties: []
+  itemProperties:
+  - rid: 1077634842465402955
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 1077634842465402955
+      type: {class: ItemPropertyFood, ns: , asm: Assembly-CSharp}
+      data:
+        saturation: 3

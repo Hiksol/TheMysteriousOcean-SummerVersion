@@ -10,19 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f5255f66fe3d06546847130c0bb68596, type: 3}
-  m_Name: ItemDataBreachPatch
+  m_Name: ItemDataPotatoChips
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: "\u0417\u0430\u043F\u043B\u0430\u0442\u043A\u0430"
+  itemName: "\u0427\u0438\u043F\u0441\u044B"
   itemDescription: '-'
-  modelPrefab: {fileID: 8127798234544785361, guid: fce20fa06a60b1141b81fbf9693d0f4b, type: 3}
+  modelPrefab: {fileID: 5225740309872049358, guid: 13cba0ddd8305c94eb64f02781aaee27, type: 3}
   slotCount: 1
-  itemFuelType: 0
-  itemFuelAmount: 0
-  itemProperties:
-  - rid: 2279679109761597440
+  itemFuelType: 3
+  itemFuelAmount: 8
+  itemProperties: []
   references:
     version: 2
-    RefIds:
-    - rid: 2279679109761597440
-      type: {class: ItemPropertyBreachPatch, ns: , asm: Assembly-CSharp}
-      data: 
+    RefIds: []

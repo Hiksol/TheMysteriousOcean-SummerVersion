@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20ae25680468c324c8e109770383f533, type: 3}
+  m_Name: GarageItemWeightedList
+  m_EditorClassIdentifier: Assembly-CSharp::ItemWeightedList
+  items:
+  - tierName: common
+    itemDatas:
+    - {fileID: 11400000, guid: 132971d96a8bd3449b187a020834c714, type: 2}
+    - {fileID: 11400000, guid: 6071a116c6030ba4d9432e8c10dff0fb, type: 2}
+    - {fileID: 11400000, guid: e8e01e1814821e141b155648fd90df20, type: 2}
+    weight: 100

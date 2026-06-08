@@ -118,6 +118,10 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   itemData: {fileID: 0}
+  itemProperties: []
+  references:
+    version: 2
+    RefIds: []
 --- !u!114 &7738660469872927654
 MonoBehaviour:
   m_ObjectHideFlags: 0

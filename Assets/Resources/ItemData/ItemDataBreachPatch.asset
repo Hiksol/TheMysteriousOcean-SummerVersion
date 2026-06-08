@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemName: "\u0417\u0430\u043F\u043B\u0430\u0442\u043A\u0430"
   itemDescription: '-'
-  modelPrefab: {fileID: 4284086390480741403, guid: 4bcc05d0743b5ad41a5aa6c9b78dc988, type: 3}
+  modelPrefab: {fileID: 8127798234544785361, guid: fce20fa06a60b1141b81fbf9693d0f4b, type: 3}
   slotCount: 1
   itemFuelType: 0
   itemFuelAmount: 0

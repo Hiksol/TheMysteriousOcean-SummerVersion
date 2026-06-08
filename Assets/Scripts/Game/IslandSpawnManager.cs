@@ -51,7 +51,7 @@ public class IslandSpawnManager : NetworkBehaviour
         Vector3 spawnPosition = GetSpawnPosition(radius);
         Collider[] colliders = new Collider[1];
         if (Physics.OverlapSphereNonAlloc(spawnPosition, radius, colliders, ~layersToExlude) > 0) return;
-        Island islandInstance = Instantiate(island, spawnPosition, Quaternion.identity);
+        Island islandInstance = Instantiate(island, spawnPosition, Quaternion.Euler(new(0, GameManager.I.Rng.Range(360), 0)));
         islandInstance.velocity = islandsVelocity;
         NetworkServer.Spawn(islandInstance.gameObject);
     }

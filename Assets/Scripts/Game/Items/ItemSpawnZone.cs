@@ -25,7 +25,7 @@ public class ItemSpawnZone : NetworkBehaviour
         StickToGround(item.gameObject);
         ParentGameObjectToTransform(item.gameObject);
         NetworkServer.Spawn(item.gameObject);
-        RpcParentGameObjectToTransform(item.gameObject);
+        // RpcParentGameObjectToTransform(item.gameObject);
         item.SetItemData(itemData);
     }
 

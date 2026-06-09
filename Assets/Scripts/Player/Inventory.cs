@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mirror;
@@ -19,11 +18,16 @@ public class Inventory : NetworkBehaviour
     public int baseInventorySize = 2;
     [SyncVar(hook = nameof(OnInventoryContainersChanged))] public List<ItemContainer> inventoryContainers = new();
 
+    [Header("Debug")]
+    public int dropRestriction = 0;
+    public bool CanDrop => dropRestriction == 0;
+
     Player player;
     Transform hiddenRoot;
 
     InputAction interactAction;
     InputAction useAction;
+    InputAction dropAction;
     List<KeyControl> inventoryKeys;
 
     public UnityEvent<ItemContainer> onHandsChange;
@@ -39,6 +43,7 @@ public class Inventory : NetworkBehaviour
         hiddenRoot.localPosition = Vector3.zero;
         interactAction = InputSystem.actions.FindAction("Interact");
         useAction = InputSystem.actions.FindAction("Attack");
+        dropAction = InputSystem.actions.FindAction("Drop");
         inventoryKeys = new() {
             Keyboard.current.digit1Key, Keyboard.current.digit2Key,
             Keyboard.current.digit3Key, Keyboard.current.digit4Key,
@@ -52,6 +57,7 @@ public class Inventory : NetworkBehaviour
         if (!isLocalPlayer) return;
         HandleInteract();
         HandleSwitchItems();
+        HandleDropItem();
     }
 
     [Client]
@@ -82,6 +88,25 @@ public class Inventory : NetworkBehaviour
         }
         if (slotIndex == -1) return;
         CmdTrySwapItemsHandsInventory(RIGHT_HAND_IND, inventoryIndex, slotIndex);
+    }
+
+    [Client]
+    void HandleDropItem() {
+        if (dropAction.WasPressedThisFrame()) CmdDropItemInRightHand();
+    }
+
+    [Command]
+    void CmdDropItemInRightHand() {
+        if (!CanDrop) {
+            RpcSendNotification(connectionToClient, "You can't throw objects away here", NotificationInstance.NotificationType.Info);
+            return;
+        }
+        DropItemInRightHand();
+    }
+
+    [TargetRpc]
+    void RpcSendNotification(NetworkConnectionToClient _, string text, NotificationInstance.NotificationType notificationType) {
+        NotificationManager.I.PrintNotification(text, notificationType);
     }
 
     [Command]
@@ -157,7 +182,7 @@ public class Inventory : NetworkBehaviour
         item.transform.position = hide ? Vector3.zero : pos;
         item.transform.localRotation = Quaternion.identity;
         item.gameObject.SetActive(!hide);
-        item.GetComponent<Rigidbody>().isKinematic = true;
+        if (item.TryGetComponent(out Rigidbody rb)) rb.isKinematic = true;
         item.GetComponent<Collider>().enabled = false;
     }
 
@@ -166,6 +191,7 @@ public class Inventory : NetworkBehaviour
         ItemInstance item = hands.FreeSlot(0);
         if (item == null) return null;
         DropItem(item, handPoints[RIGHT_HAND_IND].position);
+        if (isLocalPlayer) OnHandsChanged(null, hands);
         RpcDropItem(item, handPoints[RIGHT_HAND_IND].position);
         return item;
     }
@@ -179,7 +205,7 @@ public class Inventory : NetworkBehaviour
         item.transform.SetParent(null);
         item.transform.position = pos;
         item.gameObject.SetActive(true);
-        item.GetComponent<Rigidbody>().isKinematic = false;
+        if (item.TryGetComponent(out Rigidbody rb)) rb.isKinematic = false;
         item.GetComponent<Collider>().enabled = true;
     }
 
@@ -202,5 +228,9 @@ public class Inventory : NetworkBehaviour
 
     public int GetInventoryCapacity() {
         return inventoryContainers.Sum(ic => ic.capacity);
+    }
+
+    public void AddDropRestriction(int dropRestrictionDelta) {
+        dropRestriction = Mathf.Max(dropRestriction + dropRestrictionDelta, 0);
     }
 }

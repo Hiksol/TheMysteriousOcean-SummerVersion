@@ -27,4 +27,12 @@ public class Player : NetworkBehaviour
     public void AddSaturation(float saturation) {
         currentSaturation = Mathf.Clamp(currentSaturation + saturation, 0f, maxSaturation);
     }
+
+    [Server]
+    public void Die() {
+        KinematicCharacterController.KinematicCharacterMotorState state = PlayerController.CharacterMotor.GetState();
+        state.Position = YachtManager.I.transform.position + Vector3.up * 3f;
+        state.BaseVelocity = Vector3.zero;
+        PlayerController.CharacterMotor.ApplyState(state);
+    }
 }

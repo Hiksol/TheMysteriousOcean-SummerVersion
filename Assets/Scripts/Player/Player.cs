@@ -1,5 +1,6 @@
 using Mirror;
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(PlayerController))]
 [RequireComponent(typeof(Inventory))]
@@ -7,7 +8,20 @@ public class Player : NetworkBehaviour
 {
     public float maxSaturation = 10f;
     [SyncVar] public float currentSaturation = 10f;
-    public float saturationConsumtionPerSecond = 0.1f;
+    public float saturationConsumtionPerSecond = 0.2f;
+
+    [Header("Hunger UI")]
+    public Image[] hungerIcons;
+    public Sprite fullFood;
+    public Sprite halfFood;
+    public Sprite emptyFood;
+
+    [Header("Hunger Warning UI")]
+    public Image hungerWarningImage;   // the image that we are changing the color of
+    public Color normalColor = Color.green;
+    public Color midColor = Color.yellow;
+    public Color lowColor = Color.red;
+
 
     public float Hunger => maxSaturation - currentSaturation;
 
@@ -17,11 +31,14 @@ public class Player : NetworkBehaviour
     void Awake() {
         PlayerController = GetComponent<PlayerController>();
         Inventory = GetComponent<Inventory>();
+        normalColor = hungerWarningImage.color;
     }
 
     void Update() {
         if (!isLocalPlayer) return;
         AddSaturation(-saturationConsumtionPerSecond * Time.deltaTime);
+        UpdateHungerUI(currentSaturation + 0.3f);
+        UpdateStaminaColorUI(currentSaturation);
     }
 
     public void AddSaturation(float saturation) {
@@ -35,4 +52,31 @@ public class Player : NetworkBehaviour
         state.BaseVelocity = Vector3.zero;
         PlayerController.CharacterMotor.ApplyState(state);
     }
+
+    public void UpdateHungerUI(float saturation)
+    {
+        float hungerPoints = Mathf.RoundToInt(saturation / (maxSaturation / 20));
+
+        for (int i = 0; i < hungerIcons.Length; i++)
+        {
+            int iconValue = i * 2;
+            if (hungerPoints >= iconValue + 2)
+                hungerIcons[i].sprite = fullFood;
+            else if (hungerPoints == iconValue + 1)
+                hungerIcons[i].sprite = halfFood;
+            else
+                hungerIcons[i].sprite = emptyFood;
+        }
+    }
+
+    public void UpdateStaminaColorUI(float saturation)
+    {
+        if (saturation < maxSaturation / 4)
+            hungerWarningImage.color = lowColor;
+        else if (saturation < maxSaturation / 2)
+            hungerWarningImage.color = midColor;
+        else
+            hungerWarningImage.color = normalColor;
+    }
+
 }

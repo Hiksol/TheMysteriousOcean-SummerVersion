@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using Mirror;
 using UnityEngine.InputSystem;
 using KinematicCharacterController;
@@ -23,6 +24,23 @@ public class PlayerController : NetworkBehaviour, ICharacterController
 
     [Header("Input")]
     public float jumpBuffer = 0.1f;
+
+    //Stamina
+    [Header("UI")]
+    public Slider staminaSlider;
+    public RectTransform staminaIcon;          // the image that will rotate (RectTransform)
+    public float staminaIconRotSpeed = 360f;   // rotation speed (deg/seconds) at full rate of change
+
+    private float targetRotSpeed = 0f;
+    private float currentRotSpeed = 0f;
+
+    public float rotAcceleration = 8f;
+    public float rotDeceleration = 6f;
+
+
+
+    // For smooth rotation
+    private float currentStaminaDelta = 0f;    // the sign and magnitude of the change in stamina in the current frame
 
     [Header("Debug")]
     public float currentJumpBuffer = 0f;
@@ -59,6 +77,13 @@ public class PlayerController : NetworkBehaviour, ICharacterController
             enabled = false;
             CharacterMotor.enabled = false;
         }
+
+        //Stamina
+        if (staminaSlider != null)
+        {
+            staminaSlider.maxValue = maxStamina;
+            staminaSlider.value = currentStamina;
+        }
     }
 
     public override void OnStartLocalPlayer() {
@@ -81,12 +106,43 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         isSprinting = sprintAction.IsPressed();
         if (isSprinting && moveInput.sqrMagnitude != 0) AddStamina(-staminaSprintigPerSecond * Time.deltaTime);
         else AddStamina(staminaRegenPerSecond / GetStaminaRegenDenominator(player.Hunger) * Time.deltaTime);
-    }
 
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (staminaIcon != null)
+        {
+            float direction = Mathf.Sign(currentStaminaDelta);
+
+            // enhance the effect of changing stamina
+            float magnitude = Mathf.Clamp01(Mathf.Abs(currentStaminaDelta) * 50f);
+
+            targetRotSpeed = direction * staminaIconRotSpeed * magnitude;
+
+            if (Mathf.Abs(targetRotSpeed) > 0.01f)
+                currentRotSpeed = Mathf.Lerp(currentRotSpeed, targetRotSpeed, rotAcceleration * Time.deltaTime);
+            else
+                currentRotSpeed = Mathf.Lerp(currentRotSpeed, 0f, rotDeceleration * Time.deltaTime);
+
+            staminaIcon.Rotate(0f, 0f, currentRotSpeed * Time.deltaTime);
+        }
+    }
+    /*
     void AddStamina(float stamina) {
         currentStamina = Mathf.Clamp(currentStamina + stamina, 0f, maxStamina);
-    }
+    }*/
+    void AddStamina(float staminaDelta)
+    {
+        float oldStamina = currentStamina;
+        currentStamina = Mathf.Clamp(currentStamina + staminaDelta, 0f, maxStamina);
+        float realDelta = currentStamina - oldStamina; // clamping accounting
 
+        // We memorize the sign and magnitude of the change for the rotation of the image
+        currentStaminaDelta = realDelta;
+
+        // Updating the slider
+        if (staminaSlider != null)
+            staminaSlider.value = currentStamina;
+    }
+    /////////////////////////////////////////////////////////////////////////////////
     float GetStaminaRegenDenominator(float hunger) {
         if (hunger <= 0) return 1;
         return 9 * Mathf.Pow(hunger / 10, 5) + 1;

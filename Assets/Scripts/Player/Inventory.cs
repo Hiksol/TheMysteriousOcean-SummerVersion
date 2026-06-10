@@ -233,4 +233,10 @@ public class Inventory : NetworkBehaviour
     public void AddDropRestriction(int dropRestrictionDelta) {
         dropRestriction = Mathf.Max(dropRestriction + dropRestrictionDelta, 0);
     }
+
+    public IEnumerable<ItemInstance> GetAllItems() {
+        foreach (ItemInstance itemInstance in hands.GetAllItems()) yield return itemInstance;
+        foreach (ItemContainer itemContainer in inventoryContainers)
+            foreach (ItemInstance itemInstance in itemContainer.GetAllItems()) yield return itemInstance;
+    }
 }

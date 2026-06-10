@@ -75,8 +75,8 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         if (jumpAction.WasPressedThisFrame()) currentJumpBuffer = jumpBuffer;
         else currentJumpBuffer = Mathf.Max(currentJumpBuffer - Time.deltaTime, 0);
         if (Keyboard.current.rKey.wasPressedThisFrame) {
-            Cursor.lockState = Cursor.visible ? CursorLockMode.Locked : CursorLockMode.None;
             Cursor.visible = !Cursor.visible;
+            Cursor.lockState = Cursor.visible ? CursorLockMode.None : CursorLockMode.Locked;
         }
         isSprinting = sprintAction.IsPressed();
         if (isSprinting && moveInput.sqrMagnitude != 0) AddStamina(-staminaSprintigPerSecond * Time.deltaTime);

@@ -96,6 +96,11 @@ public class ItemContainer {
         foreach (ItemSlotInfo itemSlotInfo in containerSlots)
             if (itemSlotInfo.item != null) yield return itemSlotInfo.item;
     }
+
+    public IEnumerable<(ItemInstance item, int ind)> GetAllItemsFull() {
+        for (int i = 0; i < capacity; i++)
+            if (containerSlots[i].item != null) yield return (containerSlots[i].item, ind: i);
+    }
 }
 
 [Serializable]

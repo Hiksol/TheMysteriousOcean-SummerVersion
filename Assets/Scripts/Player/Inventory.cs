@@ -29,6 +29,7 @@ public class Inventory : NetworkBehaviour
     InputAction useAction;
     InputAction dropAction;
     List<KeyControl> inventoryKeys;
+    int lastItemCount;
 
     public UnityEvent<ItemContainer> onHandsChange;
     public UnityEvent<List<ItemContainer>> onInventoryChange;
@@ -55,9 +56,22 @@ public class Inventory : NetworkBehaviour
 
     void Update() {
         if (!isLocalPlayer) return;
-        HandleInteract();
-        HandleSwitchItems();
-        HandleDropItem();
+        CheckItemCount();
+        if (player.playerState == PlayerState.Default) {
+            HandleInteract();
+            HandleSwitchItems();
+            HandleDropItem();
+        }
+    }
+
+    [Client]
+    void CheckItemCount() {
+        int itemCount = hands.Count + inventoryContainers.Sum(ic => ic.Count);
+        if (itemCount != lastItemCount) {
+            onHandsChange.Invoke(hands);
+            onInventoryChange.Invoke(inventoryContainers);
+        }
+        lastItemCount = itemCount;
     }
 
     [Client]
@@ -111,6 +125,11 @@ public class Inventory : NetworkBehaviour
 
     [Command]
     void CmdTryPickupItem(ItemInstance item) {
+        TryPickupItem(item);
+    }
+
+    [Server]
+    public void TryPickupItem(ItemInstance item) {
         // item.netIdentity.AssignClientAuthority(connectionToClient);
         ItemData itemData = item.itemData;
         int ind = hands.FindFreeIndex(itemData.slotCount);
@@ -238,5 +257,11 @@ public class Inventory : NetworkBehaviour
         foreach (ItemInstance itemInstance in hands.GetAllItems()) yield return itemInstance;
         foreach (ItemContainer itemContainer in inventoryContainers)
             foreach (ItemInstance itemInstance in itemContainer.GetAllItems()) yield return itemInstance;
+    }
+
+    public IEnumerable<(ItemContainer container, ItemInstance item, int ind)> GetAllItemsFull() {
+        foreach ((ItemInstance item, int ind) in hands.GetAllItemsFull()) yield return (container: hands, item, ind);
+        foreach (ItemContainer container in inventoryContainers)
+            foreach ((ItemInstance item, int ind) in container.GetAllItemsFull()) yield return (container, item, ind);
     }
 }

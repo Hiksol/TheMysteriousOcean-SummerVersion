@@ -8,7 +8,9 @@ public class GameManager : SingletonNetworkBehaviour<GameManager>
 
     public override void OnStartServer() {
         base.Start();
-        if (seed == 0) seed = DateTime.Now.GetHashCode();
+        if (seed == 0)
+            seed = DateTime.Now.GetHashCode();
+        Rng = new(seed);
     }
 
     void OnChangeSeed(int _, int newVal) {

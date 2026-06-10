@@ -2350,7 +2350,6 @@ MonoBehaviour:
   craftingRecipes:
   - ingredients:
     - {fileID: 11400000, guid: e8e01e1814821e141b155648fd90df20, type: 2}
-    - {fileID: 11400000, guid: 92972256839b5c84a91bd8c32c7b8ba3, type: 2}
     result: {fileID: 11400000, guid: ce544916177d11c4c8c4434ed999f480, type: 2}
 --- !u!65 &1277317078
 BoxCollider:
@@ -3047,7 +3046,7 @@ Transform:
   m_GameObject: {fileID: 2025560961}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 475.5, y: 267.5, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3068,10 +3067,13 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  itemInstancePrefab: {fileID: 6558904777754820750, guid: 7ab3a7c85f69b5a45afb70bc8d10a0a9, type: 3}
   craftingRecipeRendererPrefab: {fileID: 2476943320439807661, guid: 350560fef0462454c81e5e0ff9a49727, type: 3}
   craftingRendererRoot: {fileID: 1273671608}
   craftingRecipesLayoutRoot: {fileID: 173527249}
   isVisible: 0
+  wasCursorVisible: 0
+  interactableInitiated: {fileID: 0}
 --- !u!114 &2025560964
 MonoBehaviour:
   m_ObjectHideFlags: 0

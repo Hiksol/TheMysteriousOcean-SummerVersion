@@ -22,6 +22,8 @@ public class Player : NetworkBehaviour
     public Color midColor = Color.yellow;
     public Color lowColor = Color.red;
 
+    [Header("Debug")]
+    public PlayerState playerState;
 
     public float Hunger => maxSaturation - currentSaturation;
 
@@ -79,4 +81,12 @@ public class Player : NetworkBehaviour
             hungerWarningImage.color = normalColor;
     }
 
+    public void SetPlayerState(PlayerState newPlayerState) {
+        playerState = newPlayerState;
+    }
+}
+
+public enum PlayerState {
+    Default,
+    Interacting
 }

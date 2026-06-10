@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Mirror;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,5 +33,11 @@ public class CraftingRecipeRenderer : MonoBehaviour
             craftingIngredientRenderer.GetComponentInChildren<TMP_Text>().text = ci.itemName;
             craftingIngredientRenderers.Add(craftingIngredientRenderer);
         });
+    }
+
+    [Client]
+    public void TryCraft() {
+        Player player = NetworkClient.localPlayer.GetComponent<Player>();
+        CraftingManager.I.CmdTryCraft(player, craftingRecipe);
     }
 }

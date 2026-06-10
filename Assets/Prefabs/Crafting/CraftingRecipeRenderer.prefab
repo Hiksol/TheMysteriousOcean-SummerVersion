@@ -74,6 +74,7 @@ GameObject:
   - component: {fileID: 4427465905520740700}
   - component: {fileID: 1542272865984401320}
   - component: {fileID: 2476943320439807661}
+  - component: {fileID: 5813991367274793366}
   m_Layer: 5
   m_Name: CraftingRecipeRenderer
   m_TagString: Untagged
@@ -155,9 +156,40 @@ MonoBehaviour:
   craftingObjectRendererPrefab: {fileID: 2774218757833494546, guid: 87cb20ff928a2954387708f9d15d1606, type: 3}
   craftingResultRenderer: {fileID: 3790064784729257499}
   craftingIngredientsRoot: {fileID: 4413348479128047155}
+  hasIngredientColor: {r: 0, g: 1, b: 0, a: 1}
+  notHasIngredientColor: {r: 0.8627452, g: 0.1921569, b: 0.1960784, a: 1}
   craftingRecipe:
     ingredients: []
     result: {fileID: 0}
+--- !u!114 &5813991367274793366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6792255754644514882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.EventSystems.EventTrigger
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 2476943320439807661}
+          m_TargetAssemblyTypeName: CraftingRecipeRenderer, Assembly-CSharp
+          m_MethodName: TryCraft
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1001 &1304076403194799625
 PrefabInstance:
   m_ObjectHideFlags: 0

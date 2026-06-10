@@ -95,40 +95,40 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     void Update() {
         if (!isLocalPlayer) return;
         lookInput = lookAction.ReadValue<Vector2>();
+        if (player.playerState != PlayerState.Default) lookInput = Vector2.zero;
         HandleCamera();
         moveInput = moveAction.ReadValue<Vector2>();
-        if (jumpAction.WasPressedThisFrame()) currentJumpBuffer = jumpBuffer;
+        if (player.playerState != PlayerState.Default) moveInput = Vector2.zero;
         else currentJumpBuffer = Mathf.Max(currentJumpBuffer - Time.deltaTime, 0);
+        if (player.playerState == PlayerState.Default && jumpAction.WasPressedThisFrame()) currentJumpBuffer = jumpBuffer;
         if (Keyboard.current.rKey.wasPressedThisFrame) {
             Cursor.visible = !Cursor.visible;
             Cursor.lockState = Cursor.visible ? CursorLockMode.None : CursorLockMode.Locked;
         }
-        isSprinting = sprintAction.IsPressed();
+        isSprinting = player.playerState == PlayerState.Default && sprintAction.IsPressed();
         if (isSprinting && moveInput.sqrMagnitude != 0) AddStamina(-staminaSprintigPerSecond * Time.deltaTime);
         else AddStamina(staminaRegenPerSecond / GetStaminaRegenDenominator(player.Hunger) * Time.deltaTime);
 
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (staminaIcon != null)
-        {
-            float direction = Mathf.Sign(currentStaminaDelta);
-
-            // enhance the effect of changing stamina
-            float magnitude = Mathf.Clamp01(Mathf.Abs(currentStaminaDelta) * 50f);
-
-            targetRotSpeed = direction * staminaIconRotSpeed * magnitude;
-
-            if (Mathf.Abs(targetRotSpeed) > 0.01f)
-                currentRotSpeed = Mathf.Lerp(currentRotSpeed, targetRotSpeed, rotAcceleration * Time.deltaTime);
-            else
-                currentRotSpeed = Mathf.Lerp(currentRotSpeed, 0f, rotDeceleration * Time.deltaTime);
-
-            staminaIcon.Rotate(0f, 0f, currentRotSpeed * Time.deltaTime);
-        }
+        UpdateStaminaIcon();
     }
-    /*
-    void AddStamina(float stamina) {
-        currentStamina = Mathf.Clamp(currentStamina + stamina, 0f, maxStamina);
-    }*/
+
+    void UpdateStaminaIcon() {
+        if (staminaIcon == null) return;
+        float direction = Mathf.Sign(currentStaminaDelta);
+
+        // enhance the effect of changing stamina
+        float magnitude = Mathf.Clamp01(Mathf.Abs(currentStaminaDelta) * 50f);
+
+        targetRotSpeed = direction * staminaIconRotSpeed * magnitude;
+
+        if (Mathf.Abs(targetRotSpeed) > 0.01f)
+            currentRotSpeed = Mathf.Lerp(currentRotSpeed, targetRotSpeed, rotAcceleration * Time.deltaTime);
+        else
+            currentRotSpeed = Mathf.Lerp(currentRotSpeed, 0f, rotDeceleration * Time.deltaTime);
+
+        staminaIcon.Rotate(0f, 0f, currentRotSpeed * Time.deltaTime);
+    }
+
     void AddStamina(float staminaDelta)
     {
         float oldStamina = currentStamina;
@@ -142,7 +142,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         if (staminaSlider != null)
             staminaSlider.value = currentStamina;
     }
-    /////////////////////////////////////////////////////////////////////////////////
+
     float GetStaminaRegenDenominator(float hunger) {
         if (hunger <= 0) return 1;
         return 9 * Mathf.Pow(hunger / 10, 5) + 1;
@@ -180,10 +180,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
             Vector3 inputRight = Vector3.Cross(moveInputNormal, CharacterMotor.CharacterUp);
             Vector3 reorientedInput = Vector3.Cross(CharacterMotor.GroundingStatus.GroundNormal, inputRight).normalized * moveInputNormal.magnitude;
             targetMovementVelocity = reorientedInput * currentPlayerSpeed;
-
-            // Smooth movement Velocity
-            currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1 - Mathf.Exp(-15 * deltaTime));
-        } else if (moveInputNormal.sqrMagnitude > 0f) {
+        } else {
             // Add move input
             targetMovementVelocity = moveInputNormal * currentPlayerSpeed;
 
@@ -193,9 +190,13 @@ public class PlayerController : NetworkBehaviour, ICharacterController
                 targetMovementVelocity = Vector3.ProjectOnPlane(targetMovementVelocity, perpenticularObstructionNormal);
             }
 
-            Vector3 velocity = Vector3.ProjectOnPlane(targetMovementVelocity, Physics.gravity);
-            currentVelocity = velocity + new Vector3(0, currentVelocity.y, 0);
+            targetMovementVelocity = Vector3.ProjectOnPlane(targetMovementVelocity, Physics.gravity);
         }
+
+        // Smooth movement Velocity
+        float y = currentVelocity.y;
+        currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1 - Mathf.Exp(-15 * deltaTime));
+        currentVelocity.y = y;
     }
 
     void HandleGravity(ref Vector3 currentVelocity, float deltaTime) {

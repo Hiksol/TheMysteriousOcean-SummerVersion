@@ -53,7 +53,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     bool JumpPressed => currentJumpBuffer > 0f;
 
     Player player;
-    KinematicCharacterMotor characterMotor;
+    public KinematicCharacterMotor CharacterMotor { get; private set; }
     Camera cam;
     InputAction moveAction;
     InputAction lookAction;
@@ -62,8 +62,8 @@ public class PlayerController : NetworkBehaviour, ICharacterController
 
     void Awake() {
         player = GetComponent<Player>();
-        characterMotor = GetComponent<KinematicCharacterMotor>();
-        characterMotor.CharacterController = this;
+        CharacterMotor = GetComponent<KinematicCharacterMotor>();
+        CharacterMotor.CharacterController = this;
         moveAction = InputSystem.actions.FindAction("Move");
         lookAction = InputSystem.actions.FindAction("Look");
         jumpAction = InputSystem.actions.FindAction("Jump");
@@ -72,10 +72,10 @@ public class PlayerController : NetworkBehaviour, ICharacterController
 
     public override void OnStartClient() {
         if (isLocalPlayer) {
-            characterMotor.CharacterController = this;
+            CharacterMotor.CharacterController = this;
         } else {
             enabled = false;
-            characterMotor.enabled = false;
+            CharacterMotor.enabled = false;
         }
 
         //Stamina
@@ -95,40 +95,40 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     void Update() {
         if (!isLocalPlayer) return;
         lookInput = lookAction.ReadValue<Vector2>();
+        if (player.playerState != PlayerState.Default) lookInput = Vector2.zero;
         HandleCamera();
         moveInput = moveAction.ReadValue<Vector2>();
-        if (jumpAction.WasPressedThisFrame()) currentJumpBuffer = jumpBuffer;
+        if (player.playerState != PlayerState.Default) moveInput = Vector2.zero;
         else currentJumpBuffer = Mathf.Max(currentJumpBuffer - Time.deltaTime, 0);
+        if (player.playerState == PlayerState.Default && jumpAction.WasPressedThisFrame()) currentJumpBuffer = jumpBuffer;
         if (Keyboard.current.rKey.wasPressedThisFrame) {
-            Cursor.lockState = Cursor.visible ? CursorLockMode.Locked : CursorLockMode.None;
             Cursor.visible = !Cursor.visible;
+            Cursor.lockState = Cursor.visible ? CursorLockMode.None : CursorLockMode.Locked;
         }
-        isSprinting = sprintAction.IsPressed();
+        isSprinting = player.playerState == PlayerState.Default && sprintAction.IsPressed();
         if (isSprinting && moveInput.sqrMagnitude != 0) AddStamina(-staminaSprintigPerSecond * Time.deltaTime);
         else AddStamina(staminaRegenPerSecond / GetStaminaRegenDenominator(player.Hunger) * Time.deltaTime);
 
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (staminaIcon != null)
-        {
-            float direction = Mathf.Sign(currentStaminaDelta);
-
-            // enhance the effect of changing stamina
-            float magnitude = Mathf.Clamp01(Mathf.Abs(currentStaminaDelta) * 50f);
-
-            targetRotSpeed = direction * staminaIconRotSpeed * magnitude;
-
-            if (Mathf.Abs(targetRotSpeed) > 0.01f)
-                currentRotSpeed = Mathf.Lerp(currentRotSpeed, targetRotSpeed, rotAcceleration * Time.deltaTime);
-            else
-                currentRotSpeed = Mathf.Lerp(currentRotSpeed, 0f, rotDeceleration * Time.deltaTime);
-
-            staminaIcon.Rotate(0f, 0f, currentRotSpeed * Time.deltaTime);
-        }
+        UpdateStaminaIcon();
     }
-    /*
-    void AddStamina(float stamina) {
-        currentStamina = Mathf.Clamp(currentStamina + stamina, 0f, maxStamina);
-    }*/
+
+    void UpdateStaminaIcon() {
+        if (staminaIcon == null) return;
+        float direction = Mathf.Sign(currentStaminaDelta);
+
+        // enhance the effect of changing stamina
+        float magnitude = Mathf.Clamp01(Mathf.Abs(currentStaminaDelta) * 50f);
+
+        targetRotSpeed = direction * staminaIconRotSpeed * magnitude;
+
+        if (Mathf.Abs(targetRotSpeed) > 0.01f)
+            currentRotSpeed = Mathf.Lerp(currentRotSpeed, targetRotSpeed, rotAcceleration * Time.deltaTime);
+        else
+            currentRotSpeed = Mathf.Lerp(currentRotSpeed, 0f, rotDeceleration * Time.deltaTime);
+
+        staminaIcon.Rotate(0f, 0f, currentRotSpeed * Time.deltaTime);
+    }
+
     void AddStamina(float staminaDelta)
     {
         float oldStamina = currentStamina;
@@ -142,7 +142,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         if (staminaSlider != null)
             staminaSlider.value = currentStamina;
     }
-    /////////////////////////////////////////////////////////////////////////////////
+
     float GetStaminaRegenDenominator(float hunger) {
         if (hunger <= 0) return 1;
         return 9 * Mathf.Pow(hunger / 10, 5) + 1;
@@ -151,7 +151,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
 
     public void UpdateRotation(ref Quaternion currentRotation, float deltaTime) {
         Vector2 lookVector = lookInput * (cameraSensivity * deltaTime);
-        currentRotation *= Quaternion.AngleAxis(lookVector.x, characterMotor.CharacterUp);
+        currentRotation *= Quaternion.AngleAxis(lookVector.x, CharacterMotor.CharacterUp);
     }
 
     public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime) {
@@ -172,34 +172,35 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         Vector3 moveInputNormal = (transform.forward * moveInput.y + transform.right * moveInput.x).normalized;
         float currentPlayerSpeed = playerSpeed * (isSprinting && currentStamina > 0 ? speedMultSprinting : 1f);
         Vector3 targetMovementVelocity;
-        if (characterMotor.GroundingStatus.IsStableOnGround) {
+        if (CharacterMotor.GroundingStatus.IsStableOnGround) {
             // Reorient velocity on slope
-            currentVelocity = characterMotor.GetDirectionTangentToSurface(currentVelocity, characterMotor.GroundingStatus.GroundNormal) * currentVelocity.magnitude;
+            currentVelocity = CharacterMotor.GetDirectionTangentToSurface(currentVelocity, CharacterMotor.GroundingStatus.GroundNormal) * currentVelocity.magnitude;
 
             // Calculate target velocity
-            Vector3 inputRight = Vector3.Cross(moveInputNormal, characterMotor.CharacterUp);
-            Vector3 reorientedInput = Vector3.Cross(characterMotor.GroundingStatus.GroundNormal, inputRight).normalized * moveInputNormal.magnitude;
+            Vector3 inputRight = Vector3.Cross(moveInputNormal, CharacterMotor.CharacterUp);
+            Vector3 reorientedInput = Vector3.Cross(CharacterMotor.GroundingStatus.GroundNormal, inputRight).normalized * moveInputNormal.magnitude;
             targetMovementVelocity = reorientedInput * currentPlayerSpeed;
-
-            // Smooth movement Velocity
-            currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1 - Mathf.Exp(-15 * deltaTime));
-        } else if (moveInputNormal.sqrMagnitude > 0f) {
+        } else {
             // Add move input
             targetMovementVelocity = moveInputNormal * currentPlayerSpeed;
 
             // Prevent climbing on un-stable slopes with air movement
-            if (characterMotor.GroundingStatus.FoundAnyGround) {
-                Vector3 perpenticularObstructionNormal = Vector3.Cross(Vector3.Cross(characterMotor.CharacterUp, characterMotor.GroundingStatus.GroundNormal), characterMotor.CharacterUp).normalized;
+            if (CharacterMotor.GroundingStatus.FoundAnyGround) {
+                Vector3 perpenticularObstructionNormal = Vector3.Cross(Vector3.Cross(CharacterMotor.CharacterUp, CharacterMotor.GroundingStatus.GroundNormal), CharacterMotor.CharacterUp).normalized;
                 targetMovementVelocity = Vector3.ProjectOnPlane(targetMovementVelocity, perpenticularObstructionNormal);
             }
 
-            Vector3 velocity = Vector3.ProjectOnPlane(targetMovementVelocity, Physics.gravity);
-            currentVelocity = velocity + new Vector3(0, currentVelocity.y, 0);
+            targetMovementVelocity = Vector3.ProjectOnPlane(targetMovementVelocity, Physics.gravity);
         }
+
+        // Smooth movement Velocity
+        float y = currentVelocity.y;
+        currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1 - Mathf.Exp(-15 * deltaTime));
+        currentVelocity.y = y;
     }
 
     void HandleGravity(ref Vector3 currentVelocity, float deltaTime) {
-        if (!characterMotor.GroundingStatus.IsStableOnGround) {
+        if (!CharacterMotor.GroundingStatus.IsStableOnGround) {
             // Gravity
             currentVelocity += Physics.gravity * (playerGravityMult * deltaTime);
             // Drag
@@ -208,10 +209,10 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     }
 
     void HandleJump(ref Vector3 currentVelocity, float _) {
-        if (JumpPressed && characterMotor.GroundingStatus.IsStableOnGround) {
-            Vector3 jumpDirection = characterMotor.CharacterUp;
-            characterMotor.ForceUnground(0.1f);
-            currentVelocity += (jumpDirection * jumpSpeed) - Vector3.Project(currentVelocity, characterMotor.CharacterUp);
+        if (JumpPressed && CharacterMotor.GroundingStatus.IsStableOnGround) {
+            Vector3 jumpDirection = CharacterMotor.CharacterUp;
+            CharacterMotor.ForceUnground(0.1f);
+            currentVelocity += (jumpDirection * jumpSpeed) - Vector3.Project(currentVelocity, CharacterMotor.CharacterUp);
             currentJumpBuffer = 0f;
         }
     }

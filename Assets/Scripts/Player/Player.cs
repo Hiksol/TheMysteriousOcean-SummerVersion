@@ -22,6 +22,8 @@ public class Player : NetworkBehaviour
     public Color midColor = Color.yellow;
     public Color lowColor = Color.red;
 
+    [Header("Debug")]
+    public PlayerState playerState;
 
     public float Hunger => maxSaturation - currentSaturation;
 
@@ -43,6 +45,14 @@ public class Player : NetworkBehaviour
 
     public void AddSaturation(float saturation) {
         currentSaturation = Mathf.Clamp(currentSaturation + saturation, 0f, maxSaturation);
+    }
+
+    [Server]
+    public void Die() {
+        KinematicCharacterController.KinematicCharacterMotorState state = PlayerController.CharacterMotor.GetState();
+        state.Position = YachtManager.I.transform.position + Vector3.up * 3f;
+        state.BaseVelocity = Vector3.zero;
+        PlayerController.CharacterMotor.ApplyState(state);
     }
 
     public void UpdateHungerUI(float saturation)
@@ -71,4 +81,12 @@ public class Player : NetworkBehaviour
             hungerWarningImage.color = normalColor;
     }
 
+    public void SetPlayerState(PlayerState newPlayerState) {
+        playerState = newPlayerState;
+    }
+}
+
+public enum PlayerState {
+    Default,
+    Interacting
 }

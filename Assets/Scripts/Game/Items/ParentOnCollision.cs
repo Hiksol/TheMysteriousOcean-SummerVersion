@@ -23,8 +23,10 @@ public class ParentOnCollision : NetworkBehaviour
 
     IEnumerator ResetRotation() {
         Vector3 localEuler = transform.localEulerAngles;
-        localEuler.x = localEuler.z = 0;
-        transform.localEulerAngles = localEuler;
+        // localEuler.x = localEuler.z = 0;
+        localEuler.y = 0;
+        // transform.localEulerAngles = localEuler;
+        transform.Rotate(-localEuler);
         yield return null;
     }
 }

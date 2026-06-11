@@ -20,8 +20,8 @@ public class GameManager : SingletonNetworkBehaviour<GameManager>
         Rng = new(newVal);
     }
 
-    [Server]
     void Update() {
+        if (!isServer) return;
         YachtManager ym = YachtManager.I;
         if (ym.currentSinkingProgress >= ym.maxSinkingProgress && gameIsRunning) {
             gameIsRunning = false;

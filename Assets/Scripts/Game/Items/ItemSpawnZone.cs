@@ -22,10 +22,10 @@ public class ItemSpawnZone : NetworkBehaviour
         ItemInstance item = Instantiate(itemPrefab);
         // item.transform.SetPositionAndRotation(transform.position + transform.rotation * GameManager.I.Rng.Vector3Abs(spawnAreaSize / 2), transform.rotation);
         item.transform.SetPositionAndRotation(spawnPlaces.Count > 0 ? GameManager.I.Rng.RandomItem(spawnPlaces).position : transform.position, transform.rotation);
-        StickToGround(item.gameObject);
+        // StickToGround(item.gameObject);
         ParentGameObjectToTransform(item.gameObject);
         NetworkServer.Spawn(item.gameObject);
-        // RpcParentGameObjectToTransform(item.gameObject);
+        RpcParentGameObjectToTransform(item.gameObject);
         item.SetItemData(itemData);
     }
 

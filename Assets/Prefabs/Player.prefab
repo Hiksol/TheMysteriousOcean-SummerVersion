@@ -396,6 +396,7 @@ MonoBehaviour:
   normalColor: {r: 0, g: 0.92156863, b: 1, a: 0.8627451}
   midColor: {r: 1, g: 0.7372549, b: 0, a: 0.8627451}
   lowColor: {r: 0.68235296, g: 0.06666667, b: 0, a: 1}
+  playerState: 0
 --- !u!114 &8879165195416996062
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -419,6 +420,15 @@ MonoBehaviour:
   staminaSprintigPerSecond: 2
   staminaRegenPerSecond: 1.5
   speedMultSprinting: 1.5
+  waterLayer:
+    serializedVersion: 2
+    m_Bits: 16
+  staminaSwimmingPerSecond: 2
+  heightWaterOffset: 0
+  targetVerticalSpeedInWater: 1.5
+  tdVerticalSpeedInWater: 2
+  csVerticalSpeedInWater: 0.75
+  maxVerticalSpeedInWater: 4
   cameraSensivity: 40
   cameraVertialClamp: 80
   jumpBuffer: 0.1
@@ -430,6 +440,8 @@ MonoBehaviour:
   currentJumpBuffer: 0
   currentStamina: 10
   isSprinting: 0
+  inWater: 0
+  waterRaycastPos: {x: 0, y: 0, z: 0}
 --- !u!114 &-1128165539592437011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -489,6 +501,7 @@ MonoBehaviour:
   - {fileID: 8619351310919370399}
   baseInventorySize: 2
   inventoryContainers: []
+  dropRestriction: 0
   onHandsChange:
     m_PersistentCalls:
       m_Calls: []

@@ -18,6 +18,15 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     public float staminaRegenPerSecond = 1.5f;
     public float speedMultSprinting = 1.5f;
 
+    [Header("Swimming")]
+    public LayerMask waterLayer = 1 << 4;
+    public float staminaSwimmingPerSecond = 2f;
+    public float heightWaterOffset = 0f;
+    public float targetVerticalSpeedInWater = 1.5f;
+    public float tdVerticalSpeedInWater = 3f;
+    public float csVerticalSpeedInWater = 1f;
+    public float maxVerticalSpeedInWater = 2f;
+
     [Header("Camera")]
     public float cameraSensivity = 100f;
     public float cameraVertialClamp = 80f;
@@ -46,6 +55,8 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     public float currentJumpBuffer = 0f;
     public float currentStamina = 10f;
     public bool isSprinting = false;
+    public bool inWater = false;
+    public Vector3 waterRaycastPos;
 
     float cameraXRotation = 0f;
     Vector2 lookInput;
@@ -94,13 +105,11 @@ public class PlayerController : NetworkBehaviour, ICharacterController
 
     void Update() {
         if (!isLocalPlayer) return;
-        lookInput = lookAction.ReadValue<Vector2>();
-        if (player.playerState != PlayerState.Default) lookInput = Vector2.zero;
+        lookInput = player.playerState == PlayerState.Default ? lookAction.ReadValue<Vector2>() : Vector2.zero;
         HandleCamera();
-        moveInput = moveAction.ReadValue<Vector2>();
-        if (player.playerState != PlayerState.Default) moveInput = Vector2.zero;
-        else currentJumpBuffer = Mathf.Max(currentJumpBuffer - Time.deltaTime, 0);
+        moveInput = player.playerState == PlayerState.Default ? moveAction.ReadValue<Vector2>() : Vector2.zero;
         if (player.playerState == PlayerState.Default && jumpAction.WasPressedThisFrame()) currentJumpBuffer = jumpBuffer;
+        else currentJumpBuffer = Mathf.Max(currentJumpBuffer - Time.deltaTime, 0);
         if (Keyboard.current.rKey.wasPressedThisFrame) {
             Cursor.visible = !Cursor.visible;
             Cursor.lockState = Cursor.visible ? CursorLockMode.None : CursorLockMode.Locked;
@@ -108,6 +117,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         isSprinting = player.playerState == PlayerState.Default && sprintAction.IsPressed();
         if (isSprinting && moveInput.sqrMagnitude != 0) AddStamina(-staminaSprintigPerSecond * Time.deltaTime);
         else AddStamina(staminaRegenPerSecond / GetStaminaRegenDenominator(player.Hunger) * Time.deltaTime);
+        CheckWater();
 
         UpdateStaminaIcon();
     }
@@ -202,18 +212,31 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     void HandleGravity(ref Vector3 currentVelocity, float deltaTime) {
         if (!CharacterMotor.GroundingStatus.IsStableOnGround) {
             // Gravity
-            currentVelocity += Physics.gravity * (playerGravityMult * deltaTime);
+            if (!inWater || CharacterMotor.MustUnground()) currentVelocity += Physics.gravity * (playerGravityMult * deltaTime);
+            else {
+                float targetSpeed = targetVerticalSpeedInWater * (transform.position.y > waterRaycastPos.y ? -1 : 1);
+                // currentVelocity.y = Mathf.Lerp(currentVelocity.y, targetSpeed, 1 - Mathf.Exp(-5 * deltaTime));
+                currentVelocity.y = Mathf.Clamp(currentVelocity.y, -maxVerticalSpeedInWater, maxVerticalSpeedInWater);
+                currentVelocity.y = Mathf.MoveTowards(currentVelocity.y, targetSpeed, tdVerticalSpeedInWater * deltaTime + Mathf.Abs(currentVelocity.y) * csVerticalSpeedInWater * deltaTime);
+            }
             // Drag
-            currentVelocity.y *= 1f / (1f + (airDrag * deltaTime));
+            // currentVelocity.y *= 1f / (1f + (airDrag * deltaTime));
         }
     }
 
     void HandleJump(ref Vector3 currentVelocity, float _) {
-        if (JumpPressed && CharacterMotor.GroundingStatus.IsStableOnGround) {
+        if (JumpPressed && (CharacterMotor.GroundingStatus.IsStableOnGround || inWater)) {
             Vector3 jumpDirection = CharacterMotor.CharacterUp;
             CharacterMotor.ForceUnground(0.1f);
             currentVelocity += (jumpDirection * jumpSpeed) - Vector3.Project(currentVelocity, CharacterMotor.CharacterUp);
             currentJumpBuffer = 0f;
+        }
+    }
+
+    void CheckWater() {
+        inWater = Physics.Raycast(transform.position + Vector3.up * (CharacterMotor.Capsule.height / 2f + 2f), Vector3.down, out RaycastHit hit, CharacterMotor.Capsule.height + 2f, waterLayer);
+        if (inWater) {
+            waterRaycastPos = hit.point;
         }
     }
 

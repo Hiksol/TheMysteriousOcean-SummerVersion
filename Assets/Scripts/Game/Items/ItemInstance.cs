@@ -11,13 +11,23 @@ public class ItemInstance : Interactable
 
     GameObject model;
     BoxCollider _collider;
+    [SyncVar(hook = nameof(OnTransformParentChangedHook))] Transform transformParent;
 
     void Awake() {
         _collider = GetComponent<BoxCollider>();
     }
 
     public override void OnStartClient() {
-        OnItemDataChanged(null, itemData);
+        if (itemData != null) OnItemDataChanged(null, itemData);
+    }
+
+    void OnTransformParentChanged() {
+        if (!isServer) return;
+        transformParent = transform.parent;
+    }
+
+    void OnTransformParentChangedHook(Transform _, Transform newValue) {
+        transform.SetParent(newValue, false);
     }
 
     [Server]

@@ -49,6 +49,20 @@ public class Player : NetworkBehaviour
 
     [Server]
     public void Die() {
+        RpcDie(connectionToClient);
+    }
+
+    [TargetRpc]
+    void RpcDie(NetworkConnectionToClient _) {
+        SetPlayerState(PlayerState.Dead);
+        NotificationManager.I.PrintNotification("Respawn in 5 seconds");
+        Invoke(nameof(Respawn), 5f);
+    }
+
+    [Client]
+    void Respawn() {
+        SetPlayerState(PlayerState.Default);
+        PlayerController.currentStamina = PlayerController.maxStamina;
         KinematicCharacterController.KinematicCharacterMotorState state = PlayerController.CharacterMotor.GetState();
         state.Position = YachtManager.I.transform.position + Vector3.up * 3f;
         state.BaseVelocity = Vector3.zero;
@@ -83,10 +97,15 @@ public class Player : NetworkBehaviour
 
     public void SetPlayerState(PlayerState newPlayerState) {
         playerState = newPlayerState;
+        bool isDead = newPlayerState == PlayerState.Dead;
+        PlayerController.CharacterMotor.enabled = !isDead;
+        PlayerController.enabled = !isDead;
+        Inventory.enabled = !isDead;
     }
 }
 
 public enum PlayerState {
     Default,
-    Interacting
+    Interacting,
+    Dead
 }

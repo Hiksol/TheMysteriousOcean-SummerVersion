@@ -29,6 +29,7 @@ public class NotificationInstance : MonoBehaviour
             NotificationType.Danger => dangerColor,
             _ => defaultColor
         };
+        StartCoroutine(FadeAndDestroy());
     }
 
     IEnumerator FadeAndDestroy() {

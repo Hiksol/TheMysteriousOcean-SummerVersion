@@ -115,11 +115,15 @@ public class PlayerController : NetworkBehaviour, ICharacterController
             Cursor.lockState = Cursor.visible ? CursorLockMode.None : CursorLockMode.Locked;
         }
         isSprinting = player.playerState == PlayerState.Default && sprintAction.IsPressed();
-        if (isSprinting && moveInput.sqrMagnitude != 0) AddStamina(-staminaSprintigPerSecond * Time.deltaTime);
-        else AddStamina(staminaRegenPerSecond / GetStaminaRegenDenominator(player.Hunger) * Time.deltaTime);
         CheckWater();
-
+        UpdateStamina();
         UpdateStaminaIcon();
+    }
+
+    void UpdateStamina() {
+        if (inWater) AddStamina(-staminaSwimmingPerSecond * Time.deltaTime);
+        else if (isSprinting && moveInput.sqrMagnitude != 0) AddStamina(-staminaSprintigPerSecond * Time.deltaTime);
+        else AddStamina(staminaRegenPerSecond / GetStaminaRegenDenominator(player.Hunger) * Time.deltaTime);
     }
 
     void UpdateStaminaIcon() {
@@ -212,7 +216,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     void HandleGravity(ref Vector3 currentVelocity, float deltaTime) {
         if (!CharacterMotor.GroundingStatus.IsStableOnGround) {
             // Gravity
-            if (!inWater || CharacterMotor.MustUnground()) currentVelocity += Physics.gravity * (playerGravityMult * deltaTime);
+            if (!inWater || CharacterMotor.MustUnground() || (inWater && currentStamina == 0)) currentVelocity += Physics.gravity * (playerGravityMult * deltaTime);
             else {
                 float targetSpeed = targetVerticalSpeedInWater * (transform.position.y > waterRaycastPos.y ? -1 : 1);
                 // currentVelocity.y = Mathf.Lerp(currentVelocity.y, targetSpeed, 1 - Mathf.Exp(-5 * deltaTime));

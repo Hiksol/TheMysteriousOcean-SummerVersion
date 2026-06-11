@@ -17,6 +17,7 @@ public class Inventory : NetworkBehaviour
     public List<Transform> handPoints;
     public int baseInventorySize = 2;
     [SyncVar(hook = nameof(OnInventoryContainersChanged))] public List<ItemContainer> inventoryContainers = new();
+    public LayerMask waterLayer = 1 << 4;
 
     [Header("Debug")]
     public int dropRestriction = 0;
@@ -79,12 +80,13 @@ public class Inventory : NetworkBehaviour
         bool interactWasPressed = interactAction.WasPressedThisFrame();
         bool useWasPressed = useAction.WasPressedThisFrame();
         if (!interactWasPressed && !useWasPressed) return;
-        bool wasHit = Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, interactionRange);
+        bool wasHit = Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, interactionRange, Physics.DefaultRaycastLayers & ~waterLayer);
         GameObject go = wasHit ? hit.collider.gameObject : null;
-        if (wasHit && interactWasPressed && go.TryGetComponent(out ItemInstance item)) CmdTryPickupItem(item);
-        else if (useWasPressed) {
-            if (wasHit && go.TryGetComponent(out Interactable interactable)) interactable.CmdInteract(player);
-            else if (GetItemInRightHand() is ItemInstance rightHandItem && rightHandItem != null) rightHandItem.Use(player, null);
+        if (wasHit && interactWasPressed) {
+            if (go.TryGetComponent(out ItemInstance item)) CmdTryPickupItem(item);
+            else if (go.TryGetComponent(out Interactable interactable)) interactable.CmdInteract(player);
+        } else if (useWasPressed) {
+            if (GetItemInRightHand() is ItemInstance rightHandItem && rightHandItem != null) rightHandItem.Use(player, null);
         }
     }
 

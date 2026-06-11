@@ -23,15 +23,15 @@ public class ItemSpawnZone : NetworkBehaviour
         // item.transform.SetPositionAndRotation(transform.position + transform.rotation * GameManager.I.Rng.Vector3Abs(spawnAreaSize / 2), transform.rotation);
         item.transform.SetPositionAndRotation(spawnPlaces.Count > 0 ? GameManager.I.Rng.RandomItem(spawnPlaces).position : transform.position, transform.rotation);
         // StickToGround(item.gameObject);
-        ParentGameObjectToTransform(item.gameObject);
         NetworkServer.Spawn(item.gameObject);
+        ParentGameObjectToTransform(item.gameObject);
         RpcParentGameObjectToTransform(item.gameObject);
         item.SetItemData(itemData);
     }
 
     [ClientRpc]
     void RpcParentGameObjectToTransform(GameObject go) {
-        go.transform.SetParent(transform);
+        ParentGameObjectToTransform(go);
     }
 
     void ParentGameObjectToTransform(GameObject go) {

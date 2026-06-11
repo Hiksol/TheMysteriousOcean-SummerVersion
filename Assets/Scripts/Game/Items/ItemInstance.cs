@@ -11,10 +11,15 @@ public class ItemInstance : Interactable
 
     GameObject model;
     BoxCollider _collider;
-    [SyncVar(hook = nameof(OnTransformParentChangedHook))] Transform transformParent;
+    public struct NetworkTransformStruct { public NetworkIdentity ni; public string childName; }
+    [SyncVar(hook = nameof(OnTransformParentChangedHook))] NetworkTransformStruct transformRoot;
 
     void Awake() {
         _collider = GetComponent<BoxCollider>();
+    }
+
+    public override void OnStartServer() {
+        if (transform.parent != null) OnTransformParentChanged();
     }
 
     public override void OnStartClient() {
@@ -23,11 +28,19 @@ public class ItemInstance : Interactable
 
     void OnTransformParentChanged() {
         if (!isServer) return;
-        transformParent = transform.parent;
+        if (transform.parent != null) transformRoot = new() {
+            ni = transform.parent.GetComponentInParent<NetworkIdentity>(),
+            childName = transform.parent.gameObject.name
+        }; else transformRoot = new() {
+            ni = null,
+            childName = ""
+        };
     }
 
-    void OnTransformParentChangedHook(Transform _, Transform newValue) {
-        transform.SetParent(newValue, false);
+    void OnTransformParentChangedHook(NetworkTransformStruct _, NetworkTransformStruct newValue) {
+        if (newValue.ni == null) transform.SetParent(null, false);
+        else if (newValue.ni.gameObject.name == newValue.childName) transform.SetParent(newValue.ni.transform, false);
+        else transform.SetParent(newValue.ni.transform.FindRecursive(newValue.childName), false);
     }
 
     [Server]

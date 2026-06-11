@@ -423,7 +423,7 @@ MonoBehaviour:
   waterLayer:
     serializedVersion: 2
     m_Bits: 16
-  staminaSwimmingPerSecond: 2
+  staminaSwimmingPerSecond: 0.5
   heightWaterOffset: 0
   targetVerticalSpeedInWater: 1.5
   tdVerticalSpeedInWater: 2
@@ -501,6 +501,9 @@ MonoBehaviour:
   - {fileID: 8619351310919370399}
   baseInventorySize: 2
   inventoryContainers: []
+  waterLayer:
+    serializedVersion: 2
+    m_Bits: 16
   dropRestriction: 0
   onHandsChange:
     m_PersistentCalls:

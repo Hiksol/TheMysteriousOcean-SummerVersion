@@ -140,13 +140,13 @@ MonoBehaviour:
   target: {fileID: 7535270318917025030}
   syncPosition: 1
   syncRotation: 1
-  syncScale: 0
+  syncScale: 1
   onlySyncOnChange: 1
   compressRotation: 1
   interpolatePosition: 1
   interpolateRotation: 1
   interpolateScale: 1
-  coordinateSpace: 1
+  coordinateSpace: 0
   timelineOffset: 1
   showGizmos: 0
   showOverlay: 0

@@ -1,7 +1,6 @@
 {
   "dependencies": {
     "com.mackysoft.serializereference-extensions": "https://github.com/mackysoft/Unity-SerializeReferenceExtensions.git?path=Assets/MackySoft/MackySoft.SerializeReferenceExtensions",
-    "com.tripo3d.unitybridge": "file:G:/Donwload/VirusCheck/Tripo3d_Unity_Bridge-latest/Tripo3d_Unity_Bridge",
     "com.unity.ai.navigation": "2.0.12",
     "com.unity.collab-proxy": "2.12.4",
     "com.unity.ide.rider": "3.0.40",

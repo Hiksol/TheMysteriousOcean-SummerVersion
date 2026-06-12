@@ -40,7 +40,7 @@ public class InventoryRenderer : NetworkBehaviour
     }
 
     void OnHandsChange(ItemContainer hands) {
-        OnBaseInventoryChange(hands.containerSlots, handsCells);
+        OnBaseInventoryChange(hands.containerSlots.ToList(), handsCells);
     }
 
     void OnInventoryChange(List<ItemContainer> itemContainers) {

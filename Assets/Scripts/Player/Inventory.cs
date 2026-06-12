@@ -16,7 +16,8 @@ public class Inventory : NetworkBehaviour
     [SyncVar(hook = nameof(OnHandsChanged))] public ItemContainer hands;
     public List<Transform> handPoints;
     public int baseInventorySize = 2;
-    [SyncVar(hook = nameof(OnInventoryContainersChanged))] public List<ItemContainer> inventoryContainers = new();
+    // [SyncVar(hook = nameof(OnInventoryContainersChanged))] public List<ItemContainer> inventoryContainers = new();
+    readonly public SyncList<ItemContainer> inventoryContainers = new();
     public LayerMask waterLayer = 1 << 4;
 
     [Header("Debug")]
@@ -33,13 +34,16 @@ public class Inventory : NetworkBehaviour
     int lastItemCount;
 
     public UnityEvent<ItemContainer> onHandsChange;
+    // public UnityEvent<List<ItemContainer>> onInventoryChange;
     public UnityEvent<List<ItemContainer>> onInventoryChange;
     public UnityEvent<int> onInventoryCapacityChange;
 
     void Awake() {
         player = GetComponent<Player>();
         hands = new(HANDS_COUNT);
-        inventoryContainers = new() { new(baseInventorySize) }; 
+        // inventoryContainers = new() { new(baseInventorySize) };
+        inventoryContainers.Add(new(baseInventorySize));
+        inventoryContainers.OnSet += OnInventoryContainersChanged;
         hiddenRoot = new GameObject("HiddenRoot").transform;
         hiddenRoot.SetParent(transform);
         hiddenRoot.localPosition = Vector3.zero;
@@ -70,7 +74,7 @@ public class Inventory : NetworkBehaviour
         int itemCount = hands.Count + inventoryContainers.Sum(ic => ic.Count);
         if (itemCount != lastItemCount) {
             onHandsChange.Invoke(hands);
-            onInventoryChange.Invoke(inventoryContainers);
+            onInventoryChange.Invoke(inventoryContainers.ToList());
         }
         lastItemCount = itemCount;
     }
@@ -159,8 +163,8 @@ public class Inventory : NetworkBehaviour
         ItemInstance item2 = container2.GetItem(slotIndex2);
         if (!container1.IsSlotFreeForPotentialItem(slotIndex1, item2) ||
             !container2.IsSlotFreeForPotentialItem(slotIndex2, item1)) return;
-        container1.FreeSlot(slotIndex1);
-        container2.FreeSlot(slotIndex2);
+        if (container1.FreeSlot(slotIndex1) != null) ForceUpdateSync(container1);
+        if (container2.FreeSlot(slotIndex2) != null) ForceUpdateSync(container2);
         if (item1 != null) InsertItemIntoContainer(item1, container2, slotIndex2);
         if (item2 != null) InsertItemIntoContainer(item2, container1, slotIndex1);
     }
@@ -173,12 +177,13 @@ public class Inventory : NetworkBehaviour
             itemContainer.InsertItemForce(item, slotIndex);
             Vector3 pos = isHands ? handPoints[slotIndex].position : Vector3.zero;
             // item.netIdentity.AssignClientAuthority(connectionToClient);
+            ForceUpdateSync(itemContainer);
             ParentItemToPlayer(item, !isHands, pos);
             RpcParentItemToPlayer(item, !isHands, pos);
         }
         if (isLocalPlayer) {
             OnHandsChanged(null, hands);
-            OnInventoryContainersChanged(null, inventoryContainers);
+            OnInventoryContainersChanged(-1, null);
         }
     }
 
@@ -212,6 +217,7 @@ public class Inventory : NetworkBehaviour
         ItemInstance item = hands.FreeSlot(0);
         if (item == null) return null;
         DropItem(item, handPoints[RIGHT_HAND_IND].position);
+        ForceUpdateSync(hands);
         if (isLocalPlayer) OnHandsChanged(null, hands);
         RpcDropItem(item, handPoints[RIGHT_HAND_IND].position);
         return item;
@@ -238,14 +244,15 @@ public class Inventory : NetworkBehaviour
     [Server]
     public void DestroyItemInRightHand() {
         hands.DestroyItem(RIGHT_HAND_IND);
+        ForceUpdateSync(hands);
     }
 
     void OnHandsChanged(ItemContainer _, ItemContainer newValue) {
         onHandsChange.Invoke(newValue);
     }
 
-    void OnInventoryContainersChanged(List<ItemContainer> _, List<ItemContainer> newValue) {
-        onInventoryChange.Invoke(newValue);
+    void OnInventoryContainersChanged(int i, ItemContainer newValue) {
+        onInventoryChange.Invoke(inventoryContainers.ToList());
     }
 
     public int GetInventoryCapacity() {
@@ -254,6 +261,16 @@ public class Inventory : NetworkBehaviour
 
     public void AddDropRestriction(int dropRestrictionDelta) {
         dropRestriction = Mathf.Max(dropRestriction + dropRestrictionDelta, 0);
+    }
+
+    void ForceUpdateSync(ItemContainer itemContainer) {
+        bool isHands = hands == itemContainer;
+        if (isHands) hands = hands.Clone();
+        else {
+            int i = inventoryContainers.FindIndex(ic => ic == itemContainer);
+            if (i < 0 || i >= inventoryContainers.Count) return;
+            inventoryContainers[i] = inventoryContainers[i].Clone();
+        }
     }
 
     public IEnumerable<ItemInstance> GetAllItems() {

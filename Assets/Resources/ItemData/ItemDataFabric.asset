@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f5255f66fe3d06546847130c0bb68596, type: 3}
-  m_Name: ItemDataCanister
+  m_Name: ItemDataFabric
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: "\u041A\u0430\u043D\u0438\u0441\u0442\u0440\u0430"
-  itemDescription: '-'
-  modelPrefab: {fileID: 784175960879635188, guid: 755cbbf1a5d64fb4a812be42b07852e2, type: 3}
+  itemName: Fabric
+  itemDescription: Used in crafting
+  modelPrefab: {fileID: 8911282090314539522, guid: af8ab291cfc41c04384d10f0200772e0, type: 3}
   slotCount: 1
-  itemFuelType: 1
-  itemFuelAmount: 10
+  itemFuelType: 2
+  itemFuelAmount: 3
   itemProperties: []
   references:
     version: 2

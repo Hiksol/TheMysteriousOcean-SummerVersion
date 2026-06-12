@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f5255f66fe3d06546847130c0bb68596, type: 3}
-  m_Name: ItemDataCanister
+  m_Name: ItemDataToolBox
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: "\u041A\u0430\u043D\u0438\u0441\u0442\u0440\u0430"
-  itemDescription: '-'
-  modelPrefab: {fileID: 784175960879635188, guid: 755cbbf1a5d64fb4a812be42b07852e2, type: 3}
+  itemName: ToolBox
+  itemDescription: Used in crafting
+  modelPrefab: {fileID: 9147973338160146515, guid: 7770cd8f375ede046a1f390f8f034690, type: 3}
   slotCount: 1
-  itemFuelType: 1
-  itemFuelAmount: 10
+  itemFuelType: 0
+  itemFuelAmount: 0
   itemProperties: []
   references:
     version: 2

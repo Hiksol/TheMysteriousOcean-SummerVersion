@@ -60,6 +60,7 @@ public class GeneratorWithInventory : Interactable
     }
 
     void ParentItem(ItemInstance item, bool hide, Vector3 pos) {
+        if (item == null) return;
         item.gameObject.SetActive(!hide);
         item.transform.position = pos;
         item.transform.SetParent(transform);

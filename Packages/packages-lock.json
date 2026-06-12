@@ -15,14 +15,6 @@
       "dependencies": {},
       "hash": "5fadcb6564f0c6e988641e2e4a4aba4b6b1caafe"
     },
-    "com.tripo3d.unitybridge": {
-      "version": "file:G:/Donwload/VirusCheck/Tripo3d_Unity_Bridge-latest/Tripo3d_Unity_Bridge",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {
-        "com.unity.modules.jsonserialize": "1.0.0"
-      }
-    },
     "com.unity.ai.navigation": {
       "version": "2.0.12",
       "depth": 0,

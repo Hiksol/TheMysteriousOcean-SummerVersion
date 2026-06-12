@@ -39,7 +39,7 @@ public class ItemInstance : Interactable
 
     void OnTransformParentChangedHook(NetworkTransformStruct _, NetworkTransformStruct newValue) {
         string currentParentName = transform.parent != null ? transform.parent.gameObject.name : "";
-        print($"{newValue.childName} --- {currentParentName} --- {newValue.childName == currentParentName}");
+        // print($"{newValue.childName} --- {currentParentName} --- {newValue.childName == currentParentName}");
         if (newValue.childName == currentParentName) return;
         // if (newValue.ni == null) transform.SetParent(null, false);
         // else if (newValue.ni.gameObject.name == newValue.childName) transform.SetParent(newValue.ni.transform, false);

@@ -223,6 +223,7 @@ public class Inventory : NetworkBehaviour
     }
 
     void DropItem(ItemInstance item, Vector3 pos) {
+        if (item == null) return;
         item.transform.SetParent(null);
         item.transform.position = pos;
         item.gameObject.SetActive(true);

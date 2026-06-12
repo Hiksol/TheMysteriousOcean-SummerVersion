@@ -506,7 +506,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  sinkingSpeed: 1
+  sinkingSpeed: 0.5
   sinkingActive: 1
 --- !u!65 &220265435
 BoxCollider:
@@ -2651,7 +2651,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  sinkingSpeed: 1
+  sinkingSpeed: 0.5
   sinkingActive: 1
 --- !u!65 &1832964585
 BoxCollider:

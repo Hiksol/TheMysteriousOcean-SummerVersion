@@ -15,7 +15,17 @@ MonoBehaviour:
   items:
   - tierName: common
     itemDatas:
-    - {fileID: 11400000, guid: 132971d96a8bd3449b187a020834c714, type: 2}
-    - {fileID: 11400000, guid: 6071a116c6030ba4d9432e8c10dff0fb, type: 2}
+    - {fileID: 11400000, guid: efca31798a9de6a4bbf44938eddc7352, type: 2}
+    weight: 30
+  - tierName: rare
+    itemDatas:
+    - {fileID: 11400000, guid: efca31798a9de6a4bbf44938eddc7352, type: 2}
+    - {fileID: 11400000, guid: cae30f9d8d5dc9940b1ed649aec7f673, type: 2}
+    - {fileID: 11400000, guid: 1d09a1afec14a4a48ad6952407e14dde, type: 2}
+    - {fileID: 11400000, guid: 32b7c1beffa1d5a4285a7c67656e46e2, type: 2}
+    - {fileID: 11400000, guid: aaa73276f7a692940906ec963e56ea8e, type: 2}
+    weight: 50
+  - tierName: canister
+    itemDatas:
     - {fileID: 11400000, guid: e8e01e1814821e141b155648fd90df20, type: 2}
-    weight: 100
+    weight: 20

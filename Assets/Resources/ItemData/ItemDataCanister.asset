@@ -16,15 +16,9 @@ MonoBehaviour:
   itemDescription: '-'
   modelPrefab: {fileID: 784175960879635188, guid: 755cbbf1a5d64fb4a812be42b07852e2, type: 3}
   slotCount: 1
-  itemFuelType: 0
-  itemFuelAmount: 0
-  itemProperties:
-  - rid: 2279679109761597512
+  itemFuelType: 1
+  itemFuelAmount: 10
+  itemProperties: []
   references:
     version: 2
-    RefIds:
-    - rid: 2279679109761597512
-      type: {class: ItemPropertyFuelCanister, ns: , asm: Assembly-CSharp}
-      data:
-        maxFuel: 50
-        currentFuel: 10
+    RefIds: []

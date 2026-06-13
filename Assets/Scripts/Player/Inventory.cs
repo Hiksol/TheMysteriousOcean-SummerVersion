@@ -23,6 +23,8 @@ public class Inventory : NetworkBehaviour
     [Header("Debug")]
     public int dropRestriction = 0;
     public bool CanDrop => dropRestriction == 0;
+    public GameObject raycastTarget;
+    public Interactable raycastInteractableTarget;
 
     Player player;
     Transform hiddenRoot;
@@ -66,6 +68,9 @@ public class Inventory : NetworkBehaviour
             HandleInteract();
             HandleSwitchItems();
             HandleDropItem();
+        } else {
+            if (raycastTarget != null) raycastTarget = null;
+            if (raycastInteractableTarget != null) raycastInteractableTarget = null;
         }
     }
 
@@ -83,14 +88,15 @@ public class Inventory : NetworkBehaviour
     void HandleInteract() {
         bool interactWasPressed = interactAction.WasPressedThisFrame();
         bool useWasPressed = useAction.WasPressedThisFrame();
-        if (!interactWasPressed && !useWasPressed) return;
+        // if (!interactWasPressed && !useWasPressed) return;
         bool wasHit = Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, interactionRange, Physics.DefaultRaycastLayers & ~waterLayer);
-        GameObject go = wasHit ? hit.collider.gameObject : null;
+        raycastTarget = wasHit ? hit.collider.gameObject : null;
+        if (raycastTarget != null) raycastInteractableTarget = raycastTarget.GetComponent<Interactable>();
         if (wasHit && interactWasPressed) {
-            if (go.TryGetComponent(out ItemInstance item)) CmdTryPickupItem(item);
-            else if (go.TryGetComponent(out Interactable interactable)) interactable.CmdInteract(player);
+            if (raycastInteractableTarget is ItemInstance item) CmdTryPickupItem(item);
+            else if (raycastInteractableTarget != null) raycastInteractableTarget.CmdInteract(player);
         } else if (useWasPressed) {
-            if (GetItemInRightHand() is ItemInstance rightHandItem && rightHandItem != null) rightHandItem.Use(player, null);
+            if (GetItemInRightHand() is ItemInstance rightHandItem && rightHandItem != null) rightHandItem.CmdUse(player, null);
         }
     }
 

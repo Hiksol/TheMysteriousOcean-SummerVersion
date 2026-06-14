@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Mirror;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : SingletonNetworkBehaviour<GameManager>
@@ -40,10 +41,15 @@ public class GameManager : SingletonNetworkBehaviour<GameManager>
     void RestartGame() {
         NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
         NetworkManager.singleton.StopHost();
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+        RpcRestartGame();
     }
 
     [ClientRpc]
     void RpcRestartGame() {
-        RestartGame();
+        // RestartGame();
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
     }
 }

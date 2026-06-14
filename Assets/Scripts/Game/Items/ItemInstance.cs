@@ -71,7 +71,7 @@ public class ItemInstance : Interactable
         }
     }
 
-    [Command]
+    [Command(requiresAuthority = false)]
     public void CmdUse(Player player, NetworkBehaviour target) {
         Use(player, target);
     }

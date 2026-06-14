@@ -5,7 +5,7 @@ public class SingletonNetworkBehaviour<T> : NetworkBehaviour where T: SingletonN
     public static T I { get; private set; }
     protected virtual bool ShouldDontDestroyOnLoad => false;
 
-    void Awake() {
+    internal void Awake() {
         if (I != null) {
             Destroy(gameObject);
             return;

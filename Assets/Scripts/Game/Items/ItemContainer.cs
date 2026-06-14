@@ -7,7 +7,7 @@ using Mirror;
 public class ItemContainer {
     public ItemInstance containerItem;
     public int capacity;
-    public List<ItemSlotInfo> containerSlots;
+    public ItemSlotInfo[] containerSlots;
 
     public int Count => containerSlots.Count(slot => slot.item != null);
 
@@ -15,12 +15,14 @@ public class ItemContainer {
     public ItemContainer(int capacity) {
         containerItem = null;
         this.capacity = capacity;
-        containerSlots = Utils.CreateItems<ItemSlotInfo>(capacity).ToList();
+        // containerSlots = Utils.CreateItems<ItemSlotInfo>(capacity).ToList();
+        containerSlots = Utils.CreateItems<ItemSlotInfo>(capacity).ToArray();
     }
     public ItemContainer(ItemInstance containerItem, int capacity) {
         this.containerItem = containerItem;
         this.capacity = capacity;
-        containerSlots = Utils.CreateItems<ItemSlotInfo>(capacity).ToList();
+        // containerSlots = Utils.CreateItems<ItemSlotInfo>(capacity).ToList();
+        containerSlots = Utils.CreateItems<ItemSlotInfo>(capacity).ToArray();
     }
 
     public int FindFreeIndex(int itemSlotCount) {
@@ -101,6 +103,8 @@ public class ItemContainer {
         for (int i = 0; i < capacity; i++)
             if (containerSlots[i].item != null) yield return (containerSlots[i].item, ind: i);
     }
+
+    public ItemContainer Clone() { return (ItemContainer)MemberwiseClone(); }
 }
 
 [Serializable]

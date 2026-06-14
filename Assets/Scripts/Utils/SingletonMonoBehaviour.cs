@@ -5,7 +5,7 @@ public class SingletonMonoBehaviour<T> : MonoBehaviour where T: SingletonMonoBeh
     public static T I { get; private set; }
     protected virtual bool ShouldDontDestroyOnLoad => false;
 
-    void Awake() {
+    internal void Awake() {
         if (I != null) {
             Destroy(gameObject.transform.root.gameObject);
             return;

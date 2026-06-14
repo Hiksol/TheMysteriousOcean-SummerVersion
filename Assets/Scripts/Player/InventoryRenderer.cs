@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Mirror;
+using TMPro;
 using UnityEngine;
 
 public class InventoryRenderer : NetworkBehaviour
@@ -8,6 +9,7 @@ public class InventoryRenderer : NetworkBehaviour
     public InventoryRendererCell inventoryRendererCellPrefab;
     public float inventoryRendererCellDelta = 50f;
     public Transform inventoryRendererRoot;
+    public TMP_Text interactTargetText;
 
     Inventory inventory;
     readonly List<InventoryRendererCell> handsCells = new();
@@ -28,6 +30,13 @@ public class InventoryRenderer : NetworkBehaviour
         OnInventoryCapacityChange(inventory.GetInventoryCapacity());
     }
 
+    void Update() {
+        if (inventory.raycastInteractableTarget) {
+            if (!interactTargetText.gameObject.activeSelf) interactTargetText.gameObject.SetActive(true);
+            interactTargetText.text = $"Press E to {(inventory.raycastInteractableTarget is ItemInstance ? "pickup" : "interact")}";
+        } else if (interactTargetText.gameObject.activeSelf) interactTargetText.gameObject.SetActive(false);
+    }
+
     void OnEnable() {
         inventory.onHandsChange.AddListener(OnHandsChange);
         inventory.onInventoryChange.AddListener(OnInventoryChange);
@@ -40,7 +49,7 @@ public class InventoryRenderer : NetworkBehaviour
     }
 
     void OnHandsChange(ItemContainer hands) {
-        OnBaseInventoryChange(hands.containerSlots, handsCells);
+        OnBaseInventoryChange(hands.containerSlots.ToList(), handsCells);
     }
 
     void OnInventoryChange(List<ItemContainer> itemContainers) {

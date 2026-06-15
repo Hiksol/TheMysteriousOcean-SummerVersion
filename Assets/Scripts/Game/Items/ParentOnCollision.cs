@@ -6,7 +6,7 @@ public class ParentOnCollision : NetworkBehaviour
 {
     void OnCollisionEnter(Collision collision) {
         if (!isServer) return;
-        if (collision.collider.CompareTag("Player")) return;
+        if (collision.collider.CompareTag("Player") || collision.collider.TryGetComponent(out ItemInstance _)) return;
         if (TryGetComponent(out ItemInstance item) && item.itemData == null) return;
         if (transform.parent == null) {
             if (TryGetComponent(out Rigidbody rb)) rb.isKinematic = true;

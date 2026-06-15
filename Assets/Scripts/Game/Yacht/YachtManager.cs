@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ public class YachtManager : SingletonNetworkBehaviour<YachtManager>
 
     [Header("Debug")]
     [SyncVar] public float currentSinkingProgress = 0f; // 0 - ok, maxSinkingProgress - defeat
+    public List<YachtBreach> breaches = new();
 
     WobbleWaves wobbleWaves;
     Collider _collider;

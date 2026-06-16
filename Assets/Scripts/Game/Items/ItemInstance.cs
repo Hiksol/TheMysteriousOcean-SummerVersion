@@ -65,7 +65,8 @@ public class ItemInstance : Interactable
         if (itemData) {
             model = Instantiate(itemData.modelPrefab, transform);
             if (model.TryGetComponent(out BoxCollider collider)) {
-                _collider.size = Vector3.Scale(Utils.VectorAbs(model.transform.localRotation * collider.size ), model.transform.localScale);
+                _collider.center = Vector3.Scale(Utils.VectorAbs(model.transform.localRotation * collider.center), model.transform.localScale);
+                _collider.size = Vector3.Scale(Utils.VectorAbs(model.transform.localRotation * collider.size), model.transform.localScale);
                 collider.enabled = false;
             }
         }

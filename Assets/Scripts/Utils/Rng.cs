@@ -26,7 +26,7 @@ public class Rng {
         return random.Next(minInc, maxExc);
     }
     public int RangeInt(int maxExc) {
-        return random.Next(0, maxExc);
+        return random.Next(maxExc);
     }
 
     public Vector3 Vector3Abs(float x, float y, float z) {
@@ -52,5 +52,16 @@ public class Rng {
             if (selectedWeight <= currentWeightsSum) return value;
         }
         return default;
+    }
+
+    public List<T> Shuffle<T>(IEnumerable<T> values) {
+        List<T> list = values.ToList();
+        int n = list.Count;
+        while (n > 1) {
+            n--;
+            int k = RangeInt(n + 1);
+            (list[n], list[k]) = (list[k], list[n]);
+        }
+        return list;
     }
 }

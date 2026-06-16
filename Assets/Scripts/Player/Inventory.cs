@@ -91,7 +91,8 @@ public class Inventory : NetworkBehaviour
         // if (!interactWasPressed && !useWasPressed) return;
         bool wasHit = Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, interactionRange, Physics.DefaultRaycastLayers & ~waterLayer);
         raycastTarget = wasHit ? hit.collider.gameObject : null;
-        if (raycastTarget != null) raycastInteractableTarget = raycastTarget.GetComponent<Interactable>();
+        if (raycastTarget != null && raycastTarget.TryGetComponent(out Interactable interactable) && interactable.owner == null) raycastInteractableTarget = raycastTarget.GetComponent<Interactable>();
+        else if (raycastInteractableTarget != null) raycastInteractableTarget = null;
         if (wasHit && interactWasPressed) {
             if (raycastInteractableTarget is ItemInstance item) CmdTryPickupItem(item);
             else if (raycastInteractableTarget != null) raycastInteractableTarget.CmdInteract(player);
@@ -143,6 +144,7 @@ public class Inventory : NetworkBehaviour
     [Server]
     public void TryPickupItem(ItemInstance item) {
         // item.netIdentity.AssignClientAuthority(connectionToClient);
+        item.owner = player;
         ItemData itemData = item.itemData;
         int ind = hands.FindFreeIndex(itemData.slotCount);
         if (ind == RIGHT_HAND_IND) {
@@ -222,6 +224,8 @@ public class Inventory : NetworkBehaviour
     public ItemInstance DropItemInRightHand() {
         ItemInstance item = hands.FreeSlot(0);
         if (item == null) return null;
+        // item.netIdentity.RemoveClientAuthority();
+        item.owner = null;
         DropItem(item, handPoints[RIGHT_HAND_IND].position);
         ForceUpdateSync(hands);
         if (isLocalPlayer) OnHandsChanged(null, hands);

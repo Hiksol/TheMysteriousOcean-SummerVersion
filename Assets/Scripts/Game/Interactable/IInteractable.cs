@@ -2,6 +2,8 @@ using Mirror;
 
 public class Interactable : NetworkBehaviour
 {
+    [SyncVar] public Player owner = null;
+
     [Command(requiresAuthority = false)]
     public void CmdInteract(Player player) {
         ItemInstance item = player.Inventory.GetItemInRightHand();

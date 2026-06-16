@@ -37,23 +37,27 @@ public class Player : NetworkBehaviour
     }
 
     void Update() {
-        if (!isLocalPlayer) return;
-        AddSaturation(-saturationConsumtionPerSecond * Time.deltaTime);
-        UpdateHungerUI(currentSaturation + 0.3f);
-        UpdateStaminaColorUI(currentSaturation);
+        if (isServer) {
+            AddSaturation(-saturationConsumtionPerSecond * Time.deltaTime);
+        }
+        if (isLocalPlayer) {
+            UpdateHungerUI(currentSaturation + 0.3f);
+            UpdateStaminaColorUI(currentSaturation);
+        }
     }
 
+    [Server]
     public void AddSaturation(float saturation) {
         currentSaturation = Mathf.Clamp(currentSaturation + saturation, 0f, maxSaturation);
     }
 
     [Server]
     public void Die() {
-        RpcDie(connectionToClient);
+        RpcDie();
     }
 
-    [TargetRpc]
-    void RpcDie(NetworkConnectionToClient _) {
+    [ClientRpc]
+    void RpcDie() {
         SetPlayerState(PlayerState.Dead);
         NotificationManager.I.PrintNotification("Respawn in 5 seconds");
         Invoke(nameof(Respawn), 5f);

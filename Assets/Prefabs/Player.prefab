@@ -429,7 +429,7 @@ MonoBehaviour:
   tdVerticalSpeedInWater: 2
   csVerticalSpeedInWater: 0.75
   maxVerticalSpeedInWater: 4
-  cameraSensivity: 5
+  cameraSensivity: 15
   cameraVertialClamp: 80
   jumpBuffer: 0.1
   staminaSlider: {fileID: 211777076436279901}

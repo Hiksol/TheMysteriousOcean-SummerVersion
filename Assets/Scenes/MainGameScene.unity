@@ -363,6 +363,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  owner: {fileID: 0}
   slotsCount: 9
   acceptableFuels: 02000000
   battery: {fileID: 1493298043}
@@ -506,6 +507,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  owner: {fileID: 0}
   sinkingSpeed: 0.5
   sinkingActive: 1
 --- !u!65 &220265435
@@ -994,6 +996,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  owner: {fileID: 0}
   battery: {fileID: 1493298043}
   energyConsumptionPerSecond: 0.1
   sinkingProgressDecreasePerSecond: 5
@@ -1582,6 +1585,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  owner: {fileID: 0}
   craftingRecipes:
   - ingredients:
     - {fileID: 11400000, guid: efca31798a9de6a4bbf44938eddc7352, type: 2}
@@ -2044,6 +2048,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  owner: {fileID: 0}
   maxFuel: 100
   acceptableFuels: 01000000
   battery: {fileID: 1493298043}
@@ -2651,6 +2656,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  owner: {fileID: 0}
   sinkingSpeed: 0.5
   sinkingActive: 1
 --- !u!65 &1832964585
@@ -2918,6 +2924,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  owner: {fileID: 0}
   slotsCount: 9
   acceptableFuels: 03000000
   battery: {fileID: 1493298043}

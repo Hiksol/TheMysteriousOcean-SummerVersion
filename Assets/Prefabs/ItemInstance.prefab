@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 2191496385695399543}
   - component: {fileID: 8605007058811085910}
   - component: {fileID: 6558904777754820750}
-  - component: {fileID: 7738660469872927654}
   - component: {fileID: 6574990552695223989}
+  - component: {fileID: 7738660469872927654}
   m_Layer: 0
   m_Name: ItemInstance
   m_TagString: Untagged
@@ -117,11 +117,27 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  owner: {fileID: 0}
   itemData: {fileID: 0}
   itemProperties: []
   references:
     version: 2
     RefIds: []
+--- !u!114 &6574990552695223989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2617934218488871334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c36fd01d7e9ac943b453ce47cdf6a92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ParentOnCollision
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
 --- !u!114 &7738660469872927654
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -143,9 +159,9 @@ MonoBehaviour:
   syncScale: 1
   onlySyncOnChange: 1
   compressRotation: 1
-  interpolatePosition: 1
-  interpolateRotation: 1
-  interpolateScale: 1
+  interpolatePosition: 0
+  interpolateRotation: 0
+  interpolateScale: 0
   coordinateSpace: 0
   timelineOffset: 1
   showGizmos: 0
@@ -156,18 +172,3 @@ MonoBehaviour:
   rotationSensitivity: 0.01
   positionPrecision: 0.01
   scalePrecision: 0.01
---- !u!114 &6574990552695223989
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2617934218488871334}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c36fd01d7e9ac943b453ce47cdf6a92, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ParentOnCollision
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0

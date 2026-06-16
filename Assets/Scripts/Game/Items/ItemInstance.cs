@@ -19,23 +19,23 @@ public class ItemInstance : Interactable
     }
 
     public override void OnStartServer() {
-        if (transform.parent != null) OnTransformParentChanged();
+        // if (transform.parent != null) OnTransformParentChanged();
     }
 
     public override void OnStartClient() {
         if (itemData != null) OnItemDataChanged(null, itemData);
     }
 
-    void OnTransformParentChanged() {
-        if (!isServer) return;
-        if (transform.parent != null) transformRoot = new() {
-            ni = transform.parent.GetComponentInParent<NetworkIdentity>(),
-            childName = transform.parent.gameObject.name
-        }; else transformRoot = new() {
-            ni = null,
-            childName = ""
-        };
-    }
+    // void OnTransformParentChanged() {
+    //     if (!isServer) return;
+    //     if (transform.parent != null) transformRoot = new() {
+    //         ni = transform.parent.GetComponentInParent<NetworkIdentity>(),
+    //         childName = transform.parent.gameObject.name
+    //     }; else transformRoot = new() {
+    //         ni = null,
+    //         childName = ""
+    //     };
+    // }
 
     void OnTransformParentChangedHook(NetworkTransformStruct _, NetworkTransformStruct newValue) {
         string currentParentName = transform.parent != null ? transform.parent.gameObject.name : "";
@@ -65,8 +65,8 @@ public class ItemInstance : Interactable
         if (itemData) {
             model = Instantiate(itemData.modelPrefab, transform);
             if (model.TryGetComponent(out BoxCollider collider)) {
-                _collider.center = Vector3.Scale(Utils.VectorAbs(model.transform.localRotation * collider.center), model.transform.localScale);
-                _collider.size = Vector3.Scale(Utils.VectorAbs(model.transform.localRotation * collider.size), model.transform.localScale);
+                _collider.center = Vector3.Scale((model.transform.localRotation * collider.center).Abs(), model.transform.localScale);
+                _collider.size = Vector3.Scale((model.transform.localRotation * collider.size).Abs(), model.transform.localScale);
                 collider.enabled = false;
             }
         }

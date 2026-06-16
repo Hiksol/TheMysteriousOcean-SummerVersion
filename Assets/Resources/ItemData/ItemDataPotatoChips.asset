@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5255f66fe3d06546847130c0bb68596, type: 3}
+  m_Name: ItemDataPotatoChips
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemName: "\u0427\u0438\u043F\u0441\u044B"
+  itemDescription: '-'
+  modelPrefab: {fileID: 5225740309872049358, guid: 13cba0ddd8305c94eb64f02781aaee27, type: 3}
+  slotCount: 1
+  itemFuelType: 3
+  itemFuelAmount: 8
+  itemProperties:
+  - rid: 1077634842465402957
+  references:
+    version: 2
+    RefIds:
+    - rid: 1077634842465402957
+      type: {class: ItemPropertyFood, ns: , asm: Assembly-CSharp}
+      data:
+        saturation: 5

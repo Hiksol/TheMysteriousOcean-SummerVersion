@@ -3,6 +3,8 @@ using UnityEngine.UI;
 using Mirror;
 using UnityEngine.InputSystem;
 using KinematicCharacterController;
+using System.Collections.Generic;
+using System.Linq;
 
 [RequireComponent(typeof(Player))]
 [RequireComponent(typeof(KinematicCharacterMotor))]
@@ -57,6 +59,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     public bool isSprinting = false;
     public bool inWater = false;
     public Vector3 waterRaycastPos;
+    public List<StaminaUseMult> staminaUseMults;
 
     float cameraXRotation = 0f;
     Vector2 lookInput;
@@ -121,9 +124,11 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     }
 
     void UpdateStamina() {
-        if (inWater) AddStamina(-staminaSwimmingPerSecond * Time.deltaTime);
-        else if (isSprinting && moveInput.sqrMagnitude != 0) AddStamina(-staminaSprintigPerSecond * Time.deltaTime);
+        float staminaUseMult = staminaUseMults.Aggregate(1f, (mult, sum) => mult * sum.staminaUseMult);
+        if (inWater) AddStamina(-staminaSwimmingPerSecond * staminaUseMult * Time.deltaTime);
+        else if (isSprinting && moveInput.sqrMagnitude != 0) AddStamina(-staminaSprintigPerSecond * staminaUseMult * Time.deltaTime);
         else AddStamina(staminaRegenPerSecond / GetStaminaRegenDenominator(player.Hunger) * Time.deltaTime);
+        staminaUseMults.ForEach(sum => { if (sum.OnUndate(Time.deltaTime)) staminaUseMults.Remove(sum); });
     }
 
     void UpdateStaminaIcon() {

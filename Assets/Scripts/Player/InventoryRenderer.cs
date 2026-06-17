@@ -3,6 +3,7 @@ using System.Linq;
 using Mirror;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InventoryRenderer : NetworkBehaviour
 {
@@ -10,6 +11,7 @@ public class InventoryRenderer : NetworkBehaviour
     public float inventoryRendererCellDelta = 50f;
     public Transform inventoryRendererRoot;
     public TMP_Text interactTargetText;
+    public Slider useItemSlider;
 
     Inventory inventory;
     readonly List<InventoryRendererCell> handsCells = new();
@@ -24,9 +26,11 @@ public class InventoryRenderer : NetworkBehaviour
             gameObject.SetActive(false);
             return;
         }
-        Utils.Repeat(Inventory.HANDS_COUNT, i => handsCells.Add(
-            Instantiate(inventoryRendererCellPrefab, inventoryRendererRoot.position + Vector3.right * (i * inventoryRendererCellDelta), Quaternion.identity, inventoryRendererRoot)
-        ));
+        Utils.Repeat(Inventory.HANDS_COUNT, i => {
+            InventoryRendererCell cell = Instantiate(inventoryRendererCellPrefab, inventoryRendererRoot);
+            cell.transform.localPosition = Vector3.right * (i * inventoryRendererCellDelta);
+            handsCells.Add(cell);
+        });
         OnInventoryCapacityChange(inventory.GetInventoryCapacity());
     }
 
@@ -35,6 +39,13 @@ public class InventoryRenderer : NetworkBehaviour
             if (!interactTargetText.gameObject.activeSelf) interactTargetText.gameObject.SetActive(true);
             interactTargetText.text = $"Press E to {(inventory.raycastInteractableTarget is ItemInstance ? "pickup" : "interact")}";
         } else if (interactTargetText.gameObject.activeSelf) interactTargetText.gameObject.SetActive(false);
+        if (inventory.IsUsingItem) {
+            if (!useItemSlider.gameObject.activeSelf) useItemSlider.gameObject.SetActive(true);
+            useItemSlider.maxValue = inventory.GetItemInRightHand() is ItemInstance item && item != null ? item.itemData.holdTimeToUse : 1;
+            useItemSlider.value = inventory.useHolding;
+        } else {
+            if (useItemSlider.gameObject.activeSelf) useItemSlider.gameObject.SetActive(false);
+        }
     }
 
     void OnEnable() {
@@ -66,8 +77,11 @@ public class InventoryRenderer : NetworkBehaviour
     }
 
     void OnInventoryCapacityChange(int capacity) {
-        while (inventoryCells.Count < capacity)
-            inventoryCells.Add(Instantiate(inventoryRendererCellPrefab, inventoryRendererRoot.position + Vector3.right * ((Inventory.HANDS_COUNT + inventoryCells.Count) * inventoryRendererCellDelta), Quaternion.identity, inventoryRendererRoot));
+        while (inventoryCells.Count < capacity) {
+            InventoryRendererCell cell = Instantiate(inventoryRendererCellPrefab, inventoryRendererRoot);
+            cell.transform.localPosition = Vector3.right * ((Inventory.HANDS_COUNT + inventoryCells.Count) * inventoryRendererCellDelta);
+            inventoryCells.Add(cell);
+        }
         if (inventoryCells.Count > capacity) {
             for (int i = capacity; i < inventoryCells.Count; i++) Destroy(inventoryCells[i].gameObject);
             inventoryCells.RemoveRange(capacity, inventoryCells.Count - capacity);

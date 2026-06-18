@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 using KinematicCharacterController;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.TextCore.Text;
 
 [RequireComponent(typeof(Player))]
 [RequireComponent(typeof(KinematicCharacterMotor))]
@@ -28,6 +29,10 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     public float tdVerticalSpeedInWater = 3f;
     public float csVerticalSpeedInWater = 1f;
     public float maxVerticalSpeedInWater = 2f;
+
+    [Header("Climbing")]
+    public float climbingSpeed = 3f;
+    public float anchoringDuration = 1f;
 
     [Header("Camera")]
     public float cameraSensivity = 100f;
@@ -57,14 +62,22 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     public float currentJumpBuffer = 0f;
     public float currentStamina = 10f;
     public bool isSprinting = false;
-    public bool inWater = false;
+    public PlayerControllerState state = PlayerControllerState.Default;
+    public ClimbingState climbingState = ClimbingState.Climbing;
     public Vector3 waterRaycastPos;
-    public List<StaminaUseMult> staminaUseMults;
+    public List<StaminaUseMult> staminaUseMults = new();
 
     float cameraXRotation = 0f;
     Vector2 lookInput;
     Vector2 moveInput;
     bool JumpPressed => currentJumpBuffer > 0f;
+    bool IsDefault => state == PlayerControllerState.Default;
+    bool InWater => state == PlayerControllerState.Swimming;
+    bool IsClimbing => state == PlayerControllerState.Climbing;
+    Ladder activeLadder;
+    float onLadderSegmentState;
+    float anchoringTimer = 0f;
+    Vector3 anchoringStartPosition;
 
     Player player;
     public KinematicCharacterMotor CharacterMotor { get; private set; }
@@ -73,6 +86,9 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     InputAction lookAction;
     InputAction jumpAction;
     InputAction sprintAction;
+    InputAction interactAction;
+    readonly Collider[] probedColliders = new Collider[8];
+    Vector3 ladderTargetPosition;
 
     void Awake() {
         player = GetComponent<Player>();
@@ -82,6 +98,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         lookAction = InputSystem.actions.FindAction("Look");
         jumpAction = InputSystem.actions.FindAction("Jump");
         sprintAction = InputSystem.actions.FindAction("Sprint");
+        interactAction = InputSystem.actions.FindAction("Interact");
     }
 
     public override void OnStartClient() {
@@ -90,6 +107,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         } else {
             enabled = false;
             CharacterMotor.enabled = false;
+            return;
         }
 
         //Stamina
@@ -110,23 +128,41 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         if (!isLocalPlayer) return;
         lookInput = player.playerState == PlayerState.Default ? lookAction.ReadValue<Vector2>() : Vector2.zero;
         HandleCamera();
-        moveInput = player.playerState == PlayerState.Default ? moveAction.ReadValue<Vector2>() : Vector2.zero;
-        if (player.playerState == PlayerState.Default && jumpAction.WasPressedThisFrame()) currentJumpBuffer = jumpBuffer;
-        else currentJumpBuffer = Mathf.Max(currentJumpBuffer - Time.deltaTime, 0);
-        if (Keyboard.current.rKey.wasPressedThisFrame) {
-            Cursor.visible = !Cursor.visible;
-            Cursor.lockState = Cursor.visible ? CursorLockMode.None : CursorLockMode.Locked;
-        }
-        isSprinting = player.playerState == PlayerState.Default && sprintAction.IsPressed();
+        HandleMovementInputs();
+        CheckLadder();
         CheckWater();
         UpdateStamina();
         UpdateStaminaIcon();
     }
 
+    void ChangeState(PlayerControllerState newState) {
+        switch (state) {
+            case PlayerControllerState.Climbing:
+                CharacterMotor.SetMovementCollisionsSolvingActivation(true);
+                CharacterMotor.SetGroundSolvingActivation(true);
+                break;
+        }
+        state = newState;
+        switch (state) {
+            case PlayerControllerState.Climbing:
+                CharacterMotor.SetMovementCollisionsSolvingActivation(false);
+                CharacterMotor.SetGroundSolvingActivation(false);
+                ladderTargetPosition = activeLadder.ClosestPointOnLadderSegment(CharacterMotor.TransientPosition, out onLadderSegmentState);
+                ChangeClimbingState(ClimbingState.Anchoring);
+                break;
+        }
+    }
+
+    void ChangeClimbingState(ClimbingState newClimbingState) {
+        climbingState = newClimbingState;
+        anchoringTimer = 0f;
+        anchoringStartPosition = CharacterMotor.TransientPosition;
+    }
+
     void UpdateStamina() {
         float staminaUseMult = staminaUseMults.Aggregate(1f, (mult, sum) => mult * sum.staminaUseMult);
-        if (inWater) AddStamina(-staminaSwimmingPerSecond * staminaUseMult * Time.deltaTime);
-        else if (isSprinting && moveInput.sqrMagnitude != 0) AddStamina(-staminaSprintigPerSecond * staminaUseMult * Time.deltaTime);
+        if (InWater) AddStamina(-staminaSwimmingPerSecond * staminaUseMult * Time.deltaTime);
+        else if (IsDefault && isSprinting && moveInput.sqrMagnitude != 0) AddStamina(-staminaSprintigPerSecond * staminaUseMult * Time.deltaTime);
         else AddStamina(staminaRegenPerSecond / GetStaminaRegenDenominator(player.Hunger) * Time.deltaTime);
         staminaUseMults.ForEach(sum => { if (sum.OnUndate(Time.deltaTime)) staminaUseMults.Remove(sum); });
     }
@@ -177,6 +213,32 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         HandleMovement(ref currentVelocity, deltaTime);
         HandleGravity(ref currentVelocity, deltaTime);
         HandleJump(ref currentVelocity, deltaTime);
+        HandleLadder(ref currentVelocity, deltaTime);
+    }
+
+    public void AfterCharacterUpdate(float deltaTime) {
+        if (!IsClimbing) return;
+        switch (climbingState) {
+            case ClimbingState.Climbing:
+                activeLadder.ClosestPointOnLadderSegment(CharacterMotor.TransientPosition, out onLadderSegmentState);
+                if (Mathf.Abs(onLadderSegmentState) > 0.05f) {
+                    ChangeClimbingState(ClimbingState.DeAnchoring);
+                    // If we're higher than the ladder top point
+                    if (onLadderSegmentState > 0) ladderTargetPosition = activeLadder.topReleasePoint.position;
+                    // If we're lower than the ladder bottom point
+                    else if (onLadderSegmentState < 0) ladderTargetPosition = activeLadder.bottomReleasePoint.position;
+                }
+                break;
+            case ClimbingState.Anchoring:
+            case ClimbingState.DeAnchoring:
+                // Detect transitioning out from anchoring states
+                if (anchoringTimer >= anchoringDuration) {
+                    if (climbingState == ClimbingState.Anchoring) ChangeClimbingState(ClimbingState.Climbing);
+                    else if (climbingState == ClimbingState.DeAnchoring) ChangeState(PlayerControllerState.Default);
+                }
+                anchoringTimer += deltaTime;
+                break;
+        }
     }
 
     void HandleCamera() {
@@ -187,7 +249,22 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         cam.transform.localEulerAngles = camEuler;
     }
 
+    void HandleMovementInputs() {
+        moveInput = player.playerState == PlayerState.Default ? moveAction.ReadValue<Vector2>() : Vector2.zero;
+        if (player.playerState == PlayerState.Default && jumpAction.WasPressedThisFrame()) currentJumpBuffer = jumpBuffer;
+        else currentJumpBuffer = Mathf.Max(currentJumpBuffer - Time.deltaTime, 0);
+        if (Keyboard.current.rKey.wasPressedThisFrame) {
+            Cursor.visible = !Cursor.visible;
+            Cursor.lockState = Cursor.visible ? CursorLockMode.None : CursorLockMode.Locked;
+        }
+        isSprinting = player.playerState == PlayerState.Default && sprintAction.IsPressed();
+    }
+
     void HandleMovement(ref Vector3 currentVelocity, float deltaTime) {
+        if (!IsDefault && !InWater) {
+            currentVelocity.x = currentVelocity.z = 0;
+            return;
+        }
         Vector3 moveInputNormal = (transform.forward * moveInput.y + transform.right * moveInput.x).normalized;
         float currentPlayerSpeed = playerSpeed * (isSprinting && currentStamina > 0 ? speedMultSprinting : 1f);
         Vector3 targetMovementVelocity;
@@ -221,20 +298,20 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     void HandleGravity(ref Vector3 currentVelocity, float deltaTime) {
         if (!CharacterMotor.GroundingStatus.IsStableOnGround) {
             // Gravity
-            if (!inWater || CharacterMotor.MustUnground() || (inWater && currentStamina == 0)) currentVelocity += Physics.gravity * (playerGravityMult * deltaTime);
-            else {
+            if (IsDefault || CharacterMotor.MustUnground() || (InWater && currentStamina == 0)) currentVelocity += Physics.gravity * (playerGravityMult * deltaTime);
+            else if (InWater) {
                 float targetSpeed = targetVerticalSpeedInWater * (transform.position.y > waterRaycastPos.y ? -1 : 1);
                 // currentVelocity.y = Mathf.Lerp(currentVelocity.y, targetSpeed, 1 - Mathf.Exp(-5 * deltaTime));
                 currentVelocity.y = Mathf.Clamp(currentVelocity.y, -maxVerticalSpeedInWater, maxVerticalSpeedInWater);
                 currentVelocity.y = Mathf.MoveTowards(currentVelocity.y, targetSpeed, tdVerticalSpeedInWater * deltaTime + Mathf.Abs(currentVelocity.y) * csVerticalSpeedInWater * deltaTime);
-            }
+            } else if (IsClimbing) currentVelocity.y = 0;
             // Drag
-            // currentVelocity.y *= 1f / (1f + (airDrag * deltaTime));
+            currentVelocity.y *= 1f / (1f + (airDrag * deltaTime));
         }
     }
 
     void HandleJump(ref Vector3 currentVelocity, float _) {
-        if (JumpPressed && (CharacterMotor.GroundingStatus.IsStableOnGround || inWater)) {
+        if (JumpPressed && (CharacterMotor.GroundingStatus.IsStableOnGround || InWater)) {
             Vector3 jumpDirection = CharacterMotor.CharacterUp;
             CharacterMotor.ForceUnground(0.1f);
             currentVelocity += (jumpDirection * jumpSpeed) - Vector3.Project(currentVelocity, CharacterMotor.CharacterUp);
@@ -243,18 +320,65 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     }
 
     void CheckWater() {
-        inWater = Physics.Raycast(transform.position + Vector3.up * (CharacterMotor.Capsule.height / 2f + 2f), Vector3.down, out RaycastHit hit, CharacterMotor.Capsule.height + 2f, waterLayer);
+        bool inWater = Physics.Raycast(transform.position + Vector3.up * (CharacterMotor.Capsule.height / 2f + 2f), Vector3.down, out RaycastHit hit, CharacterMotor.Capsule.height + 2f, waterLayer);
         if (inWater) {
+            if (IsDefault) ChangeState(PlayerControllerState.Swimming);
             waterRaycastPos = hit.point;
+        } else {
+            if (InWater) ChangeState(PlayerControllerState.Default);
+        }
+    }
+
+    void CheckLadder() {
+        if (!interactAction.WasPressedThisFrame()) return;
+        if (CharacterMotor.CharacterOverlap(CharacterMotor.TransientPosition, CharacterMotor.TransientRotation, probedColliders, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide) > 0) {
+            if (probedColliders[0] == null) return;
+            Collider collider = probedColliders.FirstOrDefault(col => col.TryGetComponent(out Ladder _));
+            if (collider != null && collider.TryGetComponent(out Ladder ladder)) {
+                if (IsDefault) {
+                    activeLadder = ladder;
+                    ChangeState(PlayerControllerState.Climbing);
+                } else if (IsClimbing) {
+                    ChangeClimbingState(ClimbingState.DeAnchoring);
+                    ladderTargetPosition = CharacterMotor.TransientPosition;
+                }
+            }
+        }
+    }
+
+    void HandleLadder(ref Vector3 currentVelocity, float deltaTime) {
+        if (!IsClimbing) return;
+        currentVelocity = Vector3.zero;
+        switch (climbingState) {
+            case ClimbingState.Climbing:
+                float ladderInput = moveInput.y * moveInput.magnitude;
+                currentVelocity = activeLadder.transform.up * (ladderInput * climbingSpeed);
+                break;
+            case ClimbingState.Anchoring:
+            case ClimbingState.DeAnchoring:
+                Vector3 tmpPosition = Vector3.Lerp(anchoringStartPosition, ladderTargetPosition, anchoringTimer / anchoringDuration);
+                currentVelocity = CharacterMotor.GetVelocityForMovePosition(CharacterMotor.TransientPosition, tmpPosition, deltaTime);
+                break;
         }
     }
 
     public void BeforeCharacterUpdate(float deltaTime) {}
     public void PostGroundingUpdate(float deltaTime) {}
-    public void AfterCharacterUpdate(float deltaTime) {}
     public bool IsColliderValidForCollisions(Collider coll) { return true; }
     public void OnGroundHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport) {}
     public void OnMovementHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport) {}
     public void ProcessHitStabilityReport(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, Vector3 atCharacterPosition, Quaternion atCharacterRotation, ref HitStabilityReport hitStabilityReport) {}
     public void OnDiscreteCollisionDetected(Collider hitCollider) {}
+
+    public enum PlayerControllerState {
+        Default,
+        Swimming,
+        Climbing
+    }
+
+    public enum ClimbingState {
+        Anchoring,
+        Climbing,
+        DeAnchoring
+    }
 }

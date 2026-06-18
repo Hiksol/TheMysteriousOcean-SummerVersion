@@ -429,6 +429,8 @@ MonoBehaviour:
   tdVerticalSpeedInWater: 2
   csVerticalSpeedInWater: 0.75
   maxVerticalSpeedInWater: 4
+  climbingSpeed: 3
+  anchoringDuration: 0.5
   cameraSensivity: 15
   cameraVertialClamp: 80
   jumpBuffer: 0.1
@@ -440,7 +442,8 @@ MonoBehaviour:
   currentJumpBuffer: 0
   currentStamina: 10
   isSprinting: 0
-  inWater: 0
+  state: 0
+  climbingState: 1
   waterRaycastPos: {x: 0, y: 0, z: 0}
 --- !u!114 &-1128165539592437011
 MonoBehaviour:

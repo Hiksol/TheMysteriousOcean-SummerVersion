@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5255f66fe3d06546847130c0bb68596, type: 3}
   m_Name: ItemDataPotatoChips
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemIcon: {fileID: 21300000, guid: 867ad815a54a82d4ba4e4ce3ce22783e, type: 3}
   itemName: "\u0427\u0438\u043F\u0441\u044B"
   itemDescription: '-'
   modelPrefab: {fileID: 5225740309872049358, guid: 13cba0ddd8305c94eb64f02781aaee27, type: 3}

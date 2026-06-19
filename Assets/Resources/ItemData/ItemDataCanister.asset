@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5255f66fe3d06546847130c0bb68596, type: 3}
   m_Name: ItemDataCanister
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemIcon: {fileID: 21300000, guid: e05aac58cacb537469e517f740736b2f, type: 3}
   itemName: "\u041A\u0430\u043D\u0438\u0441\u0442\u0440\u0430"
   itemDescription: '-'
   modelPrefab: {fileID: 784175960879635188, guid: 755cbbf1a5d64fb4a812be42b07852e2, type: 3}

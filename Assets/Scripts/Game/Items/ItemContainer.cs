@@ -25,6 +25,16 @@ public class ItemContainer {
         containerSlots = Utils.CreateItems<ItemSlotInfo>(capacity).ToArray();
     }
 
+    public bool IsEmpty()
+    {
+        for (int i = 0; i < capacity; i++)
+        {
+            if (GetItem(i) != null)
+                return false;
+        }
+        return true;
+    }
+
     public int FindFreeIndex(int itemSlotCount) {
         int freeSlot = -1;
         if (itemSlotCount < 1) return freeSlot;
@@ -42,29 +52,41 @@ public class ItemContainer {
         return freeSlot;
     }
 
-    public void InsertItemForce(ItemInstance item, int ind) {
-        if (ind < 0 || ind > capacity) return;
-        for (int i = 0; i < item.itemData.slotCount; i++) {
+    public void InsertItemForce(ItemInstance item, int ind)
+    {
+        if (item == null) return;
+        if (ind < 0 || ind + item.itemData.slotCount > capacity) return;
+
+        for (int i = 0; i < item.itemData.slotCount; i++)
+        {
             if (i == 0) containerSlots[ind + i].item = item;
             containerSlots[ind + i].occupiedByDelta = i;
         }
     }
 
-    public ItemInstance GetItem(int ind) {
-        if (ind < 0 || ind > capacity) return null;
+    public ItemInstance GetItem(int ind)
+    {
+        if (ind < 0 || ind >= capacity) return null;
+
         ItemSlotInfo itemSlotInfo = containerSlots[ind];
-        return itemSlotInfo.occupiedByDelta switch {
+        return itemSlotInfo.occupiedByDelta switch
+        {
             -1 => null,
             _ => containerSlots[ind - itemSlotInfo.occupiedByDelta].item
         };
     }
 
-    public ItemInstance FreeSlot(int ind) {
-        if (ind < 0 || ind > capacity) return null;
+    public ItemInstance FreeSlot(int ind)
+    {
+        if (ind < 0 || ind >= capacity) return null;
+
         ItemInstance item = GetItem(ind);
         if (item == null) return null;
+
         int startInd = ind - containerSlots[ind].occupiedByDelta;
-        for (int i = startInd; i < startInd + item.itemData.slotCount; i++) containerSlots[i].Reset();
+        for (int i = startInd; i < startInd + item.itemData.slotCount; i++)
+            containerSlots[i].Reset();
+
         return item;
     }
 

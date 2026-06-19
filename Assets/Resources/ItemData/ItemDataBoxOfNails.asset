@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5255f66fe3d06546847130c0bb68596, type: 3}
   m_Name: ItemDataBoxOfNails
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemIcon: {fileID: 21300000, guid: c1b755b946ef68648922603777e08cf7, type: 3}
   itemName: BoxOfNails
   itemDescription: Used in crafting
   modelPrefab: {fileID: 5578423238347163045, guid: 1ca15ce331f2a8640a8d0a519c177453, type: 3}

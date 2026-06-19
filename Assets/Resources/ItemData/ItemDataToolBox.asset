@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5255f66fe3d06546847130c0bb68596, type: 3}
   m_Name: ItemDataToolBox
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemIcon: {fileID: 21300000, guid: 9e7966d4132aaef4c9343917475e4b24, type: 3}
   itemName: ToolBox
   itemDescription: Used in crafting
   modelPrefab: {fileID: 9147973338160146515, guid: 7770cd8f375ede046a1f390f8f034690, type: 3}

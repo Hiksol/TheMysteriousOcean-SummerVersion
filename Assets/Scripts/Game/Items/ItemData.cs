@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
+using UnityEngine.UI;
 
 [CreateAssetMenu(fileName = "ItemData", menuName = "Scriptable Objects/ItemData")]
 public class ItemData : ScriptableObject
 {
+    public Sprite itemIcon;
     public string itemName;
     public string itemDescription;
     public GameObject modelPrefab;

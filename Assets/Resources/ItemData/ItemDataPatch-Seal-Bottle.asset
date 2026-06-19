@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5255f66fe3d06546847130c0bb68596, type: 3}
   m_Name: ItemDataPatch-Seal-Bottle
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemIcon: {fileID: 21300000, guid: 97047c15b5c2aca4c924159aabc4ebc6, type: 3}
   itemName: Patch-Seal-Bottle
   itemDescription: Used in crafting
   modelPrefab: {fileID: 4708394517847717876, guid: fb65ef95b22c87f47b2d40479ed0963c, type: 3}

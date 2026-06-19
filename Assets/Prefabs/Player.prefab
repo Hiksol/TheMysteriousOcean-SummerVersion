@@ -169,6 +169,8 @@ GameObject:
   - component: {fileID: 8879165195416996062}
   - component: {fileID: -1128165539592437011}
   - component: {fileID: -1145420500779648451}
+  - component: {fileID: 9131040527583956033}
+  - component: {fileID: 926220823795772392}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -515,6 +517,54 @@ MonoBehaviour:
   onInventoryCapacityChange:
     m_PersistentCalls:
       m_Calls: []
+  onSlotChanged:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &9131040527583956033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 665526447211660052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
+  m_PanelSettings: {fileID: 11400000, guid: 2a16dc9d008e1d14c96f432a25c1347e, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: ae242b01ec4f7074fb4f5c5fa74fb394, type: 3}
+  m_SortingOrder: 0
+  m_Position: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
+  m_PivotReferenceSize: 0
+  m_Pivot: 0
+  m_WorldSpaceCollider: {fileID: 0}
+--- !u!114 &926220823795772392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 665526447211660052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8434f11a7bb967458bb4eeacfaca7d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InventoryWindowController
+  uiDocument: {fileID: 9131040527583956033}
+  rowTemplate: {fileID: 9197481963319205126, guid: 6168b37d77744ae4699582abd8fc98a5, type: 3}
+  slotTemplate: {fileID: 9197481963319205126, guid: 3e482469e2675a54781d549af2bdd9b6, type: 3}
+  rowsRootName: rows-root
+  clothesFrameName: ClothesFrame
+  slotsContainerName: SlotsContainer
+  slotButtonName: SlotButton
+  slotImageName: ItemImage
+  clothesFrameSize: 188
+  slotSize: 152
 --- !u!1 &668981748905062561
 GameObject:
   m_ObjectHideFlags: 0

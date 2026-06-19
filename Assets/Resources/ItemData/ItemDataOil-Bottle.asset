@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5255f66fe3d06546847130c0bb68596, type: 3}
   m_Name: ItemDataOil-Bottle
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemIcon: {fileID: 21300000, guid: 7ab23c6543825ea4c9747f47ba039fff, type: 3}
   itemName: Oil-Bottle
   itemDescription: Used in crafting
   modelPrefab: {fileID: 6039641086331129611, guid: ea208f05e5dbeba41bc76f4905b31e8b, type: 3}

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5255f66fe3d06546847130c0bb68596, type: 3}
   m_Name: ItemDataDamagedWoodenPlank
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemIcon: {fileID: 21300000, guid: 298178ea0ea6ff44c8afcf55a1aa1c5e, type: 3}
   itemName: Damaged Wooden Plank
   itemDescription: Used in crafting
   modelPrefab: {fileID: 4249725262997630211, guid: 1096ffbcbbafef74aaa25ce59a3105b6, type: 3}

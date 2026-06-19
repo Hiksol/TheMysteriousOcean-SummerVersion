@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5255f66fe3d06546847130c0bb68596, type: 3}
   m_Name: ItemDataGlue
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemIcon: {fileID: 21300000, guid: 89cdd450654e2bc4fb303958bbdca7d0, type: 3}
   itemName: Glue
   itemDescription: Used in crafting
   modelPrefab: {fileID: 2827638134620092981, guid: 1d9964cf8e46a0240827f9bf8d4d8287, type: 3}

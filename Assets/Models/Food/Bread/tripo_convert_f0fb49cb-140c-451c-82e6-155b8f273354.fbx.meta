@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 19e8f422e2cb44146aee9cb1c86fbb38
+guid: 5a5a14a15bd30bd45b2c856afd5167bd
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -8,7 +8,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: tripo_mat_f0fb49cb
-    second: {fileID: 2100000, guid: d138745c503f6e941b03b3a9c32a3073, type: 2}
+    second: {fileID: 2100000, guid: e10497e2f63a9de4d88b67a228ea7bfb, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -73,7 +73,7 @@ ModelImporter:
     secondaryUVMinLightmapResolution: 40
     secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
-    useFileScale: 1
+    useFileScale: 0
     strictVertexDataChecks: 0
   tangentSpace:
     normalSmoothAngle: 60

@@ -30,6 +30,8 @@ public class Inventory : NetworkBehaviour
     public bool CanDrop => dropRestriction == 0;
     public GameObject raycastTarget;
     public Interactable raycastInteractableTarget;
+    public float useHolding = 0;
+    public bool IsUsingItem => useHolding > 0;
 
     Player player;
     Transform hiddenRoot;
@@ -81,11 +83,10 @@ public class Inventory : NetworkBehaviour
             HandleInteract();
             HandleSwitchItems();
             HandleDropItem();
-        }
-        else
-        {
-            if (raycastTarget != null) raycastTarget = null;
-            if (raycastInteractableTarget != null) raycastInteractableTarget = null;
+        } else {
+            raycastTarget = null;
+            raycastInteractableTarget = null;
+            useHolding = 0;
         }
     }
 
@@ -107,15 +108,21 @@ public class Inventory : NetworkBehaviour
     {
         bool interactWasPressed = interactAction.WasPressedThisFrame();
         bool useWasPressed = useAction.WasPressedThisFrame();
-
-        bool wasHit = Physics.Raycast(
-            Camera.main.transform.position,
-            Camera.main.transform.forward,
-            out RaycastHit hit,
-            interactionRange,
-            Physics.DefaultRaycastLayers & ~waterLayer
-        );
-
+        bool useWasHeld = useAction.IsPressed();
+        ItemInstance rightHandItem = GetItemInRightHand();
+        if (useWasHeld && rightHandItem != null && IsUsingItem) {
+            useHolding += Time.deltaTime;
+            if (useHolding >= rightHandItem.itemData.holdTimeToUse) {
+                rightHandItem.CmdUse(player, null);
+                useHolding = 0;
+            }
+            raycastTarget = null;
+            raycastInteractableTarget = null;
+            return;
+        } else {
+            useHolding = 0;
+        }
+        bool wasHit = Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, interactionRange, Physics.DefaultRaycastLayers & ~waterLayer);
         raycastTarget = wasHit ? hit.collider.gameObject : null;
 
         if (raycastTarget != null &&
@@ -133,11 +140,8 @@ public class Inventory : NetworkBehaviour
         {
             if (raycastInteractableTarget is ItemInstance item) CmdTryPickupItem(item);
             else if (raycastInteractableTarget != null) raycastInteractableTarget.CmdInteract(player);
-        }
-        else if (useWasPressed)
-        {
-            if (GetItemInRightHand() is ItemInstance rightHandItem && rightHandItem != null)
-                rightHandItem.CmdUse(player, null);
+        } else if (useWasPressed) {
+            if (rightHandItem != null) useHolding += Time.deltaTime;
         }
     }
 

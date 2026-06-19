@@ -13,6 +13,7 @@ public class ItemData : ScriptableObject
     public int slotCount = 1;
     public ItemFuelType itemFuelType;
     public float itemFuelAmount;
+    public float holdTimeToUse = 1f;
     [SerializeReference, SubclassSelector] public List<ItemProperty> itemProperties;
 }
 

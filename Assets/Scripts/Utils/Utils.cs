@@ -25,9 +25,4 @@ public static class Utils
         }
         return layerMask;
     }
-
-    public static Vector3 VectorAbs(Vector3 v) {
-        for (int i = 0; i < 3; i++) v[i] = Mathf.Abs(v[i]);
-        return v;
-    }
 }

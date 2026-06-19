@@ -15,10 +15,11 @@ MonoBehaviour:
   itemIcon: {fileID: 21300000, guid: a8eae62d69d09f5469a68bc6dab28a09, type: 3}
   itemName: "\u0425\u043B\u0435\u0431"
   itemDescription: '-'
-  modelPrefab: {fileID: 6029820222160761561, guid: fa7529c65062bde41a77800196e79e9b, type: 3}
+  modelPrefab: {fileID: 4132197687834361369, guid: fa7529c65062bde41a77800196e79e9b, type: 3}
   slotCount: 1
   itemFuelType: 3
   itemFuelAmount: 5
+  holdTimeToUse: 1
   itemProperties:
   - rid: 1077634842465402955
   references:

@@ -17,7 +17,7 @@ public class ItemPropertyChangeStaminaUseMult : ItemProperty
     }
 }
 
-public struct StaminaUseMult {
+public class StaminaUseMult {
     public float staminaUseMult;
     public float remainingTime;
 

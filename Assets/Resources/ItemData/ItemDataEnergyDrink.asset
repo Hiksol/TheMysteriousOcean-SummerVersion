@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5255f66fe3d06546847130c0bb68596, type: 3}
+  m_Name: ItemDataEnergyDrink
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemIcon: {fileID: 0}
+  itemName: "\u042D\u043D\u0435\u0440\u0433\u0435\u0442\u0438\u043A"
+  itemDescription: '-'
+  modelPrefab: {fileID: 4055594542038300450, guid: 3c31aeea411656f47ae1cf987d0fa694, type: 3}
+  slotCount: 1
+  itemFuelType: 0
+  itemFuelAmount: 0
+  holdTimeToUse: 1
+  itemProperties:
+  - rid: 2279679521223868416
+  references:
+    version: 2
+    RefIds:
+    - rid: 2279679521223868416
+      type: {class: ItemPropertyChangeStaminaUseMult, ns: , asm: Assembly-CSharp}
+      data:
+        staminaUseMult: 0.5
+        remainingTime: 5

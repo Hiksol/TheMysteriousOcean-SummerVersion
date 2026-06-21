@@ -165,7 +165,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         if (InWater) AddStamina(-staminaSwimmingPerSecond * staminaUseMult * Time.deltaTime);
         else if (IsDefault && isSprinting && moveInput.sqrMagnitude != 0) AddStamina(-staminaSprintigPerSecond * staminaUseMult * Time.deltaTime);
         else AddStamina(staminaRegenPerSecond / GetStaminaRegenDenominator(player.Hunger) * Time.deltaTime);
-        staminaUseMults.ForEach(sum => { if (sum.OnUndate(Time.deltaTime)) staminaUseMults.Remove(sum); });
+        staminaUseMults.ToList().ForEach(sum => { if (sum.OnUndate(Time.deltaTime)) staminaUseMults.Remove(sum); });
     }
 
     void UpdateStaminaIcon() {

@@ -19,6 +19,7 @@ MonoBehaviour:
   slotCount: 1
   itemFuelType: 0
   itemFuelAmount: 0
+  holdTimeToUse: 0
   itemProperties:
   - rid: 1077635066244890931
   references:

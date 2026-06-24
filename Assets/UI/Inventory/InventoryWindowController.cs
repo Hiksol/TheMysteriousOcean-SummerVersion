@@ -18,6 +18,7 @@ public class InventoryWindowController : MonoBehaviour
     private const string SlotsContainerName = "SlotsContainer";
     private const string SlotButtonName = "SlotButton";
     private const string SlotImageName = "ItemImage";
+    private const string FuelTankNeckTriggerName = "FuelTankNeckTrigger";
 
     private static readonly EquipableContainerType[] RowTypes =
     {
@@ -29,6 +30,7 @@ public class InventoryWindowController : MonoBehaviour
     private Inventory inventory;
     private VisualElement root;
     private VisualElement rowsRoot;
+    VisualElement fuelTankNeckTrigger;
 
     private readonly List<RowBinding> rowBindings = new();
 
@@ -126,6 +128,8 @@ public class InventoryWindowController : MonoBehaviour
             yield break;
         }
 
+        fuelTankNeckTrigger = root.Q<VisualElement>(FuelTankNeckTriggerName);
+
         CacheRows();
         CreateDragGhost();
         SetOpen(false);
@@ -156,6 +160,13 @@ public class InventoryWindowController : MonoBehaviour
 
         if (!isOpen || !isDragging || dragGhost == null || dragGhost.style.display == DisplayStyle.None)
             return;
+
+        if (isDragging && dragSource.Item.TryGetProperty(out ItemPropertyFuelCanister fuelCanister)) {
+            float dragX = dragSource.Visual.worldBound.center.x;
+            if (fuelTankNeckTrigger.worldBound.xMin <= dragX && dragX <= fuelTankNeckTrigger.worldBound.xMax) {
+                print("Overlap");
+            }
+        }
 
         dragGhost.style.left = lastPointerPos.x + 12f;
         dragGhost.style.top = lastPointerPos.y + 12f;

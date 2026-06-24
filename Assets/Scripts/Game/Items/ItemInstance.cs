@@ -52,7 +52,8 @@ public class ItemInstance : Interactable
     [Server]
     public void SetItemData(ItemData itemData) {
         this.itemData = itemData;
-        UpdateModel(itemData);
+        OnItemDataChanged(null, itemData);
+        itemProperties.ForEach(ip => ip.OnStart(this));
     }
 
     void OnItemDataChanged(ItemData _, ItemData newItemData) {
@@ -81,5 +82,10 @@ public class ItemInstance : Interactable
     public void Use(Player player, NetworkBehaviour target) {
         Interactable interactable = (Interactable)target;
         itemProperties.ForEach(itemProperty => itemProperty.OnUse(this, player, interactable));
+    }
+
+    public bool TryGetProperty<T>(out T itemProperty) {
+        itemProperty = itemProperties.OfType<T>().FirstOrDefault();
+        return itemProperty != null;
     }
 }

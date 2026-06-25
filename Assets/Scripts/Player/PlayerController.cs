@@ -70,8 +70,9 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     float cameraXRotation = 0f;
     Vector2 lookInput;
     Vector2 moveInput;
+    public Vector2 MoveInput => moveInput;
     bool JumpPressed => currentJumpBuffer > 0f;
-    bool IsDefault => state == PlayerControllerState.Default;
+    public bool IsDefault => state == PlayerControllerState.Default;
     bool InWater => state == PlayerControllerState.Swimming;
     bool IsClimbing => state == PlayerControllerState.Climbing;
     Ladder activeLadder;
@@ -164,7 +165,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         if (InWater) AddStamina(-staminaSwimmingPerSecond * staminaUseMult * Time.deltaTime);
         else if (IsDefault && isSprinting && moveInput.sqrMagnitude != 0) AddStamina(-staminaSprintigPerSecond * staminaUseMult * Time.deltaTime);
         else AddStamina(staminaRegenPerSecond / GetStaminaRegenDenominator(player.Hunger) * Time.deltaTime);
-        staminaUseMults.ForEach(sum => { if (sum.OnUndate(Time.deltaTime)) staminaUseMults.Remove(sum); });
+        staminaUseMults.ToList().ForEach(sum => { if (sum.OnUndate(Time.deltaTime)) staminaUseMults.Remove(sum); });
     }
 
     void UpdateStaminaIcon() {
@@ -333,7 +334,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         if (!interactAction.WasPressedThisFrame()) return;
         if (CharacterMotor.CharacterOverlap(CharacterMotor.TransientPosition, CharacterMotor.TransientRotation, probedColliders, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide) > 0) {
             if (probedColliders[0] == null) return;
-            Collider collider = probedColliders.FirstOrDefault(col => col.TryGetComponent(out Ladder _));
+            Collider collider = probedColliders.FirstOrDefault(col => col && col.TryGetComponent(out Ladder _));
             if (collider != null && collider.TryGetComponent(out Ladder ladder)) {
                 if (IsDefault) {
                     activeLadder = ladder;

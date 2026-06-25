@@ -3,6 +3,7 @@ using System.Linq;
 using Mirror;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(BoxCollider))]
 public class ItemInstance : Interactable
 {
@@ -10,20 +11,24 @@ public class ItemInstance : Interactable
     [SerializeReference] public List<ItemProperty> itemProperties;
 
     GameObject model;
+    Rigidbody rb;
     BoxCollider _collider;
     public struct NetworkTransformStruct { public NetworkIdentity ni; public string childName; }
     [SyncVar(hook = nameof(OnTransformParentChangedHook))] NetworkTransformStruct transformRoot;
 
     void Awake() {
+        rb = GetComponent<Rigidbody>();
+        rb.isKinematic = true;
         _collider = GetComponent<BoxCollider>();
     }
 
     public override void OnStartServer() {
         // if (transform.parent != null) OnTransformParentChanged();
+        SetItemData(itemData);
     }
 
     public override void OnStartClient() {
-        if (itemData != null) OnItemDataChanged(null, itemData);
+        // if (itemData != null) OnItemDataChanged(null, itemData);
     }
 
     // void OnTransformParentChanged() {
@@ -58,7 +63,8 @@ public class ItemInstance : Interactable
 
     void OnItemDataChanged(ItemData _, ItemData newItemData) {
         UpdateModel(newItemData);
-        itemProperties = newItemData.itemProperties.Clone().ToList();
+        itemProperties = newItemData != null ? newItemData.itemProperties.Clone().ToList() : new();
+        rb.isKinematic = newItemData == null;
     }
 
     void UpdateModel(ItemData itemData) {

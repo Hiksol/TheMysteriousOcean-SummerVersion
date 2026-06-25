@@ -162,7 +162,7 @@ public class InventoryWindowController : MonoBehaviour
             return;
 
         if (isDragging && dragSource.Item.TryGetProperty(out ItemPropertyFuelCanister fuelCanister)) {
-            float dragX = dragSource.Visual.worldBound.center.x;
+            float dragX = dragGhost.worldBound.center.x;
             if (fuelTankNeckTrigger.worldBound.xMin <= dragX && dragX <= fuelTankNeckTrigger.worldBound.xMax) {
                 print("Overlap");
             }

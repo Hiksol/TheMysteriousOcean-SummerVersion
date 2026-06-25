@@ -8,7 +8,7 @@ using UnityEngine;
 public class ItemInstance : Interactable
 {
     [SyncVar(hook = nameof(OnItemDataChanged))] public ItemData itemData;
-    [SerializeReference] public List<ItemProperty> itemProperties;
+    List<ItemProperty> itemProperties;
 
     GameObject model;
     Rigidbody rb;
@@ -56,8 +56,8 @@ public class ItemInstance : Interactable
 
     [Server]
     public void SetItemData(ItemData itemData) {
-        this.itemData = itemData;
         OnItemDataChanged(null, itemData);
+        this.itemData = itemData;
         itemProperties.ForEach(ip => ip.OnStart(this));
     }
 

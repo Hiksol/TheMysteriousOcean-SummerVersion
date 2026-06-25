@@ -10,8 +10,7 @@ public class GameManager : SingletonNetworkBehaviour<GameManager>
     public Rng Rng { get; private set; }
     public bool gameIsRunning = true;
 
-    public override void OnStartServer() {
-        base.Start();
+    protected override void AwakeNew() {
         if (seed == 0)
             seed = DateTime.Now.GetHashCode();
         Rng = new(seed);

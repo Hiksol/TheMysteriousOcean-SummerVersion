@@ -28,4 +28,6 @@ MonoBehaviour:
   - tierName: canister
     itemDatas:
     - {fileID: 11400000, guid: e8e01e1814821e141b155648fd90df20, type: 2}
+    - {fileID: 11400000, guid: 5a434df1c2ad9a747a51e5ef9eca74b3, type: 2}
+    - {fileID: 11400000, guid: c2d3c04e961dce242a48017be4466c50, type: 2}
     weight: 20

@@ -173,6 +173,7 @@ public class InventoryWindowController : MonoBehaviour
 
         if (fuelGenerator.style.display != DisplayStyle.None) fuelLevel.style.maxHeight = new(new Length(generator.currentFuel / generator.maxFuel * 100, LengthUnit.Percent));
 
+        if (isDragging && dragSource.Item == null) EndDrag();
         if (!isOpen || !isDragging || dragGhost == null || dragGhost.style.display == DisplayStyle.None)
             return;
 
@@ -180,7 +181,7 @@ public class InventoryWindowController : MonoBehaviour
         if (isDragging && dragSource.Item.TryGetProperty(out ItemPropertyFuelCanister fuelCanister)) {
             float dragX = dragGhost.worldBound.center.x;
             if (fuelTankNeckTrigger.worldBound.xMin <= dragX && dragX <= fuelTankNeckTrigger.worldBound.xMax) {
-                fuelCanister.CmdTryTransferFuelToGenerator(generator, fuelTransferPerSecond * Time.deltaTime);
+                fuelCanister.CmdTryTransferFuelToGenerator(dragSource.Item, generator, fuelTransferPerSecond * Time.deltaTime);
                 dragGhost.style.rotate = new(new Rotate(
                     Mathf.Lerp(dragGhost.style.rotate.value.angle.value, -45, 10 * Time.deltaTime)
                 ));

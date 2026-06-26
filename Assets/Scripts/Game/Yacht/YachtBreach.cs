@@ -6,6 +6,8 @@ public class YachtBreach : Interactable
     public float sinkingSpeed = 1f;
     public bool sinkingActive = true;
 
+    public ParticleSystem particleSystem;
+
     public override void OnStartServer() {
         YachtManager.I.breaches.Add(this);
     }
@@ -19,5 +21,7 @@ public class YachtBreach : Interactable
     public void Patch() {
         sinkingActive = false;
         YachtManager.I.breaches.Remove(this);
+        if (particleSystem != null)
+            particleSystem.Stop();
     }
 }

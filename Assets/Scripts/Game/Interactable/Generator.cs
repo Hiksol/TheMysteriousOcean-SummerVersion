@@ -9,6 +9,7 @@ public class Generator : Interactable
     public Battery battery;
     public float fuelConsumptionPerSecond = 1;
     public float energyGenerationPerSecond = 1;
+    public ParticleSystem _particleSystem;
 
     [Header("Debug")]
     [SyncVar] public float currentFuel = 0;
@@ -18,19 +19,21 @@ public class Generator : Interactable
         if (currentFuel > 0 && battery) {
             currentFuel = Mathf.Max(currentFuel - Time.deltaTime * fuelConsumptionPerSecond, 0);
             battery.AddCharge(energyGenerationPerSecond * Time.deltaTime);
-        }
+            if (_particleSystem && !_particleSystem.isPlaying) _particleSystem.Play();
+        } else if (_particleSystem && _particleSystem.isPlaying) _particleSystem.Stop();
     }
 
     [Server]
     override public void Interact(Player player, ItemInstance item) {
         Inventory inventory = player.Inventory;
-        if (item == null) return;
-        if (acceptableFuels.Contains(item.itemData.itemFuelType)) {
-            AddFuel(item.itemData.itemFuelAmount);
-            inventory.DestroyItemInRightHand();
-        } else {
-            item.Use(player, this);
-        }
+        // if (item == null) return;
+        // if (acceptableFuels.Contains(item.itemData.itemFuelType)) {
+        //     AddFuel(item.itemData.itemFuelAmount);
+        //     inventory.DestroyItemInRightHand();
+        // } else {
+        //     item.Use(player, this);
+        // }
+        inventory.OpenInventoryWithGenerator(this);
     }
 
     [Server]

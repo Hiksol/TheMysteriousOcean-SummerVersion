@@ -150,5 +150,9 @@ public class InventoryRenderer : NetworkBehaviour
 
             inventoryCells.RemoveRange(capacity, inventoryCells.Count - capacity);
         }
+
+        inventoryCells.ForEachI((inventoryCell, i) => {
+            inventoryCell.SetAnnotationText((i + 1).ToString());
+        });
     }
 }

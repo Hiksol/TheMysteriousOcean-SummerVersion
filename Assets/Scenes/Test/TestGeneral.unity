@@ -16143,6 +16143,7 @@ MonoBehaviour:
     containerItem: {fileID: 0}
     capacity: 0
     containerSlots: []
+  _particleSystem: {fileID: 0}
   currentFuel: 0
 --- !u!65 &1736172984
 BoxCollider:
@@ -17294,6 +17295,7 @@ MonoBehaviour:
   battery: {fileID: 317061413307024570}
   energyConsumptionPerSecond: 0.1
   sinkingProgressDecreasePerSecond: 5
+  _particleSystem: {fileID: 391368857}
   pumpEnabled: 0
 --- !u!114 &2840256905711682756
 MonoBehaviour:
@@ -17320,6 +17322,7 @@ MonoBehaviour:
     containerItem: {fileID: 0}
     capacity: 0
     containerSlots: []
+  _particleSystem: {fileID: 1151272771}
   currentFuel: 0
 --- !u!1 &2840317454529670358
 GameObject:
@@ -17573,6 +17576,7 @@ MonoBehaviour:
     containerItem: {fileID: 0}
     capacity: 0
     containerSlots: []
+  _particleSystem: {fileID: 1307011186}
   currentFuel: 0
 --- !u!33 &3414874584824718254
 MeshFilter:
@@ -18550,6 +18554,7 @@ MonoBehaviour:
   battery: {fileID: 317061413307024570}
   fuelConsumptionPerSecond: 1
   energyGenerationPerSecond: 1
+  _particleSystem: {fileID: 0}
   currentFuel: 0
 --- !u!65 &7423476832246919195
 BoxCollider:
@@ -19082,3 +19087,4 @@ SceneRoots:
   - {fileID: 1526941833}
   - {fileID: 830849783}
   - {fileID: 2121275087}
+  - {fileID: 1830071031}

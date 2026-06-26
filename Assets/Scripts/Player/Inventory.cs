@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
 [RequireComponent(typeof(Player))]
+[RequireComponent(typeof(InventoryWindowController))]
 public class Inventory : NetworkBehaviour
 {
     public float interactionRange = 3f;
@@ -34,6 +35,7 @@ public class Inventory : NetworkBehaviour
     public bool IsUsingItem => useHolding > 0;
 
     Player player;
+    InventoryWindowController inventoryWindowController;
     Transform hiddenRoot;
 
     InputAction interactAction;
@@ -50,6 +52,7 @@ public class Inventory : NetworkBehaviour
     void Awake()
     {
         player = GetComponent<Player>();
+        inventoryWindowController = GetComponent<InventoryWindowController>();
         hands = new(HANDS_COUNT);
 
         inventoryContainers.OnSet += OnInventoryContainersChanged;
@@ -529,5 +532,15 @@ public class Inventory : NetworkBehaviour
 
         if (index < inventoryContainerTypes.Count) inventoryContainerTypes.RemoveAt(index);
         if (index < inventoryContainerHeaderItems.Count) inventoryContainerHeaderItems.RemoveAt(index);
+    }
+
+    [Server]
+    public void OpenInventoryWithGenerator(Generator generator) {
+        RpcOpenInventoryWithGenerator(connectionToClient, generator);
+    }
+
+    [TargetRpc]
+    void RpcOpenInventoryWithGenerator(NetworkConnectionToClient _, Generator generator) {
+        inventoryWindowController.SetOpen(true, generator);
     }
 }

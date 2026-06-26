@@ -10,6 +10,7 @@ public class GeneratorWithInventory : Interactable
     public float fuelConsumptionPerSecond = 1;
     public float energyGenerationPerSecond = 1;
     public ItemContainer itemContainer;
+    public ParticleSystem _particleSystem;
 
     Transform hiddenRoot;
 
@@ -29,12 +30,13 @@ public class GeneratorWithInventory : Interactable
             if (currentFuel > 0) {
                 currentFuel = Mathf.Max(currentFuel - Time.deltaTime * fuelConsumptionPerSecond, 0);
                 battery.AddCharge(energyGenerationPerSecond * Time.deltaTime);
+                if (_particleSystem && !_particleSystem.isPlaying) _particleSystem.Play();
             } else if (itemContainer.Count > 0) {
                 int ind = itemContainer.FirstItemInd();
                 ItemInstance item = itemContainer.GetItem(ind);
                 currentFuel = item.itemData.itemFuelAmount;
                 itemContainer.DestroyItem(ind);
-            }
+            } else if (_particleSystem && _particleSystem.isPlaying) _particleSystem.Stop();
         }
     }
 

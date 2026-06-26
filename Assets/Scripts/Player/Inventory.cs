@@ -423,6 +423,16 @@ public class Inventory : NetworkBehaviour
         RpcInventoryLayoutChanged();
     }
 
+    [Server]
+    public void DestoryItem(ItemInstance targetItem) {
+        foreach ((ItemContainer container, ItemInstance item, int ind) in GetAllItemsFull()) {
+            if (item == targetItem) {
+                container.DestroyItem(ind);
+                break;
+            }
+        }
+    }
+
     void OnHandsChanged(ItemContainer _, ItemContainer newValue)
     {
         onHandsChange.Invoke(newValue);

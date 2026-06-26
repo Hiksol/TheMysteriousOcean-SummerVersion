@@ -8,13 +8,14 @@ public class ItemPropertyFuelCanister : ItemProperty
     public float maxFuel = 50;
     public float currentFuel = 50;
     public float minInitFuel = 20, maxInitFuel = 50;
+    public bool destroyOnEmpty;
 
     [Server]
     public override void OnUse(ItemInstance item, Player player, Interactable interactable)
     {
         if (interactable is not Generator) return;
         Generator generator = (Generator)interactable;
-        TryTransferFuelToGenerator(generator, currentFuel);
+        TryTransferFuelToGenerator(item, generator, currentFuel);
     }
 
     [Server]
@@ -23,14 +24,15 @@ public class ItemPropertyFuelCanister : ItemProperty
     }
 
     [Server]
-    public void TryTransferFuelToGenerator(Generator generator, float fuelAmount) {
+    public void TryTransferFuelToGenerator(ItemInstance item, Generator generator, float fuelAmount) {
         float fuelToAdd = Mathf.Min(generator.GetFuelMissing(), currentFuel, fuelAmount);
         currentFuel -= fuelToAdd;
         generator.AddFuel(fuelToAdd);
+        if (currentFuel == 0 && destroyOnEmpty && item.owner) item.owner.Inventory.DestoryItem(item); 
     }
 
     [Command]
-    public void CmdTryTransferFuelToGenerator(Generator generator, float fuelAmount) {
-        TryTransferFuelToGenerator(generator, fuelAmount);
+    public void CmdTryTransferFuelToGenerator(ItemInstance item, Generator generator, float fuelAmount) {
+        TryTransferFuelToGenerator(item, generator, fuelAmount);
     }
 }

@@ -13,11 +13,16 @@ public class InventoryWindowController : MonoBehaviour
     [SerializeField] private UIDocument uiDocument;
     [SerializeField] private VisualTreeAsset slotTemplate;
 
+    [Header("Generator")]
+    public float fuelTransferPerSecond = 5f;
+
     private const string RowsRootName = "rows-root";
     private const string ClothesFrameName = "ClothesFrame";
     private const string SlotsContainerName = "SlotsContainer";
     private const string SlotButtonName = "SlotButton";
     private const string SlotImageName = "ItemImage";
+    private const string FuelGeneratorName = "FuelGenerator";
+    private const string FuelLevelName = "FuelLevel";
     private const string FuelTankNeckTriggerName = "FuelTankNeckTrigger";
 
     private static readonly EquipableContainerType[] RowTypes =
@@ -27,9 +32,12 @@ public class InventoryWindowController : MonoBehaviour
         EquipableContainerType.Backpack
     };
 
+    private Player player;
     private Inventory inventory;
     private VisualElement root;
     private VisualElement rowsRoot;
+    VisualElement fuelGenerator;
+    VisualElement fuelLevel;
     VisualElement fuelTankNeckTrigger;
 
     private readonly List<RowBinding> rowBindings = new();
@@ -47,6 +55,8 @@ public class InventoryWindowController : MonoBehaviour
     private VisualElement hoveredVisual;
     private VisualElement dragSourceVisual;
     private Coroutine dropRoutine;
+
+    Generator generator;
 
     private sealed class RowBinding
     {
@@ -128,6 +138,8 @@ public class InventoryWindowController : MonoBehaviour
             yield break;
         }
 
+        fuelGenerator = root.Q<VisualElement>(FuelGeneratorName);
+        fuelLevel = root.Q<VisualElement>(FuelLevelName);
         fuelTankNeckTrigger = root.Q<VisualElement>(FuelTankNeckTriggerName);
 
         CacheRows();
@@ -137,7 +149,8 @@ public class InventoryWindowController : MonoBehaviour
         while (NetworkClient.localPlayer == null)
             yield return null;
 
-        inventory = NetworkClient.localPlayer.GetComponent<Inventory>();
+        player = NetworkClient.localPlayer.GetComponent<Player>();
+        inventory = player.Inventory;
         if (inventory == null)
         {
             Debug.LogError("InventoryWindowController: local player has no Inventory.");
@@ -158,13 +171,16 @@ public class InventoryWindowController : MonoBehaviour
         if (Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame)
             ToggleInventory();
 
+        if (fuelGenerator.style.display != DisplayStyle.None) fuelLevel.style.maxHeight = new(new Length(generator.currentFuel / generator.maxFuel * 100, LengthUnit.Percent));
+
         if (!isOpen || !isDragging || dragGhost == null || dragGhost.style.display == DisplayStyle.None)
             return;
 
         if (isDragging && dragSource.Item.TryGetProperty(out ItemPropertyFuelCanister fuelCanister)) {
-            float dragX = dragSource.Visual.worldBound.center.x;
+            float dragX = dragGhost.worldBound.center.x;
             if (fuelTankNeckTrigger.worldBound.xMin <= dragX && dragX <= fuelTankNeckTrigger.worldBound.xMax) {
                 print("Overlap");
+                fuelCanister.CmdTryTransferFuelToGenerator(generator, fuelTransferPerSecond * Time.deltaTime);
             }
         }
 
@@ -172,20 +188,27 @@ public class InventoryWindowController : MonoBehaviour
         dragGhost.style.top = lastPointerPos.y + 12f;
     }
 
-    private void ToggleInventory()
+    [Client]
+    public void ToggleInventory()
     {
         SetOpen(!isOpen);
     }
 
-    private void SetOpen(bool open)
+    [Client]
+    public void SetOpen(bool open, Generator generator = null)
     {
         isOpen = open;
+        this.generator = generator;
 
         if (root != null)
             root.style.display = open ? DisplayStyle.Flex : DisplayStyle.None;
+        fuelGenerator.style.display = generator ? DisplayStyle.Flex : DisplayStyle.None;
 
         UnityEngine.Cursor.visible = open;
         UnityEngine.Cursor.lockState = open ? CursorLockMode.None : CursorLockMode.Locked;
+
+        if (player != null)
+            player.SetPlayerState(open ? PlayerState.Interacting : PlayerState.Default);
     }
 
     private void CacheRows()

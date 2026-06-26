@@ -14,13 +14,23 @@ public class ItemPropertyFuelCanister : ItemProperty
     {
         if (interactable is not Generator) return;
         Generator generator = (Generator)interactable;
-        float fuelToAdd = Mathf.Min(generator.GetFuelMissing(), currentFuel);
-        currentFuel -= fuelToAdd;
-        generator.AddFuel(fuelToAdd);
+        TryTransferFuelToGenerator(generator, currentFuel);
     }
 
     [Server]
     public override void OnStart(ItemInstance item) {
         currentFuel = GameManager.I.Rng.Range(minInitFuel, maxInitFuel);
+    }
+
+    [Server]
+    public void TryTransferFuelToGenerator(Generator generator, float fuelAmount) {
+        float fuelToAdd = Mathf.Min(generator.GetFuelMissing(), currentFuel, fuelAmount);
+        currentFuel -= fuelToAdd;
+        generator.AddFuel(fuelToAdd);
+    }
+
+    [Command]
+    public void CmdTryTransferFuelToGenerator(Generator generator, float fuelAmount) {
+        TryTransferFuelToGenerator(generator, fuelAmount);
     }
 }

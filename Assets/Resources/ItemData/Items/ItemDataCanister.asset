@@ -19,7 +19,16 @@ MonoBehaviour:
   slotCount: 1
   itemFuelType: 1
   itemFuelAmount: 10
-  itemProperties: []
+  holdTimeToUse: 1
+  itemProperties:
+  - rid: 2279679628798329029
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 2279679628798329029
+      type: {class: ItemPropertyFuelCanister, ns: , asm: Assembly-CSharp}
+      data:
+        maxFuel: 50
+        currentFuel: 50
+        minInitFuel: 20
+        maxInitFuel: 50

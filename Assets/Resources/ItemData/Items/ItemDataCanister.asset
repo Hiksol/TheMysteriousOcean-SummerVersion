@@ -32,3 +32,4 @@ MonoBehaviour:
         currentFuel: 50
         minInitFuel: 20
         maxInitFuel: 50
+        destroyOnEmpty: 0

@@ -28,7 +28,7 @@ public class ItemInstance : Interactable
     }
 
     public override void OnStartClient() {
-        // if (itemData != null) OnItemDataChanged(null, itemData);
+        if (itemData != null) OnItemDataChanged(null, itemData);
     }
 
     // void OnTransformParentChanged() {

@@ -176,12 +176,21 @@ public class InventoryWindowController : MonoBehaviour
         if (!isOpen || !isDragging || dragGhost == null || dragGhost.style.display == DisplayStyle.None)
             return;
 
+        bool resetRotation = true;
         if (isDragging && dragSource.Item.TryGetProperty(out ItemPropertyFuelCanister fuelCanister)) {
             float dragX = dragGhost.worldBound.center.x;
             if (fuelTankNeckTrigger.worldBound.xMin <= dragX && dragX <= fuelTankNeckTrigger.worldBound.xMax) {
-                print("Overlap");
                 fuelCanister.CmdTryTransferFuelToGenerator(generator, fuelTransferPerSecond * Time.deltaTime);
+                dragGhost.style.rotate = new(new Rotate(
+                    Mathf.Lerp(dragGhost.style.rotate.value.angle.value, -45, 10 * Time.deltaTime)
+                ));
+                resetRotation = false;
             }
+        }
+        if (resetRotation && dragGhost.style.rotate.value.angle.value != 0) {
+            dragGhost.style.rotate = new(new Rotate(
+                Mathf.Lerp(dragGhost.style.rotate.value.angle.value, 0, 10 * Time.deltaTime)
+            ));
         }
 
         dragGhost.style.left = lastPointerPos.x + 12f;

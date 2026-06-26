@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
-public class InventoryWindowController : MonoBehaviour
+public class InventoryWindowController : NetworkBehaviour
 {
     [Header("UI")]
     [SerializeField] private UIDocument uiDocument;
@@ -168,6 +168,8 @@ public class InventoryWindowController : MonoBehaviour
 
     private void Update()
     {
+        if (!isLocalPlayer) return;
+
         if (Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame)
             ToggleInventory();
 
@@ -181,7 +183,7 @@ public class InventoryWindowController : MonoBehaviour
         if (isDragging && dragSource.Item.TryGetProperty(out ItemPropertyFuelCanister fuelCanister)) {
             float dragX = dragGhost.worldBound.center.x;
             if (fuelTankNeckTrigger.worldBound.xMin <= dragX && dragX <= fuelTankNeckTrigger.worldBound.xMax) {
-                fuelCanister.CmdTryTransferFuelToGenerator(dragSource.Item, generator, fuelTransferPerSecond * Time.deltaTime);
+                CmdTryTransferFuelToGenerator(fuelCanister, dragSource.Item, generator, fuelTransferPerSecond * Time.deltaTime);
                 dragGhost.style.rotate = new(new Rotate(
                     Mathf.Lerp(dragGhost.style.rotate.value.angle.value, -45, 10 * Time.deltaTime)
                 ));
@@ -196,6 +198,11 @@ public class InventoryWindowController : MonoBehaviour
 
         dragGhost.style.left = lastPointerPos.x + 12f;
         dragGhost.style.top = lastPointerPos.y + 12f;
+    }
+
+    [Command]
+    public void CmdTryTransferFuelToGenerator(ItemPropertyFuelCanister fuelCanister, ItemInstance item, Generator generator, float fuelAmount) {
+        fuelCanister.TryTransferFuelToGenerator(item, generator, fuelAmount);
     }
 
     [Client]

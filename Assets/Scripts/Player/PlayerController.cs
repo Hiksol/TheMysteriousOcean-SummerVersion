@@ -321,7 +321,8 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     }
 
     void CheckWater() {
-        bool inWater = Physics.Raycast(transform.position + Vector3.up * (CharacterMotor.Capsule.height / 2f + 2f), Vector3.down, out RaycastHit hit, CharacterMotor.Capsule.height + 2f, waterLayer);
+        bool inWater = Physics.Raycast(transform.position + Vector3.up * (CharacterMotor.Capsule.height / 2f + 2f), Vector3.down, out RaycastHit hit, CharacterMotor.Capsule.height + 2f, waterLayer) &&
+            !Physics.Raycast(transform.position + Vector3.up * CharacterMotor.Capsule.height / 2f, Vector3.down, CharacterMotor.Capsule.height + 2f, Physics.DefaultRaycastLayers & ~waterLayer);
         if (inWater) {
             if (IsDefault) ChangeState(PlayerControllerState.Swimming);
             waterRaycastPos = hit.point;

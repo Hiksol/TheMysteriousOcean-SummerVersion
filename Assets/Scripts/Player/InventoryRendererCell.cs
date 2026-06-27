@@ -8,7 +8,7 @@ public class InventoryRendererCell : MonoBehaviour
     public TMP_Text annotationText;
     public Image itemIcon;
 
-    void Start()
+    void Awake()
     {
         itemText.text = "";
         annotationText.text = "";

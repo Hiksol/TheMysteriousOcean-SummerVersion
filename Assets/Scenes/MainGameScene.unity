@@ -29815,8 +29815,40 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5737640166553245990
-Transform:
+--- !u!114 &1686602969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1686602968}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bacce192320f453459e69995d3072ebf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IslandSpawnManager
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  islandCategories:
+  - categoryName: Small
+    subcategories:
+    - scName: Common
+      scWeight: 1
+      islandPrefabs:
+      - {fileID: 2718646417605933834, guid: a842dc919f1a9364aa169255626df644, type: 3}
+    categoryTimer: 20
+    currentCategoryTimer: 0
+  spawnInterval: 10
+  startSpawnTransform: {fileID: 45287251}
+  endSpawnTransform: {fileID: 1066936185}
+  islandsVelocity: {x: 0, y: 0, z: -3}
+  layersToExlude:
+    serializedVersion: 2
+    m_Bits: 16
+  currentInterval: 0
+--- !u!114 &1686602970
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}

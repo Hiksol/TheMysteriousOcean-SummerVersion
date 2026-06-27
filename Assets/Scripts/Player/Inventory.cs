@@ -203,27 +203,28 @@ public class Inventory : NetworkBehaviour
     [Server]
     public void TryPickupItem(ItemInstance item)
     {
-        item.owner = player;
         ItemData itemData = item.itemData;
 
         int ind = hands.FindFreeIndex(itemData.slotCount);
         if (ind == RIGHT_HAND_IND)
         {
+            item.owner = player;
             InsertItemIntoContainer(item, hands, ind);
+            return;
         }
-        else
+        foreach (ItemContainer itemContainer in inventoryContainers)
         {
-            foreach (ItemContainer itemContainer in inventoryContainers)
+            ind = itemContainer.FindFreeIndex(itemData.slotCount);
+            if (ind != -1)
             {
-                ind = itemContainer.FindFreeIndex(itemData.slotCount);
-                if (ind != -1)
-                {
-                    InsertItemIntoContainer(item, itemContainer, ind);
-                    break;
-                }
+                item.owner = player;
+                InsertItemIntoContainer(item, itemContainer, ind);
+                return;
             }
         }
+        item.owner = null;
     }
+
 
     [Command]
     void CmdTrySwapItemsHandsInventory(int handSlotIndex, int inventoryIndex, int inventorySlotIndex)

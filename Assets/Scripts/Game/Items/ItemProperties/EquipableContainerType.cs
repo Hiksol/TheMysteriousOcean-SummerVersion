@@ -5,5 +5,6 @@ public enum EquipableContainerType
     Backpack,
     Gloves,
     Hat,
-    Custom
+    Custom,
+    Hands
 }

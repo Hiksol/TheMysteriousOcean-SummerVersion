@@ -29,7 +29,8 @@ public class InventoryWindowController : NetworkBehaviour
     {
         EquipableContainerType.Shirt,
         EquipableContainerType.Pants,
-        EquipableContainerType.Backpack
+        EquipableContainerType.Backpack,
+        EquipableContainerType.Hands
     };
 
     private Player player;
@@ -173,16 +174,19 @@ public class InventoryWindowController : NetworkBehaviour
         if (Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame)
             ToggleInventory();
 
-        if (fuelGenerator.style.display != DisplayStyle.None) fuelLevel.style.maxHeight = new(new Length(generator.currentFuel / generator.maxFuel * 100, LengthUnit.Percent));
+        if (fuelGenerator.style.display != DisplayStyle.None)
+            fuelLevel.style.maxHeight = new(new Length(generator.currentFuel / generator.maxFuel * 100, LengthUnit.Percent));
 
         if (isDragging && dragSource.Item == null) EndDrag();
         if (!isOpen || !isDragging || dragGhost == null || dragGhost.style.display == DisplayStyle.None)
             return;
 
         bool resetRotation = true;
-        if (isDragging && dragSource.Item.TryGetProperty(out ItemPropertyFuelCanister fuelCanister)) {
+        if (isDragging && dragSource.Item.TryGetProperty(out ItemPropertyFuelCanister fuelCanister))
+        {
             float dragX = dragGhost.worldBound.center.x;
-            if (fuelTankNeckTrigger.worldBound.xMin <= dragX && dragX <= fuelTankNeckTrigger.worldBound.xMax) {
+            if (fuelTankNeckTrigger.worldBound.xMin <= dragX && dragX <= fuelTankNeckTrigger.worldBound.xMax)
+            {
                 CmdTryTransferFuelToGenerator(fuelCanister, dragSource.Item, generator, fuelTransferPerSecond * Time.deltaTime);
                 dragGhost.style.rotate = new(new Rotate(
                     Mathf.Lerp(dragGhost.style.rotate.value.angle.value, -45, 10 * Time.deltaTime)
@@ -190,7 +194,8 @@ public class InventoryWindowController : NetworkBehaviour
                 resetRotation = false;
             }
         }
-        if (resetRotation && dragGhost.style.rotate.value.angle.value != 0) {
+        if (resetRotation && dragGhost.style.rotate.value.angle.value != 0)
+        {
             dragGhost.style.rotate = new(new Rotate(
                 Mathf.Lerp(dragGhost.style.rotate.value.angle.value, 0, 10 * Time.deltaTime)
             ));
@@ -201,7 +206,8 @@ public class InventoryWindowController : NetworkBehaviour
     }
 
     [Command]
-    public void CmdTryTransferFuelToGenerator(ItemPropertyFuelCanister fuelCanister, ItemInstance item, Generator generator, float fuelAmount) {
+    public void CmdTryTransferFuelToGenerator(ItemPropertyFuelCanister fuelCanister, ItemInstance item, Generator generator, float fuelAmount)
+    {
         fuelCanister.TryTransferFuelToGenerator(item, generator, fuelAmount);
     }
 
@@ -241,16 +247,31 @@ public class InventoryWindowController : NetworkBehaviour
             VisualElement clothesFrame = row.Q<VisualElement>(ClothesFrameName);
             VisualElement slotsContainer = row.Q<VisualElement>(SlotsContainerName);
 
-            if (clothesFrame == null || slotsContainer == null)
-                continue;
+            Button clothesButton = null;
+            Image clothesImage = null;
 
-            Button clothesButton = clothesFrame.Q<Button>(SlotButtonName);
-            Image clothesImage = clothesFrame.Q<Image>(SlotImageName);
-            if (clothesImage == null)
-                clothesImage = clothesFrame.Q<Image>();
+            if (RowTypes[i] != EquipableContainerType.Hands)
+            {
+                if (clothesFrame == null || slotsContainer == null)
+                    continue;
 
-            if (clothesButton != null)
-                clothesButton.text = string.Empty;
+                clothesButton = clothesFrame.Q<Button>(SlotButtonName);
+                clothesImage = clothesFrame.Q<Image>(SlotImageName);
+                if (clothesImage == null)
+                    clothesImage = clothesFrame.Q<Image>();
+
+                if (clothesButton != null)
+                    clothesButton.text = string.Empty;
+            }
+            else
+            {
+                // 4-я строка: руки — без ClothesFrame
+                clothesFrame = null;
+                clothesButton = null;
+                clothesImage = null;
+                if (slotsContainer == null)
+                    continue;
+            }
 
             var binding = new RowBinding
             {
@@ -389,7 +410,23 @@ public class InventoryWindowController : NetworkBehaviour
 
     private void UpdateRow(RowBinding row)
     {
-        if (row == null || row.SlotsContainer == null || row.ClothesImage == null)
+        if (row == null || row.SlotsContainer == null)
+            return;
+
+        // 4-я строка: руки
+        if (row.Type == EquipableContainerType.Hands)
+        {
+            row.SlotsContainer.Clear();
+
+            for (int slotIndex = 0; slotIndex < inventory.hands.capacity; slotIndex++)
+            {
+                ItemInstance item = inventory.hands.GetItem(slotIndex);
+                row.SlotsContainer.Add(CreateSlotVisual(EquipableContainerType.Hands, slotIndex, item));
+            }
+            return;
+        }
+
+        if (row.ClothesImage == null)
             return;
 
         if (!TryGetContainer(row.Type, out ItemContainer container, out ItemData headerItem))
@@ -592,6 +629,9 @@ public class InventoryWindowController : NetworkBehaviour
 
     private bool CanEquipFromSlotToFrame(EquipableContainerType fromType, int fromSlot, EquipableContainerType targetType)
     {
+        if (targetType == EquipableContainerType.Hands) return false;
+        if (fromType == EquipableContainerType.Hands) return false;
+
         ItemContainer source = GetContainer(fromType);
         if (source == null) return false;
 
@@ -606,6 +646,8 @@ public class InventoryWindowController : NetworkBehaviour
     private bool CanUnequipFrameToSlot(EquipableContainerType fromType, EquipableContainerType toType, int toSlot)
     {
         if (fromType == toType) return false;
+        if (fromType == EquipableContainerType.Hands) return false;
+        if (toType == EquipableContainerType.Hands) return false;
 
         ItemContainer source = GetContainer(fromType);
         ItemContainer target = GetContainer(toType);
@@ -720,6 +762,13 @@ public class InventoryWindowController : NetworkBehaviour
 
     private bool TryGetContainer(EquipableContainerType type, out ItemContainer container, out ItemData headerItem)
     {
+        if (type == EquipableContainerType.Hands)
+        {
+            container = inventory.hands;
+            headerItem = null;
+            return container != null;
+        }
+
         int index = GetContainerIndex(type);
         if (index < 0 || index >= inventory.inventoryContainers.Count)
         {
@@ -738,6 +787,9 @@ public class InventoryWindowController : NetworkBehaviour
 
     private ItemContainer GetContainer(EquipableContainerType type)
     {
+        if (type == EquipableContainerType.Hands)
+            return inventory.hands;
+
         int index = GetContainerIndex(type);
         if (index < 0 || index >= inventory.inventoryContainers.Count) return null;
         return inventory.inventoryContainers[index];

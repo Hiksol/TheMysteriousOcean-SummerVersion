@@ -182,12 +182,10 @@ public class InventoryWindowController : NetworkBehaviour
             return;
 
         bool resetRotation = true;
-        if (isDragging && dragSource.Item.TryGetProperty(out ItemPropertyFuelCanister fuelCanister))
-        {
+        if (isDragging && dragSource.Item.TryGetProperty(out ItemPropertyFuelCanister fuelCanister, out int ind)) {
             float dragX = dragGhost.worldBound.center.x;
-            if (fuelTankNeckTrigger.worldBound.xMin <= dragX && dragX <= fuelTankNeckTrigger.worldBound.xMax)
-            {
-                CmdTryTransferFuelToGenerator(fuelCanister, dragSource.Item, generator, fuelTransferPerSecond * Time.deltaTime);
+            if (fuelTankNeckTrigger.worldBound.xMin <= dragX && dragX <= fuelTankNeckTrigger.worldBound.xMax) {
+                CmdTryTransferFuelToGenerator(ind, dragSource.Item, generator, fuelTransferPerSecond * Time.deltaTime);
                 dragGhost.style.rotate = new(new Rotate(
                     Mathf.Lerp(dragGhost.style.rotate.value.angle.value, -45, 10 * Time.deltaTime)
                 ));
@@ -206,9 +204,9 @@ public class InventoryWindowController : NetworkBehaviour
     }
 
     [Command]
-    public void CmdTryTransferFuelToGenerator(ItemPropertyFuelCanister fuelCanister, ItemInstance item, Generator generator, float fuelAmount)
-    {
-        fuelCanister.TryTransferFuelToGenerator(item, generator, fuelAmount);
+    public void CmdTryTransferFuelToGenerator(int ind, ItemInstance item, Generator generator, float fuelAmount) {
+        if (item == null) return;
+        (item.GetProperty(ind) as ItemPropertyFuelCanister).TryTransferFuelToGenerator(item, generator, fuelAmount);
     }
 
     [Client]

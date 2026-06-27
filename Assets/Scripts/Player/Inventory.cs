@@ -11,8 +11,8 @@ using UnityEngine.InputSystem.Controls;
 public class Inventory : NetworkBehaviour
 {
     public float interactionRange = 3f;
-    const int RIGHT_HAND_IND = 0;
-    const int LEFT_HAND_IND = 1;
+    public const int RIGHT_HAND_IND = 0;
+    public const int LEFT_HAND_IND = 1;
     public const int HANDS_COUNT = 2;
 
     [SyncVar(hook = nameof(OnHandsChanged))]
@@ -41,6 +41,7 @@ public class Inventory : NetworkBehaviour
     InputAction interactAction;
     InputAction useAction;
     InputAction dropAction;
+    InputAction swapAction;
     List<KeyControl> inventoryKeys;
     int lastItemCount;
 
@@ -64,6 +65,7 @@ public class Inventory : NetworkBehaviour
         interactAction = InputSystem.actions.FindAction("Interact");
         useAction = InputSystem.actions.FindAction("Attack");
         dropAction = InputSystem.actions.FindAction("Drop");
+        swapAction = InputSystem.actions.FindAction("Swap");
 
         inventoryKeys = new()
         {
@@ -152,21 +154,21 @@ public class Inventory : NetworkBehaviour
     void HandleSwitchItems()
     {
         int keyInd = inventoryKeys.FindIndex(key => key.wasPressedThisFrame);
-        if (keyInd == -1) return;
-
-        int slotsChecked = 0, inventoryIndex, slotIndex = -1;
-        for (inventoryIndex = 0; inventoryIndex < inventoryContainers.Count; inventoryIndex++)
-        {
-            if (keyInd - slotsChecked < inventoryContainers[inventoryIndex].capacity)
-            {
-                slotIndex = keyInd - slotsChecked;
-                break;
+        if (keyInd != -1) {
+            int slotsChecked = 0, inventoryIndex, slotIndex = -1;
+            for (inventoryIndex = 0; inventoryIndex < inventoryContainers.Count; inventoryIndex++) {
+                if (keyInd - slotsChecked < inventoryContainers[inventoryIndex].capacity) {
+                    slotIndex = keyInd - slotsChecked;
+                    break;
+                }
+                slotsChecked += inventoryContainers[inventoryIndex].capacity;
             }
-            slotsChecked += inventoryContainers[inventoryIndex].capacity;
-        }
 
-        if (slotIndex == -1) return;
-        CmdTrySwapItemsHandsInventory(RIGHT_HAND_IND, inventoryIndex, slotIndex);
+            if (slotIndex == -1) return;
+            CmdTrySwapItemsHandsInventory(RIGHT_HAND_IND, inventoryIndex, slotIndex);
+        } else if (swapAction.WasPressedThisFrame()) {
+            CmdTrySwapItemsHands(RIGHT_HAND_IND, LEFT_HAND_IND);
+        }
     }
 
     [Client]
@@ -229,6 +231,11 @@ public class Inventory : NetworkBehaviour
         TrySwapItems(hands, handSlotIndex, inventoryContainers[inventoryIndex], inventorySlotIndex);
     }
 
+    [Command]
+    void CmdTrySwapItemsHands(int handSlotIndex1, int handSlotIndex2) {
+        TrySwapItems(hands, handSlotIndex1, hands, handSlotIndex2);
+    }
+
     [Server]
     void TrySwapItems(ItemContainer container1, int slotIndex1, ItemContainer container2, int slotIndex2)
     {
@@ -239,11 +246,14 @@ public class Inventory : NetworkBehaviour
             !container2.IsSlotFreeForPotentialItem(slotIndex2, item1))
             return;
 
-        if (container1.FreeSlot(slotIndex1) != null) ForceUpdateSync(container1);
-        if (container2.FreeSlot(slotIndex2) != null) ForceUpdateSync(container2);
+        container1.FreeSlot(slotIndex1);
+        container2.FreeSlot(slotIndex2);
 
         if (item1 != null) InsertItemIntoContainer(item1, container2, slotIndex2);
         if (item2 != null) InsertItemIntoContainer(item2, container1, slotIndex1);
+
+        ForceUpdateSync(container1);
+        ForceUpdateSync(container2);
     }
 
     [Server]

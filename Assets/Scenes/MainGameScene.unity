@@ -26966,7 +26966,7 @@ MonoBehaviour:
       scWeight: 1
       islandPrefabs:
       - {fileID: 2718646417605933834, guid: a842dc919f1a9364aa169255626df644, type: 3}
-    categoryTimer: 1
+    categoryTimer: 20
     currentCategoryTimer: 0
   spawnInterval: 10
   startSpawnTransform: {fileID: 45287251}
@@ -26975,7 +26975,7 @@ MonoBehaviour:
   layersToExlude:
     serializedVersion: 2
     m_Bits: 16
-  currentInterval: 1
+  currentInterval: 0
 --- !u!114 &1686602970
 MonoBehaviour:
   m_ObjectHideFlags: 0

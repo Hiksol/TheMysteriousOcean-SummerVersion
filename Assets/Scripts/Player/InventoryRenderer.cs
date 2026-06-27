@@ -35,6 +35,8 @@ public class InventoryRenderer : NetworkBehaviour
         {
             InventoryRendererCell cell = Instantiate(inventoryRendererCellPrefab, inventoryRendererRoot);
             cell.transform.localPosition = Vector3.right * (i * inventoryRendererCellDelta);
+            print(i);
+            if (i == Inventory.LEFT_HAND_IND) cell.SetAnnotationText("F");
             handsCells.Add(cell);
         });
 

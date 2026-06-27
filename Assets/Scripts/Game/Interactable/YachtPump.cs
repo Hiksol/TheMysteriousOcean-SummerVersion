@@ -11,12 +11,19 @@ public class YachtPump : Interactable
     [Header("Debug")]
     public bool pumpEnabled = false;
 
+    [SyncVar] bool particlesActive = false;
+
     void Update() {
-        if (!isServer) return;
-        if (pumpEnabled && battery && battery.TryConsumeCharge(energyConsumptionPerSecond * Time.deltaTime)) {
-            YachtManager.I.AddSinkingProgress(-sinkingProgressDecreasePerSecond * Time.deltaTime);
-            if (_particleSystem && !_particleSystem.isPlaying) _particleSystem.Play();
-        } else if (_particleSystem && _particleSystem.isPlaying) _particleSystem.Stop();
+        if (isServer) {
+            if (pumpEnabled && battery && battery.TryConsumeCharge(energyConsumptionPerSecond * Time.deltaTime)) {
+                YachtManager.I.AddSinkingProgress(-sinkingProgressDecreasePerSecond * Time.deltaTime);
+                particlesActive = true;
+            } else particlesActive = false;
+        }
+        if (_particleSystem) {
+            if (particlesActive && !_particleSystem.isPlaying) _particleSystem.Play();
+            else if (!particlesActive && _particleSystem.isPlaying) _particleSystem.Stop();
+        }
     }
 
     [Server]

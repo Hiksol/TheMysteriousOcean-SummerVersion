@@ -17,6 +17,8 @@ public class GeneratorWithInventory : Interactable
     [Header("Debug")]
     [SyncVar] public float currentFuel = 0;
 
+    [SyncVar] bool particlesActive = false;
+
     void Awake() {
         itemContainer = new(slotsCount);
         hiddenRoot = new GameObject("HiddenRoot").transform;
@@ -25,18 +27,23 @@ public class GeneratorWithInventory : Interactable
     }
 
     void Update() {
-        if (!isServer) return;
-        if (battery) {
-            if (currentFuel > 0) {
-                currentFuel = Mathf.Max(currentFuel - Time.deltaTime * fuelConsumptionPerSecond, 0);
-                battery.AddCharge(energyGenerationPerSecond * Time.deltaTime);
-                if (_particleSystem && !_particleSystem.isPlaying) _particleSystem.Play();
-            } else if (itemContainer.Count > 0) {
-                int ind = itemContainer.FirstItemInd();
-                ItemInstance item = itemContainer.GetItem(ind);
-                currentFuel = item.itemData.itemFuelAmount;
-                itemContainer.DestroyItem(ind);
-            } else if (_particleSystem && _particleSystem.isPlaying) _particleSystem.Stop();
+        if (isServer) {
+            if (battery) {
+                if (currentFuel > 0) {
+                    currentFuel = Mathf.Max(currentFuel - Time.deltaTime * fuelConsumptionPerSecond, 0);
+                    battery.AddCharge(energyGenerationPerSecond * Time.deltaTime);
+                    particlesActive = true;
+                } else if (itemContainer.Count > 0) {
+                    int ind = itemContainer.FirstItemInd();
+                    ItemInstance item = itemContainer.GetItem(ind);
+                    currentFuel = item.itemData.itemFuelAmount;
+                    itemContainer.DestroyItem(ind);
+                } else particlesActive = false;
+            }
+        }
+        if (_particleSystem) {
+            if (particlesActive && !_particleSystem.isPlaying) _particleSystem.Play();
+            else if (!particlesActive && _particleSystem.isPlaying) _particleSystem.Stop();
         }
     }
 

@@ -14,13 +14,20 @@ public class Generator : Interactable
     [Header("Debug")]
     [SyncVar] public float currentFuel = 0;
 
+    [SyncVar] bool particlesActive = false;
+
     void Update() {
-        if (!isServer) return;
-        if (currentFuel > 0 && battery) {
-            currentFuel = Mathf.Max(currentFuel - Time.deltaTime * fuelConsumptionPerSecond, 0);
-            battery.AddCharge(energyGenerationPerSecond * Time.deltaTime);
-            if (_particleSystem && !_particleSystem.isPlaying) _particleSystem.Play();
-        } else if (_particleSystem && _particleSystem.isPlaying) _particleSystem.Stop();
+        if (isServer) {
+            if (currentFuel > 0 && battery) {
+                currentFuel = Mathf.Max(currentFuel - Time.deltaTime * fuelConsumptionPerSecond, 0);
+                battery.AddCharge(energyGenerationPerSecond * Time.deltaTime);
+                particlesActive = true;
+            } else particlesActive = false;
+        }
+        if (_particleSystem) {
+            if (particlesActive && !_particleSystem.isPlaying) _particleSystem.Play();
+            else if (!particlesActive && _particleSystem.isPlaying) _particleSystem.Stop();
+        }
     }
 
     [Server]

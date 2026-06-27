@@ -21,7 +21,14 @@ public class YachtBreach : Interactable
     public void Patch() {
         sinkingActive = false;
         YachtManager.I.breaches.Remove(this);
-        if (_particleSystem != null)
+        if (_particleSystem != null) {
             _particleSystem.Stop();
+            RpcDisableParticleSystem();
+        }
+    }
+
+    [ClientRpc]
+    void RpcDisableParticleSystem() {
+        _particleSystem.Stop();
     }
 }

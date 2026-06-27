@@ -104,7 +104,6 @@ public class InventoryRenderer : NetworkBehaviour
 
     void OnBaseInventoryChange(List<ItemSlotInfo> itemSlots, List<InventoryRendererCell> cells)
     {
-        // Берём минимальное количество, чтобы не вылезти за границы
         int count = Mathf.Min(itemSlots.Count, cells.Count);
 
         for (int i = 0; i < count; i++)
@@ -118,15 +117,22 @@ public class InventoryRenderer : NetworkBehaviour
                         ? "---"
                         : string.Empty;
 
+            Sprite icon =
+                itemSlotInfo.IsOccupiedByItself
+                    ? itemSlotInfo.item.itemData.itemIcon
+                    : null;
+
             cells[i].SetCellText(text);
+            cells[i].SetCellIcon(icon);   // ← ДОБАВЛЕНО
         }
 
-        // Очищаем лишние ячейки, если их больше, чем слотов
         for (int i = count; i < cells.Count; i++)
         {
             cells[i].SetCellText(string.Empty);
+            cells[i].SetCellIcon(null);   // ← Очищаем иконку
         }
     }
+
 
     void OnInventoryCapacityChange(int capacity)
     {

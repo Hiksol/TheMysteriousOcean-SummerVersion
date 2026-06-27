@@ -30,9 +30,4 @@ public class ItemPropertyFuelCanister : ItemProperty
         generator.AddFuel(fuelToAdd);
         if (currentFuel == 0 && destroyOnEmpty && item.owner) item.owner.Inventory.DestoryItem(item); 
     }
-
-    [Command]
-    public void CmdTryTransferFuelToGenerator(ItemInstance item, Generator generator, float fuelAmount) {
-        TryTransferFuelToGenerator(item, generator, fuelAmount);
-    }
 }

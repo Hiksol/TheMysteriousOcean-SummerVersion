@@ -31,16 +31,16 @@ public class ItemInstance : Interactable
         if (itemData != null) OnItemDataChanged(null, itemData);
     }
 
-    // void OnTransformParentChanged() {
-    //     if (!isServer) return;
-    //     if (transform.parent != null) transformRoot = new() {
-    //         ni = transform.parent.GetComponentInParent<NetworkIdentity>(),
-    //         childName = transform.parent.gameObject.name
-    //     }; else transformRoot = new() {
-    //         ni = null,
-    //         childName = ""
-    //     };
-    // }
+    void OnTransformParentChanged() {
+        if (!isServer) return;
+        if (transform.parent != null) transformRoot = new() {
+            ni = transform.parent.GetComponentInParent<NetworkIdentity>(),
+            childName = transform.parent.gameObject.name
+        }; else transformRoot = new() {
+            ni = null,
+            childName = ""
+        };
+    }
 
     void OnTransformParentChangedHook(NetworkTransformStruct _, NetworkTransformStruct newValue) {
         string currentParentName = transform.parent != null ? transform.parent.gameObject.name : "";

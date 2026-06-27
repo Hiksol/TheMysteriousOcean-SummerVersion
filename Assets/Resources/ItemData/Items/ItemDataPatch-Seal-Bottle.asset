@@ -17,8 +17,9 @@ MonoBehaviour:
   itemDescription: Used in crafting
   modelPrefab: {fileID: 4708394517847717876, guid: fb65ef95b22c87f47b2d40479ed0963c, type: 3}
   slotCount: 1
-  itemFuelType: 0
-  itemFuelAmount: 0
+  itemFuelType: 2
+  itemFuelAmount: 1
+  holdTimeToUse: 1
   itemProperties: []
   references:
     version: 2

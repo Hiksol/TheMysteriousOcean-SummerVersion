@@ -18,7 +18,8 @@ MonoBehaviour:
   modelPrefab: {fileID: 371898532487858324, guid: a0f026501e98a5145a4e4a9324e7982d, type: 3}
   slotCount: 1
   itemFuelType: 2
-  itemFuelAmount: 10
+  itemFuelAmount: 5
+  holdTimeToUse: 1
   itemProperties: []
   references:
     version: 2

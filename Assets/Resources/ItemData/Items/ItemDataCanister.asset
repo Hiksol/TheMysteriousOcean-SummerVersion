@@ -28,8 +28,8 @@ MonoBehaviour:
     - rid: 2279679628798329029
       type: {class: ItemPropertyFuelCanister, ns: , asm: Assembly-CSharp}
       data:
-        maxFuel: 50
-        currentFuel: 50
-        minInitFuel: 20
-        maxInitFuel: 50
+        maxFuel: 15
+        currentFuel: 10
+        minInitFuel: 2
+        maxInitFuel: 15
         destroyOnEmpty: 1

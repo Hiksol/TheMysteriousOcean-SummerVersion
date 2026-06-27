@@ -558,8 +558,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8434f11a7bb967458bb4eeacfaca7d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryWindowController
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   uiDocument: {fileID: 9131040527583956033}
   slotTemplate: {fileID: 9197481963319205126, guid: 3e482469e2675a54781d549af2bdd9b6, type: 3}
+  fuelTransferPerSecond: 1.5
 --- !u!1 &668981748905062561
 GameObject:
   m_ObjectHideFlags: 0

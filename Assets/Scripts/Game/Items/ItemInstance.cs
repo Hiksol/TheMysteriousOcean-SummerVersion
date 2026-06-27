@@ -8,7 +8,7 @@ using UnityEngine;
 public class ItemInstance : Interactable
 {
     [SyncVar(hook = nameof(OnItemDataChanged))] public ItemData itemData;
-    List<ItemProperty> itemProperties;
+    [SerializeReference] List<ItemProperty> itemProperties;
 
     GameObject model;
     Rigidbody rb;
@@ -58,12 +58,13 @@ public class ItemInstance : Interactable
     public void SetItemData(ItemData itemData) {
         OnItemDataChanged(null, itemData);
         this.itemData = itemData;
+        itemProperties = itemData != null ? itemData.itemProperties.Clone().ToList() : new();
         itemProperties.ForEach(ip => ip.OnStart(this));
     }
 
     void OnItemDataChanged(ItemData _, ItemData newItemData) {
         UpdateModel(newItemData);
-        itemProperties = newItemData != null ? newItemData.itemProperties.Clone().ToList() : new();
+        if (!isServer) itemProperties = newItemData != null ? newItemData.itemProperties.Clone().ToList() : new();
         rb.isKinematic = newItemData == null;
     }
 
@@ -90,8 +91,13 @@ public class ItemInstance : Interactable
         itemProperties.ForEach(itemProperty => itemProperty.OnUse(this, player, interactable));
     }
 
-    public bool TryGetProperty<T>(out T itemProperty) {
+    public bool TryGetProperty<T>(out T itemProperty, out int ind) where T: ItemProperty {
         itemProperty = itemProperties.OfType<T>().FirstOrDefault();
+        ind = itemProperty != null ? itemProperties.IndexOf(itemProperty) : -1;
         return itemProperty != null;
+    }
+
+    public ItemProperty GetProperty(int ind) {
+        return ind < itemProperties.Count ? itemProperties[ind] : null;
     }
 }

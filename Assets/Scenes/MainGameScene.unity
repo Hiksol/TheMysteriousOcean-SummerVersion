@@ -30176,7 +30176,7 @@ MonoBehaviour:
   owner: {fileID: 0}
   sinkingSpeed: 0.5
   sinkingActive: 1
-  _particleSystem: {fileID: 0}
+  _particleSystem: {fileID: 86004130}
 --- !u!1 &4012757541542732554
 GameObject:
   m_ObjectHideFlags: 0
@@ -30807,7 +30807,7 @@ MonoBehaviour:
   owner: {fileID: 0}
   sinkingSpeed: 0.5
   sinkingActive: 1
-  _particleSystem: {fileID: 0}
+  _particleSystem: {fileID: 732046701}
 --- !u!65 &8232202263730795680
 BoxCollider:
   m_ObjectHideFlags: 0

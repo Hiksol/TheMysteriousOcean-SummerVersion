@@ -54,7 +54,7 @@ public class Inventory : NetworkBehaviour
     {
         player = GetComponent<Player>();
         inventoryWindowController = GetComponent<InventoryWindowController>();
-        hands = new(HANDS_COUNT);
+        hands = new(HANDS_COUNT, true);
 
         inventoryContainers.OnSet += OnInventoryContainersChanged;
 
@@ -262,7 +262,7 @@ public class Inventory : NetworkBehaviour
     {
         if (itemContainer.IsSlotFreeForPotentialItem(slotIndex, item))
         {
-            bool isHands = itemContainer == hands;
+            bool isHands = itemContainer.isHands;
 
             item.transform.SetParent(null);
             itemContainer.InsertItemForce(item, slotIndex);

@@ -28666,7 +28666,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7535270318917025030, guid: 7ab3a7c85f69b5a45afb70bc8d10a0a9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 5.625841
+      value: 5.117078
       objectReference: {fileID: 0}
     - target: {fileID: 7535270318917025030, guid: 7ab3a7c85f69b5a45afb70bc8d10a0a9, type: 3}
       propertyPath: m_LocalPosition.z
@@ -29960,6 +29960,7 @@ MonoBehaviour:
     containerItem: {fileID: 0}
     capacity: 0
     containerSlots: []
+    isHands: 0
   _particleSystem: {fileID: 1151272771}
   currentFuel: 0
 --- !u!1001 &3266148053852297981
@@ -30148,6 +30149,7 @@ MonoBehaviour:
     containerItem: {fileID: 0}
     capacity: 0
     containerSlots: []
+    isHands: 0
   _particleSystem: {fileID: 1307011186}
   currentFuel: 0
 --- !u!33 &3414874584824718254

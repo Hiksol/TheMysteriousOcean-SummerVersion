@@ -5,7 +5,6 @@ using UnityEngine.InputSystem;
 using KinematicCharacterController;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.TextCore.Text;
 
 [RequireComponent(typeof(Player))]
 [RequireComponent(typeof(KinematicCharacterMotor))]
@@ -336,7 +335,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     void CheckLadder() {
         if (!interactAction.WasPressedThisFrame()) return;
         if (CharacterMotor.CharacterOverlap(CharacterMotor.TransientPosition, CharacterMotor.TransientRotation, probedColliders, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide) > 0) {
-            if (probedColliders[0] == null) return;
+            // if (probedColliders[0] == null) return;
             Collider collider = probedColliders.FirstOrDefault(col => col && col.TryGetComponent(out Ladder _));
             if (collider != null && collider.TryGetComponent(out Ladder ladder)) {
                 if (IsDefault) {

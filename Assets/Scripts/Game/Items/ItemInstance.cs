@@ -3,23 +3,28 @@ using System.Linq;
 using Mirror;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(BoxCollider))]
 public class ItemInstance : Interactable
 {
     [SyncVar(hook = nameof(OnItemDataChanged))] public ItemData itemData;
-    [SerializeReference] public List<ItemProperty> itemProperties;
+    [SerializeReference] List<ItemProperty> itemProperties;
 
     GameObject model;
+    Rigidbody rb;
     BoxCollider _collider;
     public struct NetworkTransformStruct { public NetworkIdentity ni; public string childName; }
     [SyncVar(hook = nameof(OnTransformParentChangedHook))] NetworkTransformStruct transformRoot;
 
     void Awake() {
+        rb = GetComponent<Rigidbody>();
+        rb.isKinematic = true;
         _collider = GetComponent<BoxCollider>();
     }
 
     public override void OnStartServer() {
-        if (transform.parent != null) OnTransformParentChanged();
+        // if (transform.parent != null) OnTransformParentChanged();
+        SetItemData(itemData);
     }
 
     public override void OnStartClient() {
@@ -51,13 +56,16 @@ public class ItemInstance : Interactable
 
     [Server]
     public void SetItemData(ItemData itemData) {
+        OnItemDataChanged(null, itemData);
         this.itemData = itemData;
-        UpdateModel(itemData);
+        itemProperties = itemData != null ? itemData.itemProperties.Clone().ToList() : new();
+        itemProperties.ForEach(ip => ip.OnStart(this));
     }
 
     void OnItemDataChanged(ItemData _, ItemData newItemData) {
         UpdateModel(newItemData);
-        itemProperties = newItemData.itemProperties.Clone().ToList();
+        if (!isServer) itemProperties = newItemData != null ? newItemData.itemProperties.Clone().ToList() : new();
+        rb.isKinematic = newItemData == null;
     }
 
     void UpdateModel(ItemData itemData) {
@@ -65,7 +73,8 @@ public class ItemInstance : Interactable
         if (itemData) {
             model = Instantiate(itemData.modelPrefab, transform);
             if (model.TryGetComponent(out BoxCollider collider)) {
-                _collider.size = Vector3.Scale(Utils.VectorAbs(model.transform.localRotation * collider.size ), model.transform.localScale);
+                _collider.center = Vector3.Scale((model.transform.localRotation * collider.center).Abs(), model.transform.localScale);
+                _collider.size = Vector3.Scale((model.transform.localRotation * collider.size).Abs(), model.transform.localScale);
                 collider.enabled = false;
             }
         }
@@ -80,5 +89,15 @@ public class ItemInstance : Interactable
     public void Use(Player player, NetworkBehaviour target) {
         Interactable interactable = (Interactable)target;
         itemProperties.ForEach(itemProperty => itemProperty.OnUse(this, player, interactable));
+    }
+
+    public bool TryGetProperty<T>(out T itemProperty, out int ind) where T: ItemProperty {
+        itemProperty = itemProperties.OfType<T>().FirstOrDefault();
+        ind = itemProperty != null ? itemProperties.IndexOf(itemProperty) : -1;
+        return itemProperty != null;
+    }
+
+    public ItemProperty GetProperty(int ind) {
+        return ind < itemProperties.Count ? itemProperties[ind] : null;
     }
 }

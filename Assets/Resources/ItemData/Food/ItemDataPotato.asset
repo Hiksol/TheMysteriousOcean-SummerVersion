@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5255f66fe3d06546847130c0bb68596, type: 3}
+  m_Name: ItemDataPotato
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemIcon: {fileID: 21300000, guid: dfc831ed7b836484998d3f3e00fae923, type: 3}
+  itemName: "\u041A\u0430\u0440\u0442\u043E\u0448\u043A\u0430"
+  itemDescription: '-'
+  modelPrefab: {fileID: 5914680987607516451, guid: 0969ce6ccb9d7c94f8b72612e33ee0c6, type: 3}
+  slotCount: 1
+  itemFuelType: 3
+  itemFuelAmount: 2
+  holdTimeToUse: 1
+  itemProperties:
+  - rid: 1077634842465402956
+  references:
+    version: 2
+    RefIds:
+    - rid: 1077634842465402956
+      type: {class: ItemPropertyFood, ns: , asm: Assembly-CSharp}
+      data:
+        saturation: 2

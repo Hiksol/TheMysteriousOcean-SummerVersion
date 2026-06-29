@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5255f66fe3d06546847130c0bb68596, type: 3}
+  m_Name: ItemDataBlouse
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemIcon: {fileID: 21300000, guid: 669293b059ef97d4e86ffda0146cd750, type: 3}
+  itemName: Blouse
+  itemDescription: LMB to put on yourself
+  modelPrefab: {fileID: 8287646581467590250, guid: 681c56cf2e4fedc459ac8a11b8efd7dd, type: 3}
+  slotCount: 1
+  itemFuelType: 2
+  itemFuelAmount: 3
+  holdTimeToUse: 0
+  itemProperties:
+  - rid: 1077635066244890931
+  references:
+    version: 2
+    RefIds:
+    - rid: 1077635066244890931
+      type: {class: ItemPropertyEquipableContainer, ns: , asm: Assembly-CSharp}
+      data:
+        containerType: 0
+        capacity: 2

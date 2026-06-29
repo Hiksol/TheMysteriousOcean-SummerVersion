@@ -10,8 +10,7 @@ public class GameManager : SingletonNetworkBehaviour<GameManager>
     public Rng Rng { get; private set; }
     public bool gameIsRunning = true;
 
-    public override void OnStartServer() {
-        base.Start();
+    protected override void AwakeNew() {
         if (seed == 0)
             seed = DateTime.Now.GetHashCode();
         Rng = new(seed);
@@ -23,11 +22,16 @@ public class GameManager : SingletonNetworkBehaviour<GameManager>
 
     void Update() {
         if (!isServer) return;
-        YachtManager ym = YachtManager.I;
-        if (ym.currentSinkingProgress >= ym.maxSinkingProgress && gameIsRunning) {
+        if (!gameIsRunning) return;
+        if (YachtManager.I.currentSinkingProgress >= YachtManager.I.maxSinkingProgress) {
             gameIsRunning = false;
             FindObjectsByType<Player>().ToList().ForEach(player => player.SetPlayerState(PlayerState.Dead));
             RpcSendNotificationToEveryone("You've lost", NotificationInstance.NotificationType.Danger);
+            Invoke(nameof(RestartGame), 5f);
+        } else if (YachtManager.I.breaches.Count == 0) {
+            gameIsRunning = false;
+            FindObjectsByType<Player>().ToList().ForEach(player => player.SetPlayerState(PlayerState.Dead));
+            RpcSendNotificationToEveryone("You've win", NotificationInstance.NotificationType.Info);
             Invoke(nameof(RestartGame), 5f);
         }
     }
@@ -39,17 +43,20 @@ public class GameManager : SingletonNetworkBehaviour<GameManager>
 
     [Server]
     void RestartGame() {
+        RpcResetGame();
         NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
-        NetworkManager.singleton.StopHost();
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.None;
-        RpcRestartGame();
+        ResetGame();
     }
 
     [ClientRpc]
-    void RpcRestartGame() {
-        // RestartGame();
+    void RpcResetGame() {
+        ResetGame();
+    }
+
+    void ResetGame() {
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
+        if (NetworkServer.active) NetworkManager.singleton.StopHost();
+        else NetworkManager.singleton.StopClient();
     }
 }

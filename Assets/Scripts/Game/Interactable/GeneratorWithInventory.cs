@@ -10,11 +10,14 @@ public class GeneratorWithInventory : Interactable
     public float fuelConsumptionPerSecond = 1;
     public float energyGenerationPerSecond = 1;
     public ItemContainer itemContainer;
+    public ParticleSystem _particleSystem;
 
     Transform hiddenRoot;
 
     [Header("Debug")]
     [SyncVar] public float currentFuel = 0;
+
+    [SyncVar] bool particlesActive = false;
 
     void Awake() {
         itemContainer = new(slotsCount);
@@ -24,17 +27,23 @@ public class GeneratorWithInventory : Interactable
     }
 
     void Update() {
-        if (!isServer) return;
-        if (battery) {
-            if (currentFuel > 0) {
-                currentFuel = Mathf.Max(currentFuel - Time.deltaTime * fuelConsumptionPerSecond, 0);
-                battery.AddCharge(energyGenerationPerSecond * Time.deltaTime);
-            } else if (itemContainer.Count > 0) {
-                int ind = itemContainer.FirstItemInd();
-                ItemInstance item = itemContainer.GetItem(ind);
-                currentFuel = item.itemData.itemFuelAmount;
-                itemContainer.DestroyItem(ind);
+        if (isServer) {
+            if (battery) {
+                if (currentFuel > 0) {
+                    currentFuel = Mathf.Max(currentFuel - Time.deltaTime * fuelConsumptionPerSecond, 0);
+                    battery.AddCharge(energyGenerationPerSecond * Time.deltaTime);
+                    particlesActive = true;
+                } else if (itemContainer.Count > 0) {
+                    int ind = itemContainer.FirstItemInd();
+                    ItemInstance item = itemContainer.GetItem(ind);
+                    currentFuel = item.itemData.itemFuelAmount;
+                    itemContainer.DestroyItem(ind);
+                } else particlesActive = false;
             }
+        }
+        if (_particleSystem) {
+            if (particlesActive && !_particleSystem.isPlaying) _particleSystem.Play();
+            else if (!particlesActive && _particleSystem.isPlaying) _particleSystem.Stop();
         }
     }
 

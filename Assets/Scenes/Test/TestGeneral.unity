@@ -10965,7 +10965,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  maxSinkingProgress: 10000
+  maxSinkingProgress: 100000
   startHeightOffset: 0
   endHeightOffset: -5
   currentSinkingProgress: 0

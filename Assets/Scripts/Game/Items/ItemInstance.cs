@@ -65,7 +65,7 @@ public class ItemInstance : Interactable
     void OnItemDataChanged(ItemData _, ItemData newItemData) {
         UpdateModel(newItemData);
         if (!isServer) itemProperties = newItemData != null ? newItemData.itemProperties.Clone().ToList() : new();
-        rb.isKinematic = newItemData == null;
+        // rb.isKinematic = newItemData == null;
     }
 
     void UpdateModel(ItemData itemData) {

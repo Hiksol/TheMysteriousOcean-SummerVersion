@@ -29,6 +29,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     public float tdVerticalSpeedInWater = 3f;
     public float csVerticalSpeedInWater = 1f;
     public float maxVerticalSpeedInWater = 2f;
+    public float waterCheckOffset = 3f;
 
     [Header("Climbing")]
     public float climbingSpeed = 3f;
@@ -299,13 +300,14 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     void HandleGravity(ref Vector3 currentVelocity, float deltaTime) {
         if (!CharacterMotor.GroundingStatus.IsStableOnGround) {
             // Gravity
-            if (IsDefault || CharacterMotor.MustUnground() || (InWater && currentStamina == 0)) currentVelocity += Physics.gravity * (playerGravityMult * deltaTime);
-            else if (InWater) {
+            // if (IsDefault || CharacterMotor.MustUnground() || (InWater && currentStamina == 0)) else
+            if (InWater && currentStamina > 0) {
                 float targetSpeed = targetVerticalSpeedInWater * (transform.position.y > waterRaycastPos.y ? -1 : 1);
                 // currentVelocity.y = Mathf.Lerp(currentVelocity.y, targetSpeed, 1 - Mathf.Exp(-5 * deltaTime));
                 currentVelocity.y = Mathf.Clamp(currentVelocity.y, -maxVerticalSpeedInWater, maxVerticalSpeedInWater);
                 currentVelocity.y = Mathf.MoveTowards(currentVelocity.y, targetSpeed, tdVerticalSpeedInWater * deltaTime + Mathf.Abs(currentVelocity.y) * csVerticalSpeedInWater * deltaTime);
             } else if (IsClimbing) currentVelocity.y = 0;
+            else currentVelocity += Physics.gravity * (playerGravityMult * deltaTime);
             // Drag
             currentVelocity.y *= 1f / (1f + (airDrag * deltaTime));
         }
@@ -321,8 +323,8 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     }
 
     void CheckWater() {
-        bool inWater = Physics.Raycast(transform.position + Vector3.up * (CharacterMotor.Capsule.height / 2f + 2f), Vector3.down, out RaycastHit hit, CharacterMotor.Capsule.height + 2f, waterLayer) &&
-            !Physics.Raycast(transform.position + Vector3.up * CharacterMotor.Capsule.height / 2f, Vector3.down, CharacterMotor.Capsule.height + 2f, Physics.DefaultRaycastLayers & ~waterLayer);
+        bool inWater = Physics.Raycast(transform.position + Vector3.up * (CharacterMotor.Capsule.height / 2f + waterCheckOffset), Vector3.down, out RaycastHit hit, CharacterMotor.Capsule.height + waterCheckOffset, waterLayer) &&
+            !Physics.Raycast(transform.position, Vector3.down, CharacterMotor.Capsule.height + 2f, Physics.DefaultRaycastLayers & ~waterLayer);
         if (inWater) {
             if (IsDefault) ChangeState(PlayerControllerState.Swimming);
             waterRaycastPos = hit.point;

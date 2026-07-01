@@ -27358,6 +27358,96 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1210130463}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1377781428
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 6003091551041657001}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: m_RayTracingMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: m_LightProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: d5da88914ce2bbe43a081eba2c09bf44, type: 2}
+    - target: {fileID: 919132149155446097, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+      propertyPath: m_Name
+      value: YachtMask
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+--- !u!4 &1377781429 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 793d11742692e0f4cb60f84a81906f61, type: 3}
+  m_PrefabInstance: {fileID: 1377781428}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1393720506
 GameObject:
   m_ObjectHideFlags: 0
@@ -29650,7 +29740,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   owner: {fileID: 0}
-  isInteractableEnabled: 0
+  isInteractableActive: 0
   onInteractableActiveChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -29676,6 +29766,13 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   owner: {fileID: 0}
+  isInteractableActive: 0
+  onInteractableActiveChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onInteractableWorkingChanged:
+    m_PersistentCalls:
+      m_Calls: []
   slotsCount: 9
   acceptableFuels: 03000000
   battery: {fileID: 317061413307024570}
@@ -29686,7 +29783,6 @@ MonoBehaviour:
     capacity: 0
     containerSlots: []
     isHands: 0
-  _particleSystem: {fileID: 1151272771}
   currentFuel: 0
 --- !u!1 &2840317454529670358
 GameObject:
@@ -29931,6 +30027,13 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   owner: {fileID: 0}
+  isInteractableActive: 0
+  onInteractableActiveChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onInteractableWorkingChanged:
+    m_PersistentCalls:
+      m_Calls: []
   slotsCount: 9
   acceptableFuels: 02000000
   battery: {fileID: 317061413307024570}
@@ -29941,7 +30044,6 @@ MonoBehaviour:
     capacity: 0
     containerSlots: []
     isHands: 0
-  _particleSystem: {fileID: 1307011186}
   currentFuel: 0
 --- !u!33 &3414874584824718254
 MeshFilter:
@@ -30439,7 +30541,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 376573b4f4ed7f144b4f4ff987413fc8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1377781429}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 376573b4f4ed7f144b4f4ff987413fc8, type: 3}
       insertIndex: -1
@@ -30932,12 +31037,18 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   owner: {fileID: 0}
+  isInteractableActive: 0
+  onInteractableActiveChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onInteractableWorkingChanged:
+    m_PersistentCalls:
+      m_Calls: []
   maxFuel: 20
   acceptableFuels: 01000000
   battery: {fileID: 317061413307024570}
   fuelConsumptionPerSecond: 0.3
   energyGenerationPerSecond: 0.3
-  _particleSystem: {fileID: 0}
   currentFuel: 0
 --- !u!65 &7423476832246919195
 BoxCollider:

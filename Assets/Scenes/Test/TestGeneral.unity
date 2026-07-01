@@ -29650,11 +29650,16 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   owner: {fileID: 0}
+  isInteractableEnabled: 0
+  onInteractableActiveChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onInteractableWorkingChanged:
+    m_PersistentCalls:
+      m_Calls: []
   battery: {fileID: 317061413307024570}
   energyConsumptionPerSecond: 0.1
   sinkingProgressDecreasePerSecond: 5
-  _particleSystem: {fileID: 391368857}
-  pumpEnabled: 0
 --- !u!114 &2840256905711682756
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29680,6 +29685,7 @@ MonoBehaviour:
     containerItem: {fileID: 0}
     capacity: 0
     containerSlots: []
+    isHands: 0
   _particleSystem: {fileID: 1151272771}
   currentFuel: 0
 --- !u!1 &2840317454529670358
@@ -29934,6 +29940,7 @@ MonoBehaviour:
     containerItem: {fileID: 0}
     capacity: 0
     containerSlots: []
+    isHands: 0
   _particleSystem: {fileID: 1307011186}
   currentFuel: 0
 --- !u!33 &3414874584824718254
@@ -30793,6 +30800,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.9980469, y: 0.98632836, z: 0.6972658}
   m_Center: {x: 0, y: 0, z: 0.3486329}
+--- !u!114 &7096794844990451772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1510263031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 903578aa3fde49a45b11eb41989336d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractableActiveVisual
+  particleSystems:
+  - {fileID: 391368857}
 --- !u!65 &7205076166705132405
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -30891,6 +30912,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d11bbb2ee460e7a45ba17e2031d46179, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2791463864268491330}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d11bbb2ee460e7a45ba17e2031d46179, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7096794844990451772}
   m_SourcePrefab: {fileID: 100100000, guid: d11bbb2ee460e7a45ba17e2031d46179, type: 3}
 --- !u!114 &7385495239919031022
 MonoBehaviour:

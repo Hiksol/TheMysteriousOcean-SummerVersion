@@ -1,33 +1,23 @@
 using Mirror;
 using UnityEngine;
 
-public class YachtPump : Interactable
+public class YachtPump : InteractableActive
 {
     public Battery battery;
     public float energyConsumptionPerSecond = 5;
     public float sinkingProgressDecreasePerSecond = 5;
-    public ParticleSystem _particleSystem;
 
-    [Header("Debug")]
-    public bool pumpEnabled = false;
+    float EnergyConsumptionDt => energyConsumptionPerSecond * Time.deltaTime;
 
-    [SyncVar] bool particlesActive = false;
-
-    void Update() {
-        if (isServer) {
-            if (pumpEnabled && battery && battery.TryConsumeCharge(energyConsumptionPerSecond * Time.deltaTime)) {
-                YachtManager.I.AddSinkingProgress(-sinkingProgressDecreasePerSecond * Time.deltaTime);
-                particlesActive = true;
-            } else particlesActive = false;
-        }
-        if (_particleSystem) {
-            if (particlesActive && !_particleSystem.isPlaying) _particleSystem.Play();
-            else if (!particlesActive && _particleSystem.isPlaying) _particleSystem.Stop();
-        }
+    public override bool IsInteractableShouldWork() {
+        return battery && battery.currentCharge >= EnergyConsumptionDt;
     }
 
     [Server]
-    override public void Interact(Player player, ItemInstance item) {
-        pumpEnabled = !pumpEnabled;
+    protected override void UpdateNewServer(bool isInteractableWorking) {
+        if (isInteractableActive && isInteractableWorking) {
+            battery.TryConsumeCharge(EnergyConsumptionDt);
+            YachtManager.I.AddSinkingProgress(-sinkingProgressDecreasePerSecond * Time.deltaTime);
+        }
     }
 }

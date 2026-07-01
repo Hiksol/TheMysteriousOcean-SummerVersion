@@ -427,21 +427,25 @@ public class Inventory : NetworkBehaviour
     }
 
     [Server]
-    public void DestroyItemInRightHand()
-    {
-        hands.DestroyItem(RIGHT_HAND_IND);
-        ForceUpdateSync(hands);
-        RpcInventoryLayoutChanged();
+    public void DestroyItemInRightHand() {
+        DestroyItemInternal(hands, RIGHT_HAND_IND);
     }
 
     [Server]
     public void DestoryItem(ItemInstance targetItem) {
         foreach ((ItemContainer container, ItemInstance item, int ind) in GetAllItemsFull()) {
             if (item == targetItem) {
-                container.DestroyItem(ind);
+                DestroyItemInternal(container, ind);
                 break;
             }
         }
+    }
+
+    [Server]
+    void DestroyItemInternal(ItemContainer container, int ind) {
+        container.DestroyItem(ind);
+        ForceUpdateSync(container);
+        RpcInventoryLayoutChanged();
     }
 
     void OnHandsChanged(ItemContainer _, ItemContainer newValue)

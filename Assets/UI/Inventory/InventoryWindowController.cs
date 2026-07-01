@@ -171,7 +171,7 @@ public class InventoryWindowController : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
 
-        if (Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame)
+        if (Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame && CanToggleInventory())
             ToggleInventory();
 
         if (fuelGenerator.style.display != DisplayStyle.None)
@@ -213,6 +213,10 @@ public class InventoryWindowController : NetworkBehaviour
     public void ToggleInventory()
     {
         SetOpen(!isOpen);
+    }
+
+    bool CanToggleInventory() {
+        return !isOpen && player.playerState == PlayerState.Default || isOpen && player.playerState == PlayerState.Interacting;
     }
 
     [Client]

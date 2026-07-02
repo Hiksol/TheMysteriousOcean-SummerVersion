@@ -46,16 +46,19 @@ public class GeneratorWithInventory : InteractableActive
     [Server]
     override public void Interact(Player player, ItemInstance item) {
         Inventory inventory = player.Inventory;
-        if (item == null) return;
-        if (acceptableFuels.Contains(item.itemData.itemFuelType)) {
+        inventory.OpenInventoryWithInteractable(this);
+    }
+
+    [Server]
+    public void TryTransferItem(Player player, ItemInstance item) {
+        Inventory inventory = player.Inventory;
+        if (IsItemAcceptable(item)) {
             int ind = itemContainer.FindFreeIndex(item.itemData.slotCount);
             if (ind == -1) return;
             itemContainer.InsertItemForce(item, ind);
-            inventory.DropItemInRightHand();
+            inventory.DropTargetItem(item);
             ParentItem(item, true, transform.position);
             RpcParentItem(item, true, transform.position);
-        } else {
-            item.Use(player, this);
         }
     }
 
@@ -69,5 +72,14 @@ public class GeneratorWithInventory : InteractableActive
         item.gameObject.SetActive(!hide);
         item.transform.position = pos;
         item.transform.SetParent(transform);
+    }
+
+    public bool IsItemAcceptable(ItemInstance item) {
+        return acceptableFuels.Contains(item.itemData.itemFuelType);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdTryTransferItem(Player player, ItemInstance item) {
+        TryTransferItem(player, item);
     }
 }

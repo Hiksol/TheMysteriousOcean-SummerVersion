@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
+[RequireComponent(typeof(UIDocument))]
 public class InventoryWindowController : NetworkBehaviour
 {
     [Header("UI")]
@@ -22,8 +23,10 @@ public class InventoryWindowController : NetworkBehaviour
     private const string SlotButtonName = "SlotButton";
     private const string SlotImageName = "ItemImage";
     private const string FuelGeneratorName = "FuelGenerator";
+    private const string BioGeneratorName = "BioGenerator";
     private const string FuelLevelName = "FuelLevel";
     private const string FuelTankNeckTriggerName = "FuelTankNeckTrigger";
+    private const string GeneratorWithInventoryDropZoneName = "GeneratorDropZone";
 
     private static readonly EquipableContainerType[] RowTypes =
     {
@@ -38,8 +41,10 @@ public class InventoryWindowController : NetworkBehaviour
     private VisualElement root;
     private VisualElement rowsRoot;
     VisualElement fuelGenerator;
+    VisualElement bioGenerator;
     VisualElement fuelLevel;
     VisualElement fuelTankNeckTrigger;
+    VisualElement generatorWithInventoryDropZone;
 
     private readonly List<RowBinding> rowBindings = new();
 
@@ -57,7 +62,7 @@ public class InventoryWindowController : NetworkBehaviour
     private VisualElement dragSourceVisual;
     private Coroutine dropRoutine;
 
-    Generator generator;
+    InteractableActive interactableActive;
 
     private sealed class RowBinding
     {
@@ -73,7 +78,8 @@ public class InventoryWindowController : NetworkBehaviour
     {
         None,
         InventorySlot,
-        ClothesFrame
+        ClothesFrame,
+        GeneratorZone
     }
 
     private struct DragSource
@@ -84,9 +90,9 @@ public class InventoryWindowController : NetworkBehaviour
         public ItemInstance Item;
         public VisualElement Visual;
 
-        public bool IsValid => Kind != DragKind.None && Item != null && Visual != null;
+        public readonly bool IsValid => Kind != DragKind.None && Item != null && Visual != null;
 
-        public static DragSource Invalid => new DragSource
+        public static DragSource Invalid => new()
         {
             Kind = DragKind.None,
             Type = EquipableContainerType.Custom,
@@ -103,9 +109,9 @@ public class InventoryWindowController : NetworkBehaviour
         public int SlotIndex;
         public VisualElement Visual;
 
-        public bool IsValid => Kind != DragKind.None && Visual != null;
+        public readonly bool IsValid => Kind != DragKind.None && Visual != null;
 
-        public static DropTarget Invalid => new DropTarget
+        public static DropTarget Invalid => new()
         {
             Kind = DragKind.None,
             Type = EquipableContainerType.Custom,
@@ -140,10 +146,13 @@ public class InventoryWindowController : NetworkBehaviour
         }
 
         fuelGenerator = root.Q<VisualElement>(FuelGeneratorName);
+        bioGenerator = root.Q<VisualElement>(BioGeneratorName);
         fuelLevel = root.Q<VisualElement>(FuelLevelName);
         fuelTankNeckTrigger = root.Q<VisualElement>(FuelTankNeckTriggerName);
+        generatorWithInventoryDropZone = root.Q<VisualElement>(GeneratorWithInventoryDropZoneName);
 
         CacheRows();
+        AddGeneratorEvents();
         CreateDragGhost();
         SetOpen(false);
 
@@ -174,15 +183,29 @@ public class InventoryWindowController : NetworkBehaviour
         if (Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame && CanToggleInventory())
             ToggleInventory();
 
-        if (fuelGenerator.style.display != DisplayStyle.None)
-            fuelLevel.style.maxHeight = new(new Length(generator.currentFuel / generator.maxFuel * 100, LengthUnit.Percent));
+
+        bool resetRotation = true;
+        HandleGeneratorFunc(ref resetRotation);
+        if (resetRotation && dragGhost.style.rotate.value.angle.value != 0) {
+            dragGhost.style.rotate = new(new Rotate(
+                Mathf.Lerp(dragGhost.style.rotate.value.angle.value, 0, 10 * Time.deltaTime)
+            ));
+        }
 
         if (isDragging && dragSource.Item == null) EndDrag();
         if (!isOpen || !isDragging || dragGhost == null || dragGhost.style.display == DisplayStyle.None)
             return;
 
-        bool resetRotation = true;
-        if (isDragging && dragSource.Item.TryGetProperty(out ItemPropertyFuelCanister fuelCanister, out int ind)) {
+        dragGhost.style.left = lastPointerPos.x + 12f;
+        dragGhost.style.top = lastPointerPos.y + 12f;
+    }
+
+    [Client]
+    void HandleGeneratorFunc(ref bool resetRotation) {
+        if (interactableActive is not Generator generator) return;
+        if (fuelGenerator.style.display != DisplayStyle.None)
+            fuelLevel.style.maxHeight = new(new Length(generator.currentFuel / generator.maxFuel * 100, LengthUnit.Percent));
+        if (isDragging && dragSource.Item.TryGetProperty(out ItemPropertyFuelCanister _, out int ind)) {
             float dragX = dragGhost.worldBound.center.x;
             if (fuelTankNeckTrigger.worldBound.xMin <= dragX && dragX <= fuelTankNeckTrigger.worldBound.xMax) {
                 CmdTryTransferFuelToGenerator(ind, dragSource.Item, generator, fuelTransferPerSecond * Time.deltaTime);
@@ -192,15 +215,6 @@ public class InventoryWindowController : NetworkBehaviour
                 resetRotation = false;
             }
         }
-        if (resetRotation && dragGhost.style.rotate.value.angle.value != 0)
-        {
-            dragGhost.style.rotate = new(new Rotate(
-                Mathf.Lerp(dragGhost.style.rotate.value.angle.value, 0, 10 * Time.deltaTime)
-            ));
-        }
-
-        dragGhost.style.left = lastPointerPos.x + 12f;
-        dragGhost.style.top = lastPointerPos.y + 12f;
     }
 
     [Command]
@@ -220,14 +234,15 @@ public class InventoryWindowController : NetworkBehaviour
     }
 
     [Client]
-    public void SetOpen(bool open, Generator generator = null)
+    public void SetOpen(bool open, InteractableActive interactableActive = null)
     {
         isOpen = open;
-        this.generator = generator;
+        this.interactableActive = open ? interactableActive : null;        
 
         if (root != null)
             root.style.display = open ? DisplayStyle.Flex : DisplayStyle.None;
-        fuelGenerator.style.display = generator ? DisplayStyle.Flex : DisplayStyle.None;
+        fuelGenerator.style.display = interactableActive is Generator ? DisplayStyle.Flex : DisplayStyle.None;
+        bioGenerator.style.display = interactableActive is GeneratorWithInventory ? DisplayStyle.Flex : DisplayStyle.None;
 
         UnityEngine.Cursor.visible = open;
         UnityEngine.Cursor.lockState = open ? CursorLockMode.None : CursorLockMode.Locked;
@@ -259,8 +274,7 @@ public class InventoryWindowController : NetworkBehaviour
 
                 clothesButton = clothesFrame.Q<Button>(SlotButtonName);
                 clothesImage = clothesFrame.Q<Image>(SlotImageName);
-                if (clothesImage == null)
-                    clothesImage = clothesFrame.Q<Image>();
+                clothesImage ??= clothesFrame.Q<Image>();
 
                 if (clothesButton != null)
                     clothesButton.text = string.Empty;
@@ -328,6 +342,23 @@ public class InventoryWindowController : NetworkBehaviour
         root.RegisterCallback<PointerUpEvent>(OnRootPointerUp);
     }
 
+    void AddGeneratorEvents() {
+        generatorWithInventoryDropZone.RegisterCallback<PointerEnterEvent>(evt => {
+            if (!isDragging) return;
+            SetHoverTarget(new DropTarget {
+                Kind = DragKind.GeneratorZone,
+                Type = EquipableContainerType.Custom,
+                SlotIndex = -1,
+                Visual = generatorWithInventoryDropZone
+            });
+        }, TrickleDown.TrickleDown);
+
+        generatorWithInventoryDropZone.RegisterCallback<PointerLeaveEvent>(evt => {
+            if (!isDragging) return;
+            ClearHoverTargetIfMatches(DragKind.GeneratorZone, EquipableContainerType.Custom, -1);
+        }, TrickleDown.TrickleDown);
+    }
+
     private void CreateDragGhost()
     {
         if (slotTemplate == null)
@@ -341,8 +372,7 @@ public class InventoryWindowController : NetworkBehaviour
         root.Add(dragGhost);
 
         dragGhostImage = dragGhost.Q<Image>(SlotImageName);
-        if (dragGhostImage == null)
-            dragGhostImage = dragGhost.Q<Image>();
+        dragGhostImage ??= dragGhost.Q<Image>();
     }
 
     private void BindInventoryEvents()
@@ -459,8 +489,7 @@ public class InventoryWindowController : NetworkBehaviour
         if (button != null)
             button.text = string.Empty;
 
-        if (image == null)
-            image = slot.Q<Image>();
+        image ??= slot.Q<Image>();
 
         SetImage(image, item != null && item.itemData != null && item.itemData.itemIcon != null
             ? item.itemData.itemIcon.texture
@@ -539,14 +568,12 @@ public class InventoryWindowController : NetworkBehaviour
         if (!isDragging)
             return;
 
-        if (hoveredVisual != null)
-            hoveredVisual.RemoveFromClassList("hovered");
+        hoveredVisual?.RemoveFromClassList("hovered");
 
         hoverTarget = target;
         hoveredVisual = target.Visual;
 
-        if (hoveredVisual != null)
-            hoveredVisual.AddToClassList("hovered");
+        hoveredVisual?.AddToClassList("hovered");
     }
 
     private void ClearHoverTargetIfMatches(DragKind kind, EquipableContainerType type, int slotIndex)
@@ -557,8 +584,7 @@ public class InventoryWindowController : NetworkBehaviour
         if (hoverTarget.Kind != kind || hoverTarget.Type != type || hoverTarget.SlotIndex != slotIndex)
             return;
 
-        if (hoveredVisual != null)
-            hoveredVisual.RemoveFromClassList("hovered");
+        hoveredVisual?.RemoveFromClassList("hovered");
 
         hoveredVisual = null;
         hoverTarget = DropTarget.Invalid;
@@ -610,6 +636,14 @@ public class InventoryWindowController : NetworkBehaviour
             int toSlot = hoverTarget.SlotIndex;
 
             action = () => inventory.CmdUnequipContainerToSlot(fromType, toType, toSlot);
+            targetVisual = hoverTarget.Visual;
+            return true;
+        }
+
+        if (dragSource.Kind == DragKind.InventorySlot && hoverTarget.Kind == DragKind.GeneratorZone) {
+            GeneratorWithInventory generator = interactableActive as GeneratorWithInventory;
+            if (!generator.IsItemAcceptable(dragSource.Item)) return false;
+            action = () => generator.CmdTryTransferItem(player, dragSource.Item);
             targetVisual = hoverTarget.Visual;
             return true;
         }
@@ -699,7 +733,7 @@ public class InventoryWindowController : NetworkBehaviour
         if (dragGhost == null)
             yield break;
 
-        Vector2 startPos = new Vector2(dragGhost.resolvedStyle.left, dragGhost.resolvedStyle.top);
+        Vector2 startPos = new(dragGhost.resolvedStyle.left, dragGhost.resolvedStyle.top);
         float elapsed = 0f;
 
         while (elapsed < duration)
@@ -724,8 +758,7 @@ public class InventoryWindowController : NetworkBehaviour
         dragSource = DragSource.Invalid;
         hoverTarget = DropTarget.Invalid;
 
-        if (hoveredVisual != null)
-            hoveredVisual.RemoveFromClassList("hovered");
+        hoveredVisual?.RemoveFromClassList("hovered");
 
         hoveredVisual = null;
 
@@ -810,7 +843,7 @@ public class InventoryWindowController : NetworkBehaviour
     private ItemInstance GetEquippedItem(EquipableContainerType type)
     {
         ItemContainer container = GetContainer(type);
-        return container != null ? container.containerItem : null;
+        return container?.containerItem;
     }
 
     private bool TryGetEquipableData(ItemInstance item, out ItemPropertyEquipableContainer equipable)

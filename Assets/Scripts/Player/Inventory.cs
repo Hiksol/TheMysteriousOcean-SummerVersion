@@ -387,19 +387,27 @@ public class Inventory : NetworkBehaviour
     }
 
     [Server]
-    public ItemInstance DropItemInRightHand()
-    {
+    public void DropTargetItem(ItemInstance targetItem) {
+        foreach ((ItemContainer container, ItemInstance item, int ind) in GetAllItemsFull()) {
+            if (item == targetItem) {
+                container.FreeSlot(ind);
+                item.owner = null;
+                DropItem(item, handPoints[RIGHT_HAND_IND].position);
+
+                ForceUpdateSync(hands);
+                if (isLocalPlayer) OnHandsChanged(null, hands);
+
+                RpcDropItem(item, handPoints[RIGHT_HAND_IND].position);
+                break;
+            }
+        }
+    }
+
+    [Server]
+    public ItemInstance DropItemInRightHand() {
         ItemInstance item = hands.FreeSlot(0);
         if (item == null) return null;
-
-        item.owner = null;
-        DropItem(item, handPoints[RIGHT_HAND_IND].position);
-
-        ForceUpdateSync(hands);
-
-        if (isLocalPlayer) OnHandsChanged(null, hands);
-        RpcDropItem(item, handPoints[RIGHT_HAND_IND].position);
-
+        DropTargetItem(item);
         return item;
     }
 
@@ -560,12 +568,12 @@ public class Inventory : NetworkBehaviour
     }
 
     [Server]
-    public void OpenInventoryWithGenerator(Generator generator) {
-        RpcOpenInventoryWithGenerator(connectionToClient, generator);
+    public void OpenInventoryWithInteractable(InteractableActive interactable) {
+        RpcOpenInventoryWithInteractable(connectionToClient, interactable);
     }
 
     [TargetRpc]
-    void RpcOpenInventoryWithGenerator(NetworkConnectionToClient _, Generator generator) {
-        inventoryWindowController.SetOpen(true, generator);
+    void RpcOpenInventoryWithInteractable(NetworkConnectionToClient _, InteractableActive interactable) {
+        inventoryWindowController.SetOpen(true, interactable);
     }
 }

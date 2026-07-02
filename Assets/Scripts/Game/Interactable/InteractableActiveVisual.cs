@@ -25,8 +25,8 @@ public class InteractableActiveVisual : MonoBehaviour
             else particleSystems.ForEach(ps => ps.Stop());
         }
         if (audioSources.Count > 0) {
-            if (isWorking) audioSources.ForEach(ps => ps.Play());
-            else audioSources.ForEach(ps => ps.Stop());
+            if (isWorking) audioSources.ForEach(aus => aus.Play());
+            else audioSources.ForEach(aus => aus.Stop());
         }
         if (isWorking) onWorkingOn.Invoke();
         else onWorkingOff.Invoke();

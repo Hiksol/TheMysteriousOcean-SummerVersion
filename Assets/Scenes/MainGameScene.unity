@@ -5660,7 +5660,7 @@ Transform:
   m_GameObject: {fileID: 664530194}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -11206,7 +11206,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   maxSinkingProgress: 180
-  startHeightOffset: 0
+  startHeightOffset: -1
   endHeightOffset: -5
   currentSinkingProgress: 0
   breaches: []
@@ -29930,11 +29930,28 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   owner: {fileID: 0}
+  isInteractableActive: 1
+  onInteractableActiveChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onInteractableWorkingChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 391368857}
+        m_TargetAssemblyTypeName: UnityEngine.ParticleSystem, UnityEngine
+        m_MethodName: Play
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   battery: {fileID: 317061413307024570}
   energyConsumptionPerSecond: 0.1
   sinkingProgressDecreasePerSecond: 5
-  _particleSystem: {fileID: 391368857}
-  pumpEnabled: 1
 --- !u!114 &2840256905711682756
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29951,6 +29968,13 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   owner: {fileID: 0}
+  isInteractableActive: 0
+  onInteractableActiveChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onInteractableWorkingChanged:
+    m_PersistentCalls:
+      m_Calls: []
   slotsCount: 9
   acceptableFuels: 03000000
   battery: {fileID: 317061413307024570}
@@ -29961,7 +29985,6 @@ MonoBehaviour:
     capacity: 0
     containerSlots: []
     isHands: 0
-  _particleSystem: {fileID: 1151272771}
   currentFuel: 0
 --- !u!1001 &3266148053852297981
 PrefabInstance:
@@ -30140,6 +30163,13 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   owner: {fileID: 0}
+  isInteractableActive: 0
+  onInteractableActiveChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onInteractableWorkingChanged:
+    m_PersistentCalls:
+      m_Calls: []
   slotsCount: 9
   acceptableFuels: 02000000
   battery: {fileID: 317061413307024570}
@@ -30150,7 +30180,6 @@ MonoBehaviour:
     capacity: 0
     containerSlots: []
     isHands: 0
-  _particleSystem: {fileID: 1307011186}
   currentFuel: 0
 --- !u!33 &3414874584824718254
 MeshFilter:
@@ -30763,12 +30792,18 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   owner: {fileID: 0}
+  isInteractableActive: 0
+  onInteractableActiveChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onInteractableWorkingChanged:
+    m_PersistentCalls:
+      m_Calls: []
   maxFuel: 20
   acceptableFuels: 01000000
   battery: {fileID: 317061413307024570}
   fuelConsumptionPerSecond: 0.3
   energyGenerationPerSecond: 0.3
-  _particleSystem: {fileID: 0}
   currentFuel: 0
 --- !u!65 &7423476832246919195
 BoxCollider:

@@ -9,7 +9,7 @@ Shader "Custom/StencilMask"
     {
         Tags {
             "RenderType" = "Opaque"
-            "Queue" = "Geometry-1"
+            "Queue" = "Geometry+1"
             "RenderPipeline" = "UniversalPipeline"
         }
 
@@ -19,7 +19,7 @@ Shader "Custom/StencilMask"
             ColorMask 0
 
             Stencil {
-                Ref 1
+                Ref [_StencilRef]
                 Comp Always
                 Pass Replace
             }

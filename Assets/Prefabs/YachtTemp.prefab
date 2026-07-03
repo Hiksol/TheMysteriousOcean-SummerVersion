@@ -434,6 +434,8 @@ MonoBehaviour:
   owner: {fileID: 0}
   sinkingSpeed: 0.5
   sinkingActive: 1
+  _particleSystem: {fileID: 0}
+  _audioSource: {fileID: 0}
 --- !u!1 &1618634468419876465
 GameObject:
   m_ObjectHideFlags: 0
@@ -1424,6 +1426,8 @@ MonoBehaviour:
   owner: {fileID: 0}
   sinkingSpeed: 0.5
   sinkingActive: 1
+  _particleSystem: {fileID: 0}
+  _audioSource: {fileID: 0}
 --- !u!1 &7302723232308117842
 GameObject:
   m_ObjectHideFlags: 0
@@ -1645,10 +1649,16 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   owner: {fileID: 0}
+  isInteractableActive: 0
+  onInteractableActiveChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onInteractableWorkingChanged:
+    m_PersistentCalls:
+      m_Calls: []
   battery: {fileID: 7898817542306031055}
   energyConsumptionPerSecond: 0.1
   sinkingProgressDecreasePerSecond: 5
-  pumpEnabled: 0
 --- !u!4 &734587894343988268 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d11bbb2ee460e7a45ba17e2031d46179, type: 3}
@@ -1776,6 +1786,13 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   owner: {fileID: 0}
+  isInteractableActive: 0
+  onInteractableActiveChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onInteractableWorkingChanged:
+    m_PersistentCalls:
+      m_Calls: []
   slotsCount: 9
   acceptableFuels: 02000000
   battery: {fileID: 7898817542306031055}
@@ -1785,6 +1802,7 @@ MonoBehaviour:
     containerItem: {fileID: 0}
     capacity: 0
     containerSlots: []
+    isHands: 0
   currentFuel: 0
 --- !u!1001 &3751192675725289674
 PrefabInstance:
@@ -1908,6 +1926,13 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   owner: {fileID: 0}
+  isInteractableActive: 0
+  onInteractableActiveChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onInteractableWorkingChanged:
+    m_PersistentCalls:
+      m_Calls: []
   maxFuel: 100
   acceptableFuels: 01000000
   battery: {fileID: 7898817542306031055}
@@ -2178,6 +2203,13 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   owner: {fileID: 0}
+  isInteractableActive: 0
+  onInteractableActiveChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onInteractableWorkingChanged:
+    m_PersistentCalls:
+      m_Calls: []
   slotsCount: 9
   acceptableFuels: 03000000
   battery: {fileID: 7898817542306031055}
@@ -2187,6 +2219,7 @@ MonoBehaviour:
     containerItem: {fileID: 0}
     capacity: 0
     containerSlots: []
+    isHands: 0
   currentFuel: 0
 --- !u!1001 &8524647163737821924
 PrefabInstance:

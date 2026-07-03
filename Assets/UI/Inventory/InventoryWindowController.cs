@@ -27,6 +27,7 @@ public class InventoryWindowController : NetworkBehaviour
     private const string FuelLevelName = "FuelLevel";
     private const string FuelTankNeckTriggerName = "FuelTankNeckTrigger";
     private const string GeneratorWithInventoryDropZoneName = "GeneratorDropZone";
+    private const string GeneratorNumOfItemsLeftName = "NumOfItemsLeft";
 
     private static readonly EquipableContainerType[] RowTypes =
     {
@@ -45,6 +46,7 @@ public class InventoryWindowController : NetworkBehaviour
     VisualElement fuelLevel;
     VisualElement fuelTankNeckTrigger;
     VisualElement generatorWithInventoryDropZone;
+    List<Label> generatorNumOfItemsLeft;
 
     private readonly List<RowBinding> rowBindings = new();
 
@@ -150,6 +152,7 @@ public class InventoryWindowController : NetworkBehaviour
         fuelLevel = root.Q<VisualElement>(FuelLevelName);
         fuelTankNeckTrigger = root.Q<VisualElement>(FuelTankNeckTriggerName);
         generatorWithInventoryDropZone = root.Q<VisualElement>(GeneratorWithInventoryDropZoneName);
+        generatorNumOfItemsLeft = root.Query<Label>(GeneratorNumOfItemsLeftName).Build().ToList();
 
         CacheRows();
         AddGeneratorEvents();
@@ -186,6 +189,7 @@ public class InventoryWindowController : NetworkBehaviour
 
         bool resetRotation = true;
         HandleGeneratorFunc(ref resetRotation);
+        HandleGeneratorWithInventoryFunc();
         if (resetRotation && dragGhost.style.rotate.value.angle.value != 0) {
             dragGhost.style.rotate = new(new Rotate(
                 Mathf.Lerp(dragGhost.style.rotate.value.angle.value, 0, 10 * Time.deltaTime)
@@ -214,6 +218,15 @@ public class InventoryWindowController : NetworkBehaviour
                 ));
                 resetRotation = false;
             }
+        }
+    }
+
+    [Client]
+    void HandleGeneratorWithInventoryFunc() {
+        if (interactableActive is not GeneratorWithInventory generator) return;
+        if (bioGenerator.style.display != DisplayStyle.None) {
+            string text = $"{generator.ItemsLeft} items left";
+            generatorNumOfItemsLeft.ForEach(label => label.text = text);
         }
     }
 

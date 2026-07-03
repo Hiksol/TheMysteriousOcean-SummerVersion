@@ -13,6 +13,8 @@ public class GeneratorWithInventory : InteractableActive
 
     Transform hiddenRoot;
 
+    public int ItemsLeft => itemContainer.Count;
+
     [Header("Debug")]
     [SyncVar] public float currentFuel = 0;
 

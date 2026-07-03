@@ -29,7 +29,7 @@ public class Generator : InteractableActive
     [Server]
     override public void Interact(Player player, ItemInstance item) {
         Inventory inventory = player.Inventory;
-        inventory.OpenInventoryWithGenerator(this);
+        inventory.OpenInventoryWithInteractable(this);
     }
 
     [Server]

@@ -164,7 +164,8 @@ namespace Mirror
             // considered active, so this check requires to scan inactive.
 #if UNITY_2021_3_OR_NEWER // 2021 has GetComponentInParent(bool includeInactive = false)
             if (GetComponent<NetworkIdentity>() == null &&
-                GetComponentInParent<NetworkIdentity>(true) == null)
+                GetComponentInParent<NetworkIdentity>(true) == null &&
+                !string.IsNullOrEmpty(gameObject.scene.path))
             {
                 Debug.LogError($"{GetType()} on {name} requires a NetworkIdentity. Please add a NetworkIdentity component to {name} or its parents.", this);
             }

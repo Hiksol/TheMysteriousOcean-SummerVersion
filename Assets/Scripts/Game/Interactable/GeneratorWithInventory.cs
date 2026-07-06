@@ -57,8 +57,20 @@ public class GeneratorWithInventory : InteractableActive
         if (IsItemAcceptable(item)) {
             int ind = itemContainer.FindFreeIndex(item.itemData.slotCount);
             if (ind == -1) return;
-            itemContainer.InsertItemForce(item, ind);
             inventory.DropTargetItem(item);
+            itemContainer.InsertItemForce(item, ind);
+            ParentItem(item, true, transform.position);
+            RpcParentItem(item, true, transform.position);
+        }
+    }
+
+    [Server]
+    public void TryTransferItemToSlot(Player player, ItemInstance item, int ind) {
+        Inventory inventory = player.Inventory;
+        if (IsItemAcceptable(item)) {
+            if (!itemContainer.IsSlotFreeForPotentialItem(ind, item)) return;
+            inventory.DropTargetItem(item);
+            itemContainer.InsertItemForce(item, ind);
             ParentItem(item, true, transform.position);
             RpcParentItem(item, true, transform.position);
         }
@@ -83,5 +95,10 @@ public class GeneratorWithInventory : InteractableActive
     [Command(requiresAuthority = false)]
     public void CmdTryTransferItem(Player player, ItemInstance item) {
         TryTransferItem(player, item);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdTryTransferItemToSlot(Player player, ItemInstance item, int ind) {
+        TryTransferItemToSlot(player, item, ind);
     }
 }

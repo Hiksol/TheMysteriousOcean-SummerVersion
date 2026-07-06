@@ -405,7 +405,7 @@ public class Inventory : NetworkBehaviour
 
     [Server]
     public ItemInstance DropItemInRightHand() {
-        ItemInstance item = hands.FreeSlot(0);
+        ItemInstance item = hands.GetItem(0);
         if (item == null) return null;
         DropTargetItem(item);
         return item;

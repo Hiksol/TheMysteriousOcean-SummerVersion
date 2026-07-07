@@ -118,6 +118,12 @@ public class ItemContainer {
         return -1;
     }
 
+    public int FindItemIndex(ItemInstance item) {
+        for (int i = 0; i < capacity; i++)
+            if(containerSlots[i].item == item) return i;
+        return -1;
+    }
+
     public IEnumerable<ItemInstance> GetAllItems() {
         foreach (ItemSlotInfo itemSlotInfo in containerSlots)
             if (itemSlotInfo.item != null) yield return itemSlotInfo.item;

@@ -76,6 +76,16 @@ public class GeneratorWithInventory : InteractableActive
         }
     }
 
+    [Server]
+    public void TryReturnItemToInventory(Player player, ItemInstance item, EquipableContainerType containerType, int ind) {
+        Inventory inventory = player.Inventory;
+        if (IsItemAcceptable(item)) {
+            if (!player.Inventory.GetContainer(containerType).IsSlotFreeForPotentialItem(ind, item)) return;
+            itemContainer.FreeSlot(itemContainer.FindItemIndex(item));
+            inventory.TryInsertItemIntoContainerType(item, containerType, ind);
+        }
+    }
+
     [ClientRpc]
     void RpcParentItem(ItemInstance item, bool hide, Vector3 pos) {
         ParentItem(item, hide, pos);
@@ -100,5 +110,10 @@ public class GeneratorWithInventory : InteractableActive
     [Command(requiresAuthority = false)]
     public void CmdTryTransferItemToSlot(Player player, ItemInstance item, int ind) {
         TryTransferItemToSlot(player, item, ind);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdTryReturnItemToInventory(Player player, ItemInstance item, EquipableContainerType containerType, int ind) {
+        TryReturnItemToInventory(player, item, containerType, ind);
     }
 }

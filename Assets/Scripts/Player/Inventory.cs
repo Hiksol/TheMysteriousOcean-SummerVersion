@@ -306,6 +306,13 @@ public class Inventory : NetworkBehaviour
         RpcInventoryLayoutChanged();
     }
 
+    [Server]
+    public void TryInsertItemIntoContainerType(ItemInstance item, EquipableContainerType containerType, int slotInd) {
+        ItemContainer container = GetContainer(containerType);
+        if (container == null) return;
+        InsertItemIntoContainer(item, container, slotInd);
+    }
+
     [Command]
     public void CmdEquipContainer(ItemInstance item)
     {

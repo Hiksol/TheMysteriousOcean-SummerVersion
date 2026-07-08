@@ -166,7 +166,7 @@ public class InventoryWindowController : NetworkBehaviour
         steamGeneratorDoor = root.Q<VisualElement>(SteamGeneratorDoorName);
         steamGeneratorClosure = root.Q<VisualElement>(SteamGeneratorClosureName);
         steamGeneratorClosure.RegisterCallback<PointerDownEvent>(evt => {
-            if (evt.button != 0 || steamGenOpenState != 0) return;
+            if (evt.button != 0 || steamGenOpenState != 0 || steamGenOpeningRoutine != null) return;
             IEnumerator Routine() {
                 float t = 0;
                 while (t < timeToOpen) {
@@ -175,20 +175,23 @@ public class InventoryWindowController : NetworkBehaviour
                     yield return null;
                 }
                 steamGenOpenState = 1;
+                steamGenOpeningRoutine = null;
             }
             steamGenOpeningRoutine = StartCoroutine(Routine());
             evt.StopPropagation();
         });
         steamGeneratorDoor.RegisterCallback<PointerDownEvent>(evt => {
-            if (evt.button != 0 || steamGenOpenState != 1) return;
+            if (evt.button != 0 || steamGenOpenState != 1 || steamGenOpeningRoutine != null) return;
             IEnumerator Routine() {
                 float t = 0;
                 while (t < timeToOpen) {
                     t += Time.deltaTime;
                     steamGeneratorDoor.style.scale = new(new Vector2(Mathf.Lerp(1, -1, t / timeToOpen), 1));
+                    if (t / timeToOpen >= 0.5f) steamGeneratorClosure.style.visibility = UnityEngine.UIElements.Visibility.Hidden;
                     yield return null;
                 }
                 steamGenOpenState = 2;
+                steamGenOpeningRoutine = null;
                 RebuildGenWithInventory();
             }
             steamGenOpeningRoutine = StartCoroutine(Routine());
@@ -303,6 +306,7 @@ public class InventoryWindowController : NetworkBehaviour
         steamGenOpenState = 0;
         steamGeneratorClosure.style.rotate = new(new Rotate(0));
         steamGeneratorDoor.style.scale = new(new Vector2(1, 1));
+        steamGeneratorClosure.style.visibility = UnityEngine.UIElements.Visibility.Visible;
         RebuildGenWithInventory();
 
         UnityEngine.Cursor.visible = open;
@@ -586,10 +590,7 @@ public class InventoryWindowController : NetworkBehaviour
         if (shouldBuildSlots) Utils.Repeat(generator.slotsCount, i => {
             ItemInstance item = generator.itemContainer.GetItem(i);
             TemplateContainer slot = slotTemplate.CloneTree();
-            // slot.style.position = Position.Absolute;
             parent.Add(slot);
-            // slot.style.left = slotsOffset * (i % 3 + 1);
-            // slot.style.bottom = slotsOffset * (Mathf.Floor(i / 3) + 1);
 
             Image image = slot.Q<Image>(SlotImageName);
             image ??= slot.Q<Image>();

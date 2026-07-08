@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class GeneratorWithInventory : InteractableActive
 {
@@ -10,6 +11,7 @@ public class GeneratorWithInventory : InteractableActive
     public float fuelConsumptionPerSecond = 1;
     public float energyGenerationPerSecond = 1;
     public ItemContainer itemContainer;
+    public UnityEvent onGenInventoryChanged = new();
 
     Transform hiddenRoot;
 
@@ -41,6 +43,7 @@ public class GeneratorWithInventory : InteractableActive
                 ItemInstance item = itemContainer.GetItem(ind);
                 currentFuel = item.itemData.itemFuelAmount;
                 itemContainer.DestroyItem(ind);
+            RpcInvokeGenInventoryChanged();
             }
         }
     }
@@ -61,6 +64,7 @@ public class GeneratorWithInventory : InteractableActive
             itemContainer.InsertItemForce(item, ind);
             ParentItem(item, true, transform.position);
             RpcParentItem(item, true, transform.position);
+            RpcInvokeGenInventoryChanged();
         }
     }
 
@@ -73,6 +77,7 @@ public class GeneratorWithInventory : InteractableActive
             itemContainer.InsertItemForce(item, ind);
             ParentItem(item, true, transform.position);
             RpcParentItem(item, true, transform.position);
+            RpcInvokeGenInventoryChanged();
         }
     }
 
@@ -83,6 +88,7 @@ public class GeneratorWithInventory : InteractableActive
             if (!player.Inventory.GetContainer(containerType).IsSlotFreeForPotentialItem(ind, item)) return;
             itemContainer.FreeSlot(itemContainer.FindItemIndex(item));
             inventory.TryInsertItemIntoContainerType(item, containerType, ind);
+            RpcInvokeGenInventoryChanged();
         }
     }
 
@@ -115,5 +121,10 @@ public class GeneratorWithInventory : InteractableActive
     [Command(requiresAuthority = false)]
     public void CmdTryReturnItemToInventory(Player player, ItemInstance item, EquipableContainerType containerType, int ind) {
         TryReturnItemToInventory(player, item, containerType, ind);
+    }
+
+    [ClientRpc]
+    void RpcInvokeGenInventoryChanged() {
+        onGenInventoryChanged.Invoke();
     }
 }

@@ -65,7 +65,7 @@
                     <ui:Image name="Closure" source="project://database/Assets/UI/HeatGenerator/Closure.png?fileID=2800000&amp;guid=eb07eb9065ec2b94e95b14651888e091&amp;type=3#Closure" style="align-self: center; justify-content: flex-start; align-items: stretch; align-content: flex-start; max-height: 40%; max-width: 30%; translate: -130px 8px; scale: 1 1; transform-origin: 85%;"/>
                 </ui:Image>
             </ui:Image>
-            <ui:VisualElement name="GeneratorDropZone" style="flex-grow: 1; max-width: none; background-color: rgba(0, 0, 0, 0); align-self: center; width: 45%; translate: 0 362px; max-height: 30%; height: 86%;"/>
+            <ui:VisualElement name="GeneratorDropZone" style="flex-grow: 1; max-width: none; background-color: rgba(0, 0, 0, 0); align-self: center; width: 45%; translate: 0 362px; max-height: 30%; height: 86%; flex-direction: row; flex-wrap: wrap; align-content: center; justify-content: center;"/>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

@@ -301,6 +301,8 @@ public class InventoryWindowController : NetworkBehaviour
         bioGenerator.style.display = interactableActive is GeneratorWithInventory bioGen && bioGen.acceptableFuels.Contains(ItemFuelType.Bio) ? DisplayStyle.Flex : DisplayStyle.None;
         steamGenerator.style.display = interactableActive is GeneratorWithInventory steamGen && steamGen.acceptableFuels.Contains(ItemFuelType.Heat) ? DisplayStyle.Flex : DisplayStyle.None;
         steamGenOpenState = 0;
+        steamGeneratorClosure.style.rotate = new(new Rotate(0));
+        steamGeneratorDoor.style.scale = new(new Vector2(1, 1));
         RebuildGenWithInventory();
 
         UnityEngine.Cursor.visible = open;

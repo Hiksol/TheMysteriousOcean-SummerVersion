@@ -813,7 +813,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IslandGenerator
   shapeBlend: 0.5
-  radius: 30
+  radius: 100
   resolution: 128
   noiseAmount: 0.3
   edgeWidth: 2

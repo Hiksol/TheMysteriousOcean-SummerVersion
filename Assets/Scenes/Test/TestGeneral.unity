@@ -20698,7 +20698,7 @@ MonoBehaviour:
   onInteractableWorkingChanged:
     m_PersistentCalls:
       m_Calls: []
-  slotsCount: 9
+  slotsCount: 4
   acceptableFuels: 03000000
   battery: {fileID: 317061413307024570}
   fuelConsumptionPerSecond: 0.1
@@ -20957,7 +20957,7 @@ MonoBehaviour:
   onInteractableWorkingChanged:
     m_PersistentCalls:
       m_Calls: []
-  slotsCount: 9
+  slotsCount: 4
   acceptableFuels: 02000000
   battery: {fileID: 317061413307024570}
   fuelConsumptionPerSecond: 0.2

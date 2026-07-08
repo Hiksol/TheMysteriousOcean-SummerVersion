@@ -270,10 +270,8 @@ public class InventoryWindowController : NetworkBehaviour
     [Client]
     void HandleGeneratorWithInventoryFunc() {
         if (interactableActive is not GeneratorWithInventory generator) return;
-        if (bioGenerator.style.display != DisplayStyle.None) {
-            string text = $"{generator.ItemsLeft} items left";
-            generatorNumOfItemsLeft.ForEach(label => label.text = text);
-        }
+        string text = $"{generator.ItemsLeft} items left";
+        generatorNumOfItemsLeft.ForEach(label => label.text = text);
     }
 
     [Command]
@@ -296,7 +294,9 @@ public class InventoryWindowController : NetworkBehaviour
     public void SetOpen(bool open, InteractableActive interactableActive = null)
     {
         isOpen = open;
-        this.interactableActive = open ? interactableActive : null;        
+        if (!isOpen) UnbindGenEvents();
+        this.interactableActive = open ? interactableActive : null;       
+        if (isOpen) BindGenEvents(); 
 
         if (root != null)
             root.style.display = open ? DisplayStyle.Flex : DisplayStyle.None;
@@ -446,6 +446,18 @@ public class InventoryWindowController : NetworkBehaviour
     private void OnAnyInventoryChanged(int _) => Rebuild();
     private void OnAnySlotChanged(ItemContainer _, int __) => Rebuild();
 
+    void BindGenEvents() {
+        if (interactableActive == null || interactableActive is not GeneratorWithInventory generator) return;
+        generator.onGenInventoryChanged.AddListener(OnGenInventoryChanged);
+    }
+
+    void UnbindGenEvents() {
+        if (interactableActive == null || interactableActive is not GeneratorWithInventory generator) return;
+        generator.onGenInventoryChanged.RemoveListener(OnGenInventoryChanged);
+    }
+
+    private void OnGenInventoryChanged() => RebuildGenWithInventory();
+
     private void OnRootPointerMove(PointerMoveEvent evt)
     {
         lastPointerPos = evt.position;
@@ -593,7 +605,6 @@ public class InventoryWindowController : NetworkBehaviour
             parent.Add(slot);
 
             Image image = slot.Q<Image>(SlotImageName);
-            image ??= slot.Q<Image>();
             SetImage(image, item != null && item.itemData.itemIcon != null ? item.itemData.itemIcon.texture : null);
 
             slot.RegisterCallback<PointerDownEvent>(evt => {

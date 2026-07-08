@@ -16,9 +16,11 @@ public class InventoryWindowController : NetworkBehaviour
 
     [Header("Generator")]
     public float fuelTransferPerSecond = 5f;
+
     [Header("Generator with inventory")]
     public int columnsCount = 3;
     public float slotsOffset = 20f;
+    public float timeToOpen = 1f;
 
     private const string RowsRootName = "rows-root";
     private const string ClothesFrameName = "ClothesFrame";
@@ -33,6 +35,7 @@ public class InventoryWindowController : NetworkBehaviour
     private const string GeneratorWithInventoryDropZoneName = "GeneratorDropZone";
     private const string GeneratorNumOfItemsLeftName = "NumOfItemsLeft";
     private const string SteamGeneratorDoorName = "Door";
+    private const string SteamGeneratorClosureName = "Closure";
 
     private static readonly EquipableContainerType[] RowTypes =
     {
@@ -51,16 +54,17 @@ public class InventoryWindowController : NetworkBehaviour
     VisualElement steamGenerator;
     VisualElement fuelLevel;
     VisualElement fuelTankNeckTrigger;
-    // VisualElement generatorWithInventoryDropZone;
     List<Label> generatorNumOfItemsLeft;
-    VisualElement steamGeneratorDoor;
     readonly List<VisualElement> genWithInventorySlots = new();
+    VisualElement steamGeneratorDoor;
+    VisualElement steamGeneratorClosure;
 
     private readonly List<RowBinding> rowBindings = new();
 
     private bool isOpen;
     private bool isDragging;
-    bool isSteamGenOpen = false;
+    int steamGenOpenState = 0;
+    Coroutine steamGenOpeningRoutine;
 
     private TemplateContainer dragGhost;
     private Image dragGhostImage;
@@ -160,14 +164,36 @@ public class InventoryWindowController : NetworkBehaviour
         bioGenerator = root.Q<VisualElement>(BioGeneratorName);
         steamGenerator = root.Q<VisualElement>(SteamGeneratorName);
         steamGeneratorDoor = root.Q<VisualElement>(SteamGeneratorDoorName);
-        void changeSteamGenDoor(PointerDownEvent evt) {
-            if (evt.button != 0) return;
-            isSteamGenOpen = !isSteamGenOpen;
-            RebuildGenWithInventory();
+        steamGeneratorClosure = root.Q<VisualElement>(SteamGeneratorClosureName);
+        steamGeneratorClosure.RegisterCallback<PointerDownEvent>(evt => {
+            if (evt.button != 0 || steamGenOpenState != 0) return;
+            IEnumerator Routine() {
+                float t = 0;
+                while (t < timeToOpen) {
+                    t += Time.deltaTime;
+                    steamGeneratorClosure.style.rotate = new(new Rotate(-180 * (t / timeToOpen)));
+                    yield return null;
+                }
+                steamGenOpenState = 1;
+            }
+            steamGenOpeningRoutine = StartCoroutine(Routine());
             evt.StopPropagation();
-        }
-        steamGenerator.Q<VisualElement>("OvenImage").RegisterCallback((EventCallback<PointerDownEvent>)changeSteamGenDoor);
-        steamGeneratorDoor.RegisterCallback((EventCallback<PointerDownEvent>)changeSteamGenDoor);
+        });
+        steamGeneratorDoor.RegisterCallback<PointerDownEvent>(evt => {
+            if (evt.button != 0 || steamGenOpenState != 1) return;
+            IEnumerator Routine() {
+                float t = 0;
+                while (t < timeToOpen) {
+                    t += Time.deltaTime;
+                    steamGeneratorDoor.style.scale = new(new Vector2(Mathf.Lerp(1, -1, t / timeToOpen), 1));
+                    yield return null;
+                }
+                steamGenOpenState = 2;
+                RebuildGenWithInventory();
+            }
+            steamGenOpeningRoutine = StartCoroutine(Routine());
+            evt.StopPropagation();
+        });
         fuelLevel = root.Q<VisualElement>(FuelLevelName);
         fuelTankNeckTrigger = root.Q<VisualElement>(FuelTankNeckTriggerName);
         generatorNumOfItemsLeft = root.Query<Label>(GeneratorNumOfItemsLeftName).Build().ToList();
@@ -274,7 +300,7 @@ public class InventoryWindowController : NetworkBehaviour
         fuelGenerator.style.display = interactableActive is Generator ? DisplayStyle.Flex : DisplayStyle.None;
         bioGenerator.style.display = interactableActive is GeneratorWithInventory bioGen && bioGen.acceptableFuels.Contains(ItemFuelType.Bio) ? DisplayStyle.Flex : DisplayStyle.None;
         steamGenerator.style.display = interactableActive is GeneratorWithInventory steamGen && steamGen.acceptableFuels.Contains(ItemFuelType.Heat) ? DisplayStyle.Flex : DisplayStyle.None;
-        isSteamGenOpen = false;
+        steamGenOpenState = 0;
         RebuildGenWithInventory();
 
         UnityEngine.Cursor.visible = open;
@@ -554,9 +580,7 @@ public class InventoryWindowController : NetworkBehaviour
         genWithInventorySlots.ForEach(ve => ve.RemoveFromHierarchy());
         if (interactableActive is not GeneratorWithInventory generator) return;
         VisualElement parent = ActiveGenWithInventory.Q<VisualElement>(GeneratorWithInventoryDropZoneName);
-        steamGeneratorDoor.style.visibility = isSteamGenOpen ?
-            UnityEngine.UIElements.Visibility.Hidden : UnityEngine.UIElements.Visibility.Visible;
-        bool shouldBuildSlots = steamGenerator.style.display != DisplayStyle.Flex || isSteamGenOpen;
+        bool shouldBuildSlots = steamGenerator.style.display != DisplayStyle.Flex || steamGenOpenState == 2;
         if (shouldBuildSlots) Utils.Repeat(generator.slotsCount, i => {
             ItemInstance item = generator.itemContainer.GetItem(i);
             TemplateContainer slot = slotTemplate.CloneTree();

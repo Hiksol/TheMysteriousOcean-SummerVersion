@@ -171,7 +171,7 @@ public class InventoryWindowController : NetworkBehaviour
                 float t = 0;
                 while (t < timeToOpen) {
                     t += Time.deltaTime;
-                    steamGeneratorClosure.style.rotate = new(new Rotate(-180 * (t / timeToOpen)));
+                    steamGeneratorClosure.style.rotate = new(new Rotate(180 * (t / timeToOpen)));
                     yield return null;
                 }
                 steamGenOpenState = 1;

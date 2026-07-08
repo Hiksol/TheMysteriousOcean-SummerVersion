@@ -431,6 +431,7 @@ MonoBehaviour:
   tdVerticalSpeedInWater: 2
   csVerticalSpeedInWater: 0.75
   maxVerticalSpeedInWater: 4
+  waterCheckOffset: 3
   climbingSpeed: 3
   anchoringDuration: 0.5
   cameraSensivity: 15
@@ -501,6 +502,7 @@ MonoBehaviour:
     containerItem: {fileID: 0}
     capacity: 0
     containerSlots: []
+    isHands: 0
   handPoints:
   - {fileID: 1039657005129850954}
   - {fileID: 8619351310919370399}
@@ -564,6 +566,9 @@ MonoBehaviour:
   uiDocument: {fileID: 9131040527583956033}
   slotTemplate: {fileID: 9197481963319205126, guid: 3e482469e2675a54781d549af2bdd9b6, type: 3}
   fuelTransferPerSecond: 1.5
+  columnsCount: 3
+  slotsOffset: 20
+  timeToOpen: 0.5
 --- !u!1 &668981748905062561
 GameObject:
   m_ObjectHideFlags: 0

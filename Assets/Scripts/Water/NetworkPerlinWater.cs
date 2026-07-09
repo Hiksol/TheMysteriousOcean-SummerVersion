@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using Mirror;
+using System.Collections.Generic;
+using System.Linq;
 
 [RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(MeshCollider))]
+[RequireComponent(typeof(MeshRenderer))]
 public class NetworkPerlinWater : NetworkBehaviour
 {
     [Header("Mesh Settings")]
@@ -20,11 +22,18 @@ public class NetworkPerlinWater : NetworkBehaviour
 
     private Mesh dynamicMesh;
     private Vector3[] baseVertices;
+    readonly List<Matrix4x4> matrices = new();
+
+    MeshRenderer meshRenderer;
 
     public override void OnStartServer()
     {
         // фиксируем момент старта на сервере
         generationStartTime = NetworkTime.time;
+    }
+
+    void Awake() {
+        meshRenderer = GetComponent<MeshRenderer>();
     }
 
     void Start()
@@ -35,6 +44,9 @@ public class NetworkPerlinWater : NetworkBehaviour
     void Update()
     {
         CalcNoise();
+        SmoothEdges();
+        dynamicMesh.RecalculateNormals();
+        RenderSubMeshes();
     }
 
     void CreateCustomMesh()
@@ -97,7 +109,16 @@ public class NetworkPerlinWater : NetworkBehaviour
 
         baseVertices = (Vector3[])vertices.Clone();
 
-        GetComponent<MeshCollider>().sharedMesh = dynamicMesh;
+        if (TryGetComponent(out MeshCollider meshCollider)) meshCollider.sharedMesh = dynamicMesh;
+
+        for (int deltaX = -1; deltaX <= 1; deltaX++) {
+            for (int deltaY = -1; deltaY <= 1; deltaY++) {
+                if (deltaX != 0 || deltaY != 0) matrices.Add(
+                    // Matrix4x4.TRS(transform.position + new Vector3(deltaX, 0, deltaY) * meshSize, Quaternion.identity, transform.lossyScale)
+                    Matrix4x4.TRS(transform.position + Vector3.Scale(new Vector3(deltaX, 0, deltaY) * meshSize, transform.lossyScale), Quaternion.identity, transform.lossyScale)
+                );
+            }
+        }
     }
 
     void CalcNoise()
@@ -118,13 +139,29 @@ public class NetworkPerlinWater : NetworkBehaviour
         }
 
         dynamicMesh.vertices = vertices;
-        dynamicMesh.RecalculateNormals();
-
-        GetComponent<MeshCollider>().sharedMesh = dynamicMesh;
     }
 
-    public void UpdateMeshResolution()
-    {
-        CreateCustomMesh();
+    int CoordToInd(int x, int z) {
+        return x + z * (meshResolution + 1);
+    }
+
+    void SmoothEdges() {
+        Vector3[] vertices = dynamicMesh.vertices;
+        void AvgYOnInds(int[] inds) {
+            float avgY = inds.Select(i => vertices[i].y).Average();
+            foreach (int i in inds) vertices[i].y = avgY;
+        }
+        int[] corners = { CoordToInd(0, 0), CoordToInd(meshResolution, 0), CoordToInd(0, meshResolution), CoordToInd(meshResolution, meshResolution) };
+        AvgYOnInds(corners);
+        for (int i = 1; i < meshResolution; i++) {
+            AvgYOnInds(new[] { CoordToInd(i, 0), CoordToInd(i, meshResolution) });
+            AvgYOnInds(new[] { CoordToInd(0, i), CoordToInd(meshResolution, i) });
+        }
+        dynamicMesh.vertices = vertices;
+    }
+
+    void RenderSubMeshes() {
+        RenderParams renderParams = new(meshRenderer.material);
+        Graphics.RenderMeshInstanced(renderParams, dynamicMesh, 0, matrices);
     }
 }

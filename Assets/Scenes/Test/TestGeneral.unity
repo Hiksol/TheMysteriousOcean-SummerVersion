@@ -20708,6 +20708,9 @@ MonoBehaviour:
     capacity: 0
     containerSlots: []
     isHands: 0
+  onGenInventoryChanged:
+    m_PersistentCalls:
+      m_Calls: []
   currentFuel: 0
 --- !u!1 &2840317454529670358
 GameObject:
@@ -20967,6 +20970,9 @@ MonoBehaviour:
     capacity: 0
     containerSlots: []
     isHands: 0
+  onGenInventoryChanged:
+    m_PersistentCalls:
+      m_Calls: []
   currentFuel: 0
 --- !u!23 &3749867343490312172
 MeshRenderer:

@@ -25,6 +25,7 @@ public class NetworkPerlinWater : NetworkBehaviour
     readonly List<Matrix4x4> matrices = new();
 
     MeshRenderer meshRenderer;
+    MeshCollider meshCollider;
 
     public override void OnStartServer()
     {
@@ -34,6 +35,7 @@ public class NetworkPerlinWater : NetworkBehaviour
 
     void Awake() {
         meshRenderer = GetComponent<MeshRenderer>();
+        TryGetComponent(out meshCollider);
     }
 
     void Start()
@@ -41,12 +43,16 @@ public class NetworkPerlinWater : NetworkBehaviour
         CreateCustomMesh();
     }
 
-    void Update()
-    {
+    void Update() {
         CalcNoise();
         SmoothEdges();
-        dynamicMesh.RecalculateNormals();
+        AssignMesh();
         RenderSubMeshes();
+    }
+
+    void AssignMesh() {
+        dynamicMesh.RecalculateNormals();
+        if (meshCollider) meshCollider.sharedMesh = dynamicMesh;
     }
 
     void CreateCustomMesh()
@@ -109,7 +115,7 @@ public class NetworkPerlinWater : NetworkBehaviour
 
         baseVertices = (Vector3[])vertices.Clone();
 
-        if (TryGetComponent(out MeshCollider meshCollider)) meshCollider.sharedMesh = dynamicMesh;
+        AssignMesh();
 
         for (int deltaX = -1; deltaX <= 1; deltaX++) {
             for (int deltaY = -1; deltaY <= 1; deltaY++) {

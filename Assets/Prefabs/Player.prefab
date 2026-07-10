@@ -568,7 +568,7 @@ MonoBehaviour:
   fuelTransferPerSecond: 1.5
   columnsCount: 3
   slotsOffset: 20
-  timeToOpen: 0.5
+  timeToOpen: 0.3
 --- !u!1 &668981748905062561
 GameObject:
   m_ObjectHideFlags: 0

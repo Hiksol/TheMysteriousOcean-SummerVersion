@@ -526,8 +526,8 @@ public class Inventory : NetworkBehaviour
         return -1;
     }
 
-    public ItemContainer GetContainer(EquipableContainerType type)
-    {
+    public ItemContainer GetContainer(EquipableContainerType type) {
+        if (type == EquipableContainerType.Hands) return hands;
         int index = GetContainerIndex(type);
         if (index < 0 || index >= inventoryContainers.Count) return null;
         return inventoryContainers[index];

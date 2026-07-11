@@ -10,6 +10,7 @@ public class NetworkPerlinWater : NetworkBehaviour
     [Header("Mesh Settings")]
     public int meshResolution = 50;
     public float meshSize = 10f;
+    public float deltaUpdateCollider = 0.1f;
 
     [Header("Wave Settings")]
     [SyncVar] public float perlinScale = 1f;
@@ -23,8 +24,10 @@ public class NetworkPerlinWater : NetworkBehaviour
     private Mesh dynamicMesh;
     private Vector3[] baseVertices;
     readonly List<Matrix4x4> matrices = new();
+    float currentDeltaUpdateCollider = 0f;
 
     MeshRenderer meshRenderer;
+    MeshCollider meshCollider;
 
     public override void OnStartServer()
     {
@@ -34,6 +37,7 @@ public class NetworkPerlinWater : NetworkBehaviour
 
     void Awake() {
         meshRenderer = GetComponent<MeshRenderer>();
+        TryGetComponent(out meshCollider);
     }
 
     void Start()
@@ -41,12 +45,20 @@ public class NetworkPerlinWater : NetworkBehaviour
         CreateCustomMesh();
     }
 
-    void Update()
-    {
+    void Update() {
         CalcNoise();
         SmoothEdges();
         dynamicMesh.RecalculateNormals();
+        AssignMesh();
         RenderSubMeshes();
+    }
+
+    void AssignMesh() {
+        currentDeltaUpdateCollider += Time.deltaTime;
+        if (currentDeltaUpdateCollider >= deltaUpdateCollider) {
+            currentDeltaUpdateCollider -= deltaUpdateCollider;
+            if (meshCollider) meshCollider.sharedMesh = dynamicMesh;
+        }
     }
 
     void CreateCustomMesh()
@@ -109,13 +121,13 @@ public class NetworkPerlinWater : NetworkBehaviour
 
         baseVertices = (Vector3[])vertices.Clone();
 
-        if (TryGetComponent(out MeshCollider meshCollider)) meshCollider.sharedMesh = dynamicMesh;
+        AssignMesh();
 
         for (int deltaX = -1; deltaX <= 1; deltaX++) {
-            for (int deltaY = -1; deltaY <= 1; deltaY++) {
-                if (deltaX != 0 || deltaY != 0) matrices.Add(
+            for (int deltaZ = 0; deltaZ <= 1; deltaZ++) {
+                if (deltaX != 0 || deltaZ != 0) matrices.Add(
                     // Matrix4x4.TRS(transform.position + new Vector3(deltaX, 0, deltaY) * meshSize, Quaternion.identity, transform.lossyScale)
-                    Matrix4x4.TRS(transform.position + Vector3.Scale(new Vector3(deltaX, 0, deltaY) * meshSize, transform.lossyScale), Quaternion.identity, transform.lossyScale)
+                    Matrix4x4.TRS(transform.position + Vector3.Scale(new Vector3(deltaX, 0, deltaZ) * meshSize, transform.lossyScale), Quaternion.identity, transform.lossyScale)
                 );
             }
         }

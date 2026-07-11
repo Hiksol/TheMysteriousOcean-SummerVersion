@@ -26,6 +26,7 @@ public class WobbleWaves : NetworkBehaviour
     [Header("Debug")]
     [SyncVar] public Vector3 targetRotation;
     [SyncVar] public Vector3 targetSmoothPosition;
+    public bool hasWater = false;
 
     Rigidbody rb;
 
@@ -51,8 +52,10 @@ public class WobbleWaves : NetworkBehaviour
     void Update() {
         if (isServer) {
             SampleWaveHeights();
-            CalculateTilt();
-            CalculatePositionAndRotation();
+            if (hasWater) {
+                CalculateTilt();
+                CalculatePositionAndRotation();
+            }
         }
     }
 
@@ -84,8 +87,11 @@ public class WobbleWaves : NetworkBehaviour
             Vector3 worldPos = samplePoints[i].position;
             Vector3 rayStart = new(worldPos.x, targetHeight, worldPos.z);
 
-            if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, raycastDistance, waterLayer)) currentSampleHeights[i] = hit.point.y;
-            else currentSampleHeights[i] = 0;
+            hasWater = false;
+            if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, raycastDistance, waterLayer)) {
+                currentSampleHeights[i] = hit.point.y;
+                hasWater = true;
+            } else currentSampleHeights[i] = 0;
         }
     }
 
@@ -94,7 +100,7 @@ public class WobbleWaves : NetworkBehaviour
     }
 
     void CalculateTilt() {
-        if (currentSampleHeights.Count < 3) return;
+        if (currentSampleHeights.Count < 4) return;
 
         // Вычисляем наклон по оси X (вперед-назад)
         float frontHeight = currentSampleHeights[0];

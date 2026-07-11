@@ -21,6 +21,7 @@ public class CraftingRecipeRenderer : MonoBehaviour
     public void SetCraftingRecipe(CraftingRecipe craftingRecipe, Player player) {
         this.craftingRecipe = craftingRecipe;
         craftingResultRenderer.GetComponentInChildren<TMP_Text>().text = craftingRecipe.result.itemName;
+        craftingResultRenderer.GetComponentInChildren<Image>().sprite = craftingRecipe.result.itemIcon;
         craftingIngredientRenderers.ForEach(cir => Destroy(cir));
         craftingIngredientRenderers.Clear();
         Dictionary<ItemData, int> requiredIngredients = new();
@@ -31,6 +32,7 @@ public class CraftingRecipeRenderer : MonoBehaviour
             craftingIngredientRenderer.GetComponent<Image>().color =
                 player.Inventory.GetAllItems().Count(item => item.itemData == ci) >= requiredIngredients[ci] ? hasIngredientColor : notHasIngredientColor;
             craftingIngredientRenderer.GetComponentInChildren<TMP_Text>().text = ci.itemName;
+            craftingIngredientRenderer.GetComponentInChildren<Image>().sprite = ci.itemIcon;
             craftingIngredientRenderers.Add(craftingIngredientRenderer);
         });
     }

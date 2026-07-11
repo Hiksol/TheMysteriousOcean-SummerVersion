@@ -1188,7 +1188,7 @@ GameObject:
   - component: {fileID: 8924393145936045490}
   m_Layer: 0
   m_Name: Island
-  m_TagString: Untagged
+  m_TagString: Island
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1307,8 +1307,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  velocity: {x: 0, y: 0, z: -6}
-  timeToLive: 180
+  velocity: {x: 0, y: 0, z: 0}
   halfDiagonal: 22
   currentTimeLiving: 0
   targetPosition: {x: 0, y: 0, z: 0}

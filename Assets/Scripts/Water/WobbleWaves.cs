@@ -87,11 +87,12 @@ public class WobbleWaves : NetworkBehaviour
             Vector3 worldPos = samplePoints[i].position;
             Vector3 rayStart = new(worldPos.x, targetHeight, worldPos.z);
 
-            hasWater = false;
-            if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, raycastDistance, waterLayer)) {
-                currentSampleHeights[i] = hit.point.y;
-                hasWater = true;
-            } else currentSampleHeights[i] = 0;
+            hasWater = true;
+            if (Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, raycastDistance, waterLayer)) currentSampleHeights[i] = hit.point.y;
+            else {
+                currentSampleHeights[i] = 0;
+                hasWater = false;
+            }
         }
     }
 

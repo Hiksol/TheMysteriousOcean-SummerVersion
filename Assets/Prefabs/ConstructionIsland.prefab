@@ -295,7 +295,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   velocity: {x: 0, y: 0, z: 0}
-  halfDiagonal: 75
+  halfDiagonal: 80
   currentTimeLiving: 0
   targetPosition: {x: 0, y: 0, z: 0}
   targetRotation: {x: 0, y: 0, z: 0, w: 0}

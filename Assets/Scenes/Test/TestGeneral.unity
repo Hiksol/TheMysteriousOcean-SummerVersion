@@ -6710,6 +6710,98 @@ PrefabInstance:
       propertyPath: sceneId
       value: 2405090647
       objectReference: {fileID: 0}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: craftingRecipes.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: craftingRecipes.Array.data[1].result
+      value: 
+      objectReference: {fileID: 11400000, guid: c2d3c04e961dce242a48017be4466c50, type: 2}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: craftingRecipes.Array.data[2].result
+      value: 
+      objectReference: {fileID: 11400000, guid: 5a434df1c2ad9a747a51e5ef9eca74b3, type: 2}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: craftingRecipes.Array.data[3].result
+      value: 
+      objectReference: {fileID: 11400000, guid: 294ca1f2dda65a449a98882c668f92b0, type: 2}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: craftingRecipes.Array.data[4].result
+      value: 
+      objectReference: {fileID: 11400000, guid: 5995a0534d57ffe4190090b2431b32b1, type: 2}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: craftingRecipes.Array.data[5].result
+      value: 
+      objectReference: {fileID: 11400000, guid: 6071a116c6030ba4d9432e8c10dff0fb, type: 2}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: craftingRecipes.Array.data[1].ingredients.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: craftingRecipes.Array.data[3].ingredients.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: craftingRecipes.Array.data[4].ingredients.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: craftingRecipes.Array.data[5].ingredients.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: 'craftingRecipes.Array.data[1].ingredients.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: cae30f9d8d5dc9940b1ed649aec7f673, type: 2}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: 'craftingRecipes.Array.data[1].ingredients.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: cae30f9d8d5dc9940b1ed649aec7f673, type: 2}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: 'craftingRecipes.Array.data[1].ingredients.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: cae30f9d8d5dc9940b1ed649aec7f673, type: 2}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: 'craftingRecipes.Array.data[2].ingredients.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: c2d3c04e961dce242a48017be4466c50, type: 2}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: 'craftingRecipes.Array.data[2].ingredients.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: c2d3c04e961dce242a48017be4466c50, type: 2}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: 'craftingRecipes.Array.data[3].ingredients.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 1d09a1afec14a4a48ad6952407e14dde, type: 2}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: 'craftingRecipes.Array.data[3].ingredients.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 32b7c1beffa1d5a4285a7c67656e46e2, type: 2}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: 'craftingRecipes.Array.data[4].ingredients.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: aaa73276f7a692940906ec963e56ea8e, type: 2}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: 'craftingRecipes.Array.data[4].ingredients.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: cae30f9d8d5dc9940b1ed649aec7f673, type: 2}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: 'craftingRecipes.Array.data[4].ingredients.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 5995a0534d57ffe4190090b2431b32b1, type: 2}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: 'craftingRecipes.Array.data[5].ingredients.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 132971d96a8bd3449b187a020834c714, type: 2}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: 'craftingRecipes.Array.data[5].ingredients.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 294ca1f2dda65a449a98882c668f92b0, type: 2}
+    - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: 'craftingRecipes.Array.data[5].ingredients.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 5995a0534d57ffe4190090b2431b32b1, type: 2}
     - target: {fileID: 4928007434233813203, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
       propertyPath: maxSinkingProgress
       value: 100000

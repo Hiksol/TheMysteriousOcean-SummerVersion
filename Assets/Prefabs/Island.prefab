@@ -1307,7 +1307,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  velocity: {x: 0, y: 0, z: 0}
+  velocity: {x: 0, y: 0, z: -6}
   timeToLive: 180
   halfDiagonal: 22
   currentTimeLiving: 0

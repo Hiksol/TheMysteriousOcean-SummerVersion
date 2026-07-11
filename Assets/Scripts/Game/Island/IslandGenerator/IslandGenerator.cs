@@ -1,10 +1,10 @@
 using UnityEngine;
 
-[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
 public class IslandGenerator : MonoBehaviour
 {
     [Header("Shape")]
-    [Range(0f, 1f)] public float shapeBlend = 0f; // 0 = круг, 1 = квадрат
+    [Range(0f, 1f)] public float shapeBlend = 0f;
     public float radius = 20f;
     public int resolution = 128;
 
@@ -20,9 +20,11 @@ public class IslandGenerator : MonoBehaviour
     public float inwardCurve = 3f;
 
     private Mesh mesh;
+    private MeshCollider meshCollider;
 
     void Start()
     {
+        meshCollider = GetComponent<MeshCollider>();
         Generate();
     }
 
@@ -30,34 +32,27 @@ public class IslandGenerator : MonoBehaviour
     {
         mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+
         GetComponent<MeshFilter>().mesh = mesh;
 
-        int rings = 3; // top ring, edge ring, bottom ring
+        int rings = 3;
         int ringVertices = resolution;
-        int vertexCount = rings * ringVertices + 2; // + top center + bottom center
+        int vertexCount = rings * ringVertices + 2;
 
         Vector3[] vertices = new Vector3[vertexCount];
 
-        // Сабмеши:
-        // 0 — верхняя плоскость (top cap)
-        // 1 — край (edge)
-        // 2 — боковая юбка (side)
-        // 3 — нижняя плоскость (bottom cap)
         mesh.subMeshCount = 4;
 
         int[][] submeshTriangles = new int[4][];
-        submeshTriangles[0] = new int[resolution * 3]; // top cap
-        submeshTriangles[1] = new int[resolution * 6]; // edge
-        submeshTriangles[2] = new int[resolution * 6]; // side
-        submeshTriangles[3] = new int[resolution * 3]; // bottom cap
+        submeshTriangles[0] = new int[resolution * 3];
+        submeshTriangles[1] = new int[resolution * 6];
+        submeshTriangles[2] = new int[resolution * 6];
+        submeshTriangles[3] = new int[resolution * 3];
 
         int[] triIndex = new int[4];
 
         int v = 0;
 
-        // -------------------------
-        // RINGS (top, edge, bottom)
-        // -------------------------
         for (int ring = 0; ring < rings; ring++)
         {
             float height = 0f;
@@ -102,11 +97,7 @@ public class IslandGenerator : MonoBehaviour
         vertices[topCenter] = new Vector3(0, 0, 0);
         vertices[bottomCenter] = new Vector3(0, -depth, 0);
 
-        // -------------------------
-        // TRIANGLES
-        // -------------------------
-
-        // TOP CAP (submesh 0) — нормали вверх
+        // TOP CAP (normals up)
         for (int i = 0; i < resolution; i++)
         {
             int next = (i + 1) % resolution;
@@ -116,7 +107,7 @@ public class IslandGenerator : MonoBehaviour
             submeshTriangles[0][triIndex[0]++] = i;
         }
 
-        // EDGE (submesh 1)
+        // EDGE
         for (int i = 0; i < resolution; i++)
         {
             int next = (i + 1) % resolution;
@@ -135,7 +126,7 @@ public class IslandGenerator : MonoBehaviour
             submeshTriangles[1][triIndex[1]++] = edgeNext;
         }
 
-        // SIDE (submesh 2)
+        // SIDE
         for (int i = 0; i < resolution; i++)
         {
             int next = (i + 1) % resolution;
@@ -154,7 +145,7 @@ public class IslandGenerator : MonoBehaviour
             submeshTriangles[2][triIndex[2]++] = bottomNext;
         }
 
-        // BOTTOM CAP (submesh 3) — нормали вниз
+        // BOTTOM CAP (normals down)
         int bottomStart = resolution * 2;
 
         for (int i = 0; i < resolution; i++)
@@ -174,5 +165,10 @@ public class IslandGenerator : MonoBehaviour
         mesh.SetTriangles(submeshTriangles[3], 3);
 
         mesh.RecalculateNormals();
+
+        // APPLY COLLIDER
+        meshCollider.sharedMesh = null;   // force refresh
+        meshCollider.sharedMesh = mesh;
+        meshCollider.convex = false;      // island should NOT be convex
     }
 }

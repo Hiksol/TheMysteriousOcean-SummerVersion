@@ -1308,7 +1308,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   velocity: {x: 0, y: 0, z: 0}
-  timeToLive: 120
+  timeToLive: 180
   halfDiagonal: 22
   currentTimeLiving: 0
   targetPosition: {x: 0, y: 0, z: 0}

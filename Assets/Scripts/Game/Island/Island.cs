@@ -49,13 +49,13 @@ public class Island : NetworkBehaviour, IMoverController
         }
         Vector3 position = wobbleWaves.hasWater ? wobbleWaves.targetSmoothPosition : transform.position;
         targetPosition = position + (!wobbleWaves || wobbleWaves.hasWater ? velocity : Vector3.down * downSpeed) * Time.fixedDeltaTime;
-        Quaternion rotation = wobbleWaves.hasWater ? Quaternion.Euler(wobbleWaves.targetRotation) :
-            Quaternion.Euler(-angleChangeSpeed * Time.deltaTime, 0, 0) * transform.rotation;
-        rotation.DecomposeSwingTwist(Vector3.right, out Quaternion swing, out Quaternion twist);
-        float xAngle = (twist.eulerAngles.x + 180) % 360 - 180;
-        if (xAngle < -maxAngle) {
-            twist.eulerAngles = new(-maxAngle, twist.eulerAngles.y, twist.eulerAngles.z);
-            rotation = swing * twist;
+        Quaternion rotation;
+        if (wobbleWaves.hasWater) rotation = Quaternion.Euler(wobbleWaves.targetRotation);
+        else {
+            rotation = Quaternion.Euler(-angleChangeSpeed * Time.deltaTime, 0, 0) * transform.rotation;
+            rotation.DecomposeSwingTwist(Vector3.right, out Quaternion _, out Quaternion twist);
+            float xAngle = (twist.eulerAngles.x + 180) % 360 - 180;
+            if (xAngle < -maxAngle) rotation = transform.rotation;
         }
         targetRotation = rotation;
     }

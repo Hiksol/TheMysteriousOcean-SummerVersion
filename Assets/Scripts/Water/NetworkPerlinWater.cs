@@ -120,8 +120,7 @@ public class NetworkPerlinWater : NetworkBehaviour
         dynamicMesh.RecalculateBounds();
 
         baseVertices = (Vector3[])vertices.Clone();
-        
-        dynamicMesh.RecalculateNormals();
+
         AssignMesh();
 
         for (int deltaX = -1; deltaX <= 1; deltaX++) {

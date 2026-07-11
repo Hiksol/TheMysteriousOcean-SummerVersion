@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mirror;
@@ -99,5 +100,11 @@ public class ItemInstance : Interactable
 
     public ItemProperty GetProperty(int ind) {
         return ind < itemProperties.Count ? itemProperties[ind] : null;
+    }
+
+    [Server]
+    public void Remove() {
+        NetworkServer.UnSpawn(gameObject);
+        Destroy(gameObject);
     }
 }

@@ -6473,11 +6473,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1029052608492135140, guid: e3be5079090795f479110e2f126258b9, type: 3}
       propertyPath: m_LocalScale.x
-      value: 50
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 1029052608492135140, guid: e3be5079090795f479110e2f126258b9, type: 3}
       propertyPath: m_LocalScale.z
-      value: 50
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 1029052608492135140, guid: e3be5079090795f479110e2f126258b9, type: 3}
       propertyPath: m_LocalPosition.x
@@ -6489,7 +6489,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1029052608492135140, guid: e3be5079090795f479110e2f126258b9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 190
+      value: 440
       objectReference: {fileID: 0}
     - target: {fileID: 1029052608492135140, guid: e3be5079090795f479110e2f126258b9, type: 3}
       propertyPath: m_LocalRotation.w
@@ -6519,6 +6519,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2286310053414052342, guid: e3be5079090795f479110e2f126258b9, type: 3}
+      propertyPath: m_CookingOptions
+      value: 16
+      objectReference: {fileID: 0}
     - target: {fileID: 2471520363076566005, guid: e3be5079090795f479110e2f126258b9, type: 3}
       propertyPath: m_Name
       value: Water
@@ -6529,7 +6533,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3225983526051009299, guid: e3be5079090795f479110e2f126258b9, type: 3}
       propertyPath: meshResolution
-      value: 250
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 7000836104834387315, guid: e3be5079090795f479110e2f126258b9, type: 3}
       propertyPath: sceneId

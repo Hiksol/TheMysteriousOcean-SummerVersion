@@ -96,8 +96,7 @@ public class ItemContainer {
         if (ind < 0 || ind > capacity) return;
         ItemInstance item = FreeSlot(ind);
         if (item == null) return;
-        NetworkServer.UnSpawn(item.gameObject);
-        UnityEngine.Object.Destroy(item.gameObject);
+        item.Remove();
     }
 
     public bool IsSlotFreeForPotentialItem(int ind, ItemInstance potentialItem) {

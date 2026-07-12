@@ -296,6 +296,9 @@ MonoBehaviour:
   syncInterval: 0
   velocity: {x: 0, y: 0, z: 0}
   halfDiagonal: 80
+  maxAngle: 60
+  angleChangeSpeed: 30
+  downSpeed: 5
   currentTimeLiving: 0
   targetPosition: {x: 0, y: 0, z: 0}
   targetRotation: {x: 0, y: 0, z: 0, w: 0}
@@ -315,7 +318,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   applyPositionAndRotation: 1
-  sampleDistance: 1
+  sampleDistance: 20
   samplePoints: []
   waterLayer:
     serializedVersion: 2
@@ -328,6 +331,7 @@ MonoBehaviour:
   heightSmoothness: 0.1
   targetRotation: {x: 0, y: 0, z: 0}
   targetSmoothPosition: {x: 0, y: 0, z: 0}
+  hasWater: 0
 --- !u!1 &2179357355163593796
 GameObject:
   m_ObjectHideFlags: 0

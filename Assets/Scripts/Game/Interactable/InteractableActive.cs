@@ -20,6 +20,7 @@ public abstract class InteractableActive : Interactable
             bool isInteractableWorkingNew = IsInteractableWorking;
             if (isInteractableWorkingNew != isInteractableWorkingLast) {
                 onInteractableWorkingChanged.Invoke(isInteractableWorkingNew);
+                RpcInvokeWorkingChanged(isInteractableWorkingNew);
             }
             UpdateNewServer(isInteractableWorkingNew);
             isInteractableWorkingLast = isInteractableWorkingNew;
@@ -53,7 +54,7 @@ public abstract class InteractableActive : Interactable
     protected virtual void OnInteractableActiveChangedInternal(bool isActive) {}
 
     [ClientRpc]
-    public void RpcInvokeWorkingChanged(bool isActive) {
+    void RpcInvokeWorkingChanged(bool isActive) {
         onInteractableWorkingChanged.Invoke(isActive);
     }
 }

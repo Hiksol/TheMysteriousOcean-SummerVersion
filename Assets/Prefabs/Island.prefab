@@ -1306,7 +1306,7 @@ MonoBehaviour:
   noiseAmount: 0.3
   edgeWidth: 2
   edgeDrop: 1
-  depth: 10
+  depth: 5
   inwardCurve: 3
 --- !u!1 &8487492477131812558
 GameObject:
@@ -1445,7 +1445,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  velocity: {x: 0, y: 0, z: -3}
+  velocity: {x: 0, y: 0, z: -5}
   halfDiagonal: 22
   maxAngle: 60
   angleChangeSpeed: 30
@@ -1479,7 +1479,7 @@ MonoBehaviour:
   waveCastHeight: 2
   maxTiltAngle: 5
   rotationSpeed: 2
-  heightOffset: 1
+  heightOffset: 0
   heightSmoothness: 0.1
   targetRotation: {x: 0, y: 0, z: 0}
   targetSmoothPosition: {x: 0, y: 0, z: 0}

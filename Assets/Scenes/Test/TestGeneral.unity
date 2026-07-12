@@ -730,20 +730,20 @@ MonoBehaviour:
       scWeight: 1
       islandPrefabs:
       - {fileID: 6581947262247567884, guid: 7740253b3eab6a6498bcd4421d03f715, type: 3}
-    categoryTimer: 120
-    currentCategoryTimer: 120
+    categoryTimer: 180
+    currentCategoryTimer: 0
   - categoryName: Small
     subcategories:
     - scName: Common
       scWeight: 1
       islandPrefabs:
       - {fileID: 2718646417605933834, guid: a842dc919f1a9364aa169255626df644, type: 3}
-    categoryTimer: 2
+    categoryTimer: 25
     currentCategoryTimer: 0
-  spawnInterval: 10
+  spawnInterval: 15
   startSpawnTransform: {fileID: 1370658650}
   endSpawnTransform: {fileID: 212383074}
-  islandsVelocity: {x: 0, y: 0, z: -3}
+  islandsVelocity: {x: 0, y: 0, z: -5}
   layersToExlude:
     serializedVersion: 2
     m_Bits: 16
@@ -6264,6 +6264,10 @@ PrefabInstance:
       propertyPath: sceneId
       value: 2405090647
       objectReference: {fileID: 0}
+    - target: {fileID: 1533606455838015232, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: slotsCount
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 3916317730379809644, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
       propertyPath: craftingRecipes.Array.size
       value: 6
@@ -6403,6 +6407,10 @@ PrefabInstance:
     - target: {fileID: 6034134328446660172, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8890575420504695259, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: slotsCount
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

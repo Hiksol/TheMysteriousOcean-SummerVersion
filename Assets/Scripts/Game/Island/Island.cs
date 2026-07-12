@@ -17,6 +17,7 @@ public class Island : NetworkBehaviour, IMoverController
     public float currentTimeLiving = 0f;
     [SyncVar] public Vector3 targetPosition;
     [SyncVar] public Quaternion targetRotation;
+    public bool isDrowning = false;
 
     PhysicsMover mover;
     WobbleWaves wobbleWaves;
@@ -34,10 +35,7 @@ public class Island : NetworkBehaviour, IMoverController
     void Update() {
         if (!isServer) return;
         currentTimeLiving += Time.deltaTime;
-        // if (currentTimeLiving >= timeToLive) {
-        //     NetworkServer.UnSpawn(gameObject);
-        //     Destroy(gameObject);
-        // }
+        if (wobbleWaves && !isDrowning && currentTimeLiving >= 0.1f && !wobbleWaves.hasWater) isDrowning = true;
     }
 
     void FixedUpdate() {
@@ -47,10 +45,10 @@ public class Island : NetworkBehaviour, IMoverController
             targetRotation = transform.rotation;
             return;
         }
-        Vector3 position = wobbleWaves.hasWater ? wobbleWaves.targetSmoothPosition : transform.position;
-        targetPosition = position + (!wobbleWaves || wobbleWaves.hasWater ? velocity : Vector3.down * downSpeed) * Time.fixedDeltaTime;
+        Vector3 position = !isDrowning ? wobbleWaves.targetSmoothPosition : transform.position;
+        targetPosition = position + (!isDrowning ? velocity : Vector3.down * downSpeed) * Time.fixedDeltaTime;
         Quaternion rotation;
-        if (wobbleWaves.hasWater) rotation = Quaternion.Euler(wobbleWaves.targetRotation);
+        if (!isDrowning) rotation = Quaternion.Euler(wobbleWaves.targetRotation);
         else {
             rotation = Quaternion.Euler(-angleChangeSpeed * Time.deltaTime, 0, 0) * transform.rotation;
             rotation.DecomposeSwingTwist(Vector3.right, out Quaternion _, out Quaternion twist);

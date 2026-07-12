@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 using KinematicCharacterController;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Cinemachine;
 
 [RequireComponent(typeof(Player))]
 [RequireComponent(typeof(KinematicCharacterMotor))]
@@ -35,6 +36,8 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     public float anchoringDuration = 1f;
 
     [Header("Camera")]
+    public Transform cam;
+    public CinemachineCamera cinemachineCamera;
     public float cameraSensivity = 100f;
     public float cameraVertialClamp = 80f;
 
@@ -82,7 +85,6 @@ public class PlayerController : NetworkBehaviour, ICharacterController
 
     Player player;
     public KinematicCharacterMotor CharacterMotor { get; private set; }
-    Camera cam;
     InputAction moveAction;
     InputAction lookAction;
     InputAction jumpAction;
@@ -120,9 +122,11 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     }
 
     public override void OnStartLocalPlayer() {
-        if (Camera.main) Camera.main.gameObject.SetActive(false);
-        cam = GetComponentInChildren<Camera>(true);
-        cam.gameObject.SetActive(true);
+        // if (Camera.main) Camera.main.gameObject.SetActive(false);
+        // cam = GetComponentInChildren<Camera>(true);
+        // cam.gameObject.SetActive(true);
+        cinemachineCamera.transform.SetParent(null);
+        cinemachineCamera.gameObject.SetActive(true);
     }
 
     void Update() {

@@ -35,7 +35,7 @@ public class Island : NetworkBehaviour, IMoverController
     void Update() {
         if (!isServer) return;
         currentTimeLiving += Time.deltaTime;
-        if (wobbleWaves && !isDrowning && currentTimeLiving >= 0.1f && !wobbleWaves.hasWater) isDrowning = true;
+        if (wobbleWaves && !isDrowning && currentTimeLiving >= 1f && !wobbleWaves.hasWater) isDrowning = true;
     }
 
     void FixedUpdate() {

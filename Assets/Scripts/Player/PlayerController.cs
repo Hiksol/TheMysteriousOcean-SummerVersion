@@ -313,7 +313,16 @@ public class PlayerController : NetworkBehaviour, ICharacterController
             else currentVelocity += Physics.gravity * (playerGravityMult * deltaTime);
             // Drag
             currentVelocity.y *= 1f / (1f + (airDrag * deltaTime));
+        /* } else {
+            Vector3 groundPoint = CharacterMotor.GroundingStatus.GroundPoint;
+            // Vector3 groundPoint = ;
+            Vector3 characterBottom = transform.position + CharacterMotor.CharacterTransformToCapsuleBottom;
+            // float distance = Vector3.Distance(groundPoint, characterBottom);
+            currentVelocity += groundPoint - characterBottom; */
         }
+        Vector3 groundPoint = CharacterMotor.GroundingStatus.GroundPoint;
+        Vector3 characterBottom = transform.position + CharacterMotor.CharacterTransformToCapsuleBottom;
+        currentVelocity += groundPoint - characterBottom;
     }
 
     void HandleJump(ref Vector3 currentVelocity, float _) {
@@ -338,7 +347,8 @@ public class PlayerController : NetworkBehaviour, ICharacterController
 
     void CheckLadder() {
         if (!interactAction.WasPressedThisFrame()) return;
-        if (CharacterMotor.CharacterOverlap(CharacterMotor.TransientPosition, CharacterMotor.TransientRotation, probedColliders, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide) > 0) {
+        // if (CharacterMotor.CharacterOverlap(CharacterMotor.TransientPosition, CharacterMotor.TransientRotation, probedColliders, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide) > 0) {
+        if (CharacterMotor.CharacterOverlap(transform.position, transform.rotation, probedColliders, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide) > 0) {
             // if (probedColliders[0] == null) return;
             Collider collider = probedColliders.FirstOrDefault(col => col && col.TryGetComponent(out Ladder _));
             if (collider != null && collider.TryGetComponent(out Ladder ladder)) {

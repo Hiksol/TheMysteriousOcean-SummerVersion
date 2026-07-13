@@ -313,13 +313,16 @@ public class PlayerController : NetworkBehaviour, ICharacterController
             else currentVelocity += Physics.gravity * (playerGravityMult * deltaTime);
             // Drag
             currentVelocity.y *= 1f / (1f + (airDrag * deltaTime));
-        } else {
+        /* } else {
             Vector3 groundPoint = CharacterMotor.GroundingStatus.GroundPoint;
             // Vector3 groundPoint = ;
             Vector3 characterBottom = transform.position + CharacterMotor.CharacterTransformToCapsuleBottom;
             // float distance = Vector3.Distance(groundPoint, characterBottom);
-            currentVelocity += groundPoint - characterBottom;
+            currentVelocity += groundPoint - characterBottom; */
         }
+        Vector3 groundPoint = CharacterMotor.GroundingStatus.GroundPoint;
+        Vector3 characterBottom = transform.position + CharacterMotor.CharacterTransformToCapsuleBottom;
+        currentVelocity += groundPoint - characterBottom;
     }
 
     void HandleJump(ref Vector3 currentVelocity, float _) {

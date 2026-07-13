@@ -7,6 +7,7 @@ public class YachtBreach : Interactable
     public bool sinkingActive = true;
 
     public ParticleSystem _particleSystem;
+    public AudioSource _audioSource;
 
     public override void OnStartServer() {
         YachtManager.I.breaches.Add(this);
@@ -23,6 +24,7 @@ public class YachtBreach : Interactable
         YachtManager.I.breaches.Remove(this);
         if (_particleSystem != null) {
             _particleSystem.Stop();
+            _audioSource.Stop();
             RpcDisableParticleSystem();
         }
     }
@@ -30,5 +32,6 @@ public class YachtBreach : Interactable
     [ClientRpc]
     void RpcDisableParticleSystem() {
         _particleSystem.Stop();
+        _audioSource.Stop();
     }
 }

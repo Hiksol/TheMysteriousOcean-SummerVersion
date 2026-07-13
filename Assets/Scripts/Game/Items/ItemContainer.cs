@@ -8,15 +8,17 @@ public class ItemContainer {
     public ItemInstance containerItem;
     public int capacity;
     public ItemSlotInfo[] containerSlots;
+    public bool isHands = false;
 
     public int Count => containerSlots.Count(slot => slot.item != null);
 
     public ItemContainer() {}
-    public ItemContainer(int capacity) {
+    public ItemContainer(int capacity, bool isHands = false) {
         containerItem = null;
         this.capacity = capacity;
         // containerSlots = Utils.CreateItems<ItemSlotInfo>(capacity).ToList();
         containerSlots = Utils.CreateItems<ItemSlotInfo>(capacity).ToArray();
+        this.isHands = isHands;
     }
     public ItemContainer(ItemInstance containerItem, int capacity) {
         this.containerItem = containerItem;
@@ -94,8 +96,7 @@ public class ItemContainer {
         if (ind < 0 || ind > capacity) return;
         ItemInstance item = FreeSlot(ind);
         if (item == null) return;
-        NetworkServer.UnSpawn(item.gameObject);
-        UnityEngine.Object.Destroy(item.gameObject);
+        item.Remove();
     }
 
     public bool IsSlotFreeForPotentialItem(int ind, ItemInstance potentialItem) {
@@ -113,6 +114,12 @@ public class ItemContainer {
     public int FirstItemInd() {
         for (int i = 0; i < capacity; i++)
             if (containerSlots[i].item != null) return i;
+        return -1;
+    }
+
+    public int FindItemIndex(ItemInstance item) {
+        for (int i = 0; i < capacity; i++)
+            if(containerSlots[i].item == item) return i;
         return -1;
     }
 

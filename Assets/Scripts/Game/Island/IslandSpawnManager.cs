@@ -24,11 +24,15 @@ public class IslandSpawnManager : NetworkBehaviour
         }
     }
 
-    Island TryGetIsland() {
-        foreach (IslandSpawnCategory islandCategory in islandCategories) {
-            Island island = islandCategory.TryGetIsland();
-            if (island != null) return island;
+    Island TryGetIsland(out IslandSpawnCategory islandCategory) {
+        foreach (IslandSpawnCategory _islandCategory in islandCategories) {
+            Island island = _islandCategory.TryGetIsland();
+            if (island != null) {
+                islandCategory = _islandCategory;
+                return island;
+            }
         }
+        islandCategory = null;
         return null;
     }
 
@@ -45,12 +49,13 @@ public class IslandSpawnManager : NetworkBehaviour
 
     [Server]
     void SpawnIsland() {
-        Island island = TryGetIsland();
+        Island island = TryGetIsland(out IslandSpawnCategory islandCategory);
         if (island == null) return;
         float radius = island.halfDiagonal;
         Vector3 spawnPosition = GetSpawnPosition(radius);
         Collider[] colliders = new Collider[1];
         if (Physics.OverlapSphereNonAlloc(spawnPosition, radius, colliders, ~layersToExlude) > 0) return;
+        islandCategory.currentCategoryTimer = 0;
         Island islandInstance = Instantiate(island, spawnPosition, Quaternion.Euler(new(0, GameManager.I.Rng.Range(360), 0)));
         islandInstance.velocity = islandsVelocity;
         NetworkServer.Spawn(islandInstance.gameObject);
@@ -69,7 +74,7 @@ public class IslandSpawnManager : NetworkBehaviour
 
         public Island TryGetIsland() {
             if (currentCategoryTimer == categoryTimer) {
-                currentCategoryTimer = 0;
+                // currentCategoryTimer = 0;
                 IslandSpawnSubcategory islandSpawnSubcategory = GameManager.I.Rng.RandomWeightedItem(subcategories, sc => sc.scWeight);
                 return GameManager.I.Rng.RandomItem(islandSpawnSubcategory.islandPrefabs);
             }

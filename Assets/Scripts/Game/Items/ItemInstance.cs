@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mirror;
@@ -65,7 +66,7 @@ public class ItemInstance : Interactable
     void OnItemDataChanged(ItemData _, ItemData newItemData) {
         UpdateModel(newItemData);
         if (!isServer) itemProperties = newItemData != null ? newItemData.itemProperties.Clone().ToList() : new();
-        rb.isKinematic = newItemData == null;
+        // rb.isKinematic = newItemData == null;
     }
 
     void UpdateModel(ItemData itemData) {
@@ -99,5 +100,11 @@ public class ItemInstance : Interactable
 
     public ItemProperty GetProperty(int ind) {
         return ind < itemProperties.Count ? itemProperties[ind] : null;
+    }
+
+    [Server]
+    public void Remove() {
+        NetworkServer.UnSpawn(gameObject);
+        Destroy(gameObject);
     }
 }

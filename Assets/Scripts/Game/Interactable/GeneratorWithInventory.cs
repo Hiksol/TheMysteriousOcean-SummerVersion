@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class GeneratorWithInventory : Interactable
+public class GeneratorWithInventory : InteractableActive
 {
     public int slotsCount = 9;
     public List<ItemFuelType> acceptableFuels = new() { ItemFuelType.Fuel };
@@ -10,14 +11,14 @@ public class GeneratorWithInventory : Interactable
     public float fuelConsumptionPerSecond = 1;
     public float energyGenerationPerSecond = 1;
     public ItemContainer itemContainer;
-    public ParticleSystem _particleSystem;
+    public UnityEvent onGenInventoryChanged = new();
 
     Transform hiddenRoot;
 
+    public int ItemsLeft => itemContainer.Count;
+
     [Header("Debug")]
     [SyncVar] public float currentFuel = 0;
-
-    [SyncVar] bool particlesActive = false;
 
     void Awake() {
         itemContainer = new(slotsCount);
@@ -26,40 +27,68 @@ public class GeneratorWithInventory : Interactable
         hiddenRoot.localPosition = Vector3.zero;
     }
 
-    void Update() {
-        if (isServer) {
-            if (battery) {
-                if (currentFuel > 0) {
-                    currentFuel = Mathf.Max(currentFuel - Time.deltaTime * fuelConsumptionPerSecond, 0);
-                    battery.AddCharge(energyGenerationPerSecond * Time.deltaTime);
-                    particlesActive = true;
-                } else if (itemContainer.Count > 0) {
-                    int ind = itemContainer.FirstItemInd();
-                    ItemInstance item = itemContainer.GetItem(ind);
-                    currentFuel = item.itemData.itemFuelAmount;
-                    itemContainer.DestroyItem(ind);
-                } else particlesActive = false;
+    protected override bool IsAlwaysActive => true;
+
+    public override bool IsInteractableShouldWork() {
+        return battery && (currentFuel > 0 || itemContainer.Count > 0);
+    }
+
+    protected override void UpdateNewServer(bool isInteractableWorking) {
+        if (isInteractableWorking) {
+            if (currentFuel > 0) {
+                currentFuel = Mathf.Max(currentFuel - Time.deltaTime * fuelConsumptionPerSecond, 0);
+                battery.AddCharge(energyGenerationPerSecond * Time.deltaTime);
+            } else if (itemContainer.Count > 0) {
+                int ind = itemContainer.FirstItemInd();
+                ItemInstance item = itemContainer.GetItem(ind);
+                currentFuel = item.itemData.itemFuelAmount;
+                itemContainer.DestroyItem(ind);
+            RpcInvokeGenInventoryChanged();
             }
-        }
-        if (_particleSystem) {
-            if (particlesActive && !_particleSystem.isPlaying) _particleSystem.Play();
-            else if (!particlesActive && _particleSystem.isPlaying) _particleSystem.Stop();
         }
     }
 
     [Server]
     override public void Interact(Player player, ItemInstance item) {
         Inventory inventory = player.Inventory;
-        if (item == null) return;
-        if (acceptableFuels.Contains(item.itemData.itemFuelType)) {
+        inventory.OpenInventoryWithInteractable(this);
+    }
+
+    [Server]
+    public void TryTransferItem(Player player, ItemInstance item) {
+        Inventory inventory = player.Inventory;
+        if (IsItemAcceptable(item)) {
             int ind = itemContainer.FindFreeIndex(item.itemData.slotCount);
             if (ind == -1) return;
+            inventory.DropTargetItem(item);
             itemContainer.InsertItemForce(item, ind);
-            inventory.DropItemInRightHand();
             ParentItem(item, true, transform.position);
             RpcParentItem(item, true, transform.position);
-        } else {
-            item.Use(player, this);
+            RpcInvokeGenInventoryChanged();
+        }
+    }
+
+    [Server]
+    public void TryTransferItemToSlot(Player player, ItemInstance item, int ind) {
+        Inventory inventory = player.Inventory;
+        if (IsItemAcceptable(item)) {
+            if (!itemContainer.IsSlotFreeForPotentialItem(ind, item)) return;
+            inventory.DropTargetItem(item);
+            itemContainer.InsertItemForce(item, ind);
+            ParentItem(item, true, transform.position);
+            RpcParentItem(item, true, transform.position);
+            RpcInvokeGenInventoryChanged();
+        }
+    }
+
+    [Server]
+    public void TryReturnItemToInventory(Player player, ItemInstance item, EquipableContainerType containerType, int ind) {
+        Inventory inventory = player.Inventory;
+        if (IsItemAcceptable(item)) {
+            if (!player.Inventory.GetContainer(containerType).IsSlotFreeForPotentialItem(ind, item)) return;
+            itemContainer.FreeSlot(itemContainer.FindItemIndex(item));
+            inventory.TryInsertItemIntoContainerType(item, containerType, ind);
+            RpcInvokeGenInventoryChanged();
         }
     }
 
@@ -73,5 +102,29 @@ public class GeneratorWithInventory : Interactable
         item.gameObject.SetActive(!hide);
         item.transform.position = pos;
         item.transform.SetParent(transform);
+    }
+
+    public bool IsItemAcceptable(ItemInstance item) {
+        return acceptableFuels.Contains(item.itemData.itemFuelType);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdTryTransferItem(Player player, ItemInstance item) {
+        TryTransferItem(player, item);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdTryTransferItemToSlot(Player player, ItemInstance item, int ind) {
+        TryTransferItemToSlot(player, item, ind);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdTryReturnItemToInventory(Player player, ItemInstance item, EquipableContainerType containerType, int ind) {
+        TryReturnItemToInventory(player, item, containerType, ind);
+    }
+
+    [ClientRpc]
+    void RpcInvokeGenInventoryChanged() {
+        onGenInventoryChanged.Invoke();
     }
 }

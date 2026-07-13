@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
+[RequireComponent(typeof(UIDocument))]
 public class InventoryWindowController : NetworkBehaviour
 {
     [Header("UI")]
@@ -16,14 +17,25 @@ public class InventoryWindowController : NetworkBehaviour
     [Header("Generator")]
     public float fuelTransferPerSecond = 5f;
 
+    [Header("Generator with inventory")]
+    public int columnsCount = 3;
+    public float slotsOffset = 20f;
+    public float timeToOpen = 1f;
+
     private const string RowsRootName = "rows-root";
     private const string ClothesFrameName = "ClothesFrame";
     private const string SlotsContainerName = "SlotsContainer";
     private const string SlotButtonName = "SlotButton";
     private const string SlotImageName = "ItemImage";
     private const string FuelGeneratorName = "FuelGenerator";
+    private const string BioGeneratorName = "BioGenerator";
+    private const string SteamGeneratorName = "SteamGenerator";
     private const string FuelLevelName = "FuelLevel";
     private const string FuelTankNeckTriggerName = "FuelTankNeckTrigger";
+    private const string GeneratorWithInventoryDropZoneName = "GeneratorDropZone";
+    private const string GeneratorNumOfItemsLeftName = "NumOfItemsLeft";
+    private const string SteamGeneratorDoorName = "Door";
+    private const string SteamGeneratorClosureName = "Closure";
 
     private static readonly EquipableContainerType[] RowTypes =
     {
@@ -38,13 +50,21 @@ public class InventoryWindowController : NetworkBehaviour
     private VisualElement root;
     private VisualElement rowsRoot;
     VisualElement fuelGenerator;
+    VisualElement bioGenerator;
+    VisualElement steamGenerator;
     VisualElement fuelLevel;
     VisualElement fuelTankNeckTrigger;
+    List<Label> generatorNumOfItemsLeft;
+    readonly List<VisualElement> genWithInventorySlots = new();
+    VisualElement steamGeneratorDoor;
+    VisualElement steamGeneratorClosure;
 
     private readonly List<RowBinding> rowBindings = new();
 
     private bool isOpen;
     private bool isDragging;
+    int steamGenOpenState = 0;
+    Coroutine steamGenOpeningRoutine;
 
     private TemplateContainer dragGhost;
     private Image dragGhostImage;
@@ -57,7 +77,7 @@ public class InventoryWindowController : NetworkBehaviour
     private VisualElement dragSourceVisual;
     private Coroutine dropRoutine;
 
-    Generator generator;
+    InteractableActive interactableActive;
 
     private sealed class RowBinding
     {
@@ -73,7 +93,8 @@ public class InventoryWindowController : NetworkBehaviour
     {
         None,
         InventorySlot,
-        ClothesFrame
+        ClothesFrame,
+        GeneratorSlot
     }
 
     private struct DragSource
@@ -84,9 +105,9 @@ public class InventoryWindowController : NetworkBehaviour
         public ItemInstance Item;
         public VisualElement Visual;
 
-        public bool IsValid => Kind != DragKind.None && Item != null && Visual != null;
+        public readonly bool IsValid => Kind != DragKind.None && Item != null && Visual != null;
 
-        public static DragSource Invalid => new DragSource
+        public static DragSource Invalid => new()
         {
             Kind = DragKind.None,
             Type = EquipableContainerType.Custom,
@@ -103,9 +124,9 @@ public class InventoryWindowController : NetworkBehaviour
         public int SlotIndex;
         public VisualElement Visual;
 
-        public bool IsValid => Kind != DragKind.None && Visual != null;
+        public readonly bool IsValid => Kind != DragKind.None && Visual != null;
 
-        public static DropTarget Invalid => new DropTarget
+        public static DropTarget Invalid => new()
         {
             Kind = DragKind.None,
             Type = EquipableContainerType.Custom,
@@ -140,8 +161,45 @@ public class InventoryWindowController : NetworkBehaviour
         }
 
         fuelGenerator = root.Q<VisualElement>(FuelGeneratorName);
+        bioGenerator = root.Q<VisualElement>(BioGeneratorName);
+        steamGenerator = root.Q<VisualElement>(SteamGeneratorName);
+        steamGeneratorDoor = root.Q<VisualElement>(SteamGeneratorDoorName);
+        steamGeneratorClosure = root.Q<VisualElement>(SteamGeneratorClosureName);
+        steamGeneratorClosure.RegisterCallback<PointerDownEvent>(evt => {
+            if (evt.button != 0 || steamGenOpenState != 0 || steamGenOpeningRoutine != null) return;
+            IEnumerator Routine() {
+                float t = 0;
+                while (t < timeToOpen) {
+                    t += Time.deltaTime;
+                    steamGeneratorClosure.style.rotate = new(new Rotate(180 * (t / timeToOpen)));
+                    yield return null;
+                }
+                steamGenOpenState = 1;
+                steamGenOpeningRoutine = null;
+            }
+            steamGenOpeningRoutine = StartCoroutine(Routine());
+            evt.StopPropagation();
+        });
+        steamGeneratorDoor.RegisterCallback<PointerDownEvent>(evt => {
+            if (evt.button != 0 || steamGenOpenState != 1 || steamGenOpeningRoutine != null) return;
+            IEnumerator Routine() {
+                float t = 0;
+                while (t < timeToOpen) {
+                    t += Time.deltaTime;
+                    steamGeneratorDoor.style.scale = new(new Vector2(Mathf.Lerp(1, -1, t / timeToOpen), 1));
+                    if (t / timeToOpen >= 0.5f) steamGeneratorClosure.style.visibility = UnityEngine.UIElements.Visibility.Hidden;
+                    yield return null;
+                }
+                steamGenOpenState = 2;
+                steamGenOpeningRoutine = null;
+                RebuildGenWithInventory();
+            }
+            steamGenOpeningRoutine = StartCoroutine(Routine());
+            evt.StopPropagation();
+        });
         fuelLevel = root.Q<VisualElement>(FuelLevelName);
         fuelTankNeckTrigger = root.Q<VisualElement>(FuelTankNeckTriggerName);
+        generatorNumOfItemsLeft = root.Query<Label>(GeneratorNumOfItemsLeftName).Build().ToList();
 
         CacheRows();
         CreateDragGhost();
@@ -171,18 +229,33 @@ public class InventoryWindowController : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
 
-        if (Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame)
+        if (Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame && CanToggleInventory())
             ToggleInventory();
 
-        if (fuelGenerator.style.display != DisplayStyle.None)
-            fuelLevel.style.maxHeight = new(new Length(generator.currentFuel / generator.maxFuel * 100, LengthUnit.Percent));
+
+        bool resetRotation = true;
+        HandleGeneratorFunc(ref resetRotation);
+        HandleGeneratorWithInventoryFunc();
+        if (resetRotation && dragGhost.style.rotate.value.angle.value != 0) {
+            dragGhost.style.rotate = new(new Rotate(
+                Mathf.Lerp(dragGhost.style.rotate.value.angle.value, 0, 10 * Time.deltaTime)
+            ));
+        }
 
         if (isDragging && dragSource.Item == null) EndDrag();
         if (!isOpen || !isDragging || dragGhost == null || dragGhost.style.display == DisplayStyle.None)
             return;
 
-        bool resetRotation = true;
-        if (isDragging && dragSource.Item.TryGetProperty(out ItemPropertyFuelCanister fuelCanister, out int ind)) {
+        dragGhost.style.left = lastPointerPos.x + 12f;
+        dragGhost.style.top = lastPointerPos.y + 12f;
+    }
+
+    [Client]
+    void HandleGeneratorFunc(ref bool resetRotation) {
+        if (interactableActive is not Generator generator) return;
+        if (fuelGenerator.style.display != DisplayStyle.None)
+            fuelLevel.style.maxHeight = new(new Length(generator.currentFuel / generator.maxFuel * 100, LengthUnit.Percent));
+        if (isDragging && dragSource.Item.TryGetProperty(out ItemPropertyFuelCanister _, out int ind)) {
             float dragX = dragGhost.worldBound.center.x;
             if (fuelTankNeckTrigger.worldBound.xMin <= dragX && dragX <= fuelTankNeckTrigger.worldBound.xMax) {
                 CmdTryTransferFuelToGenerator(ind, dragSource.Item, generator, fuelTransferPerSecond * Time.deltaTime);
@@ -192,15 +265,13 @@ public class InventoryWindowController : NetworkBehaviour
                 resetRotation = false;
             }
         }
-        if (resetRotation && dragGhost.style.rotate.value.angle.value != 0)
-        {
-            dragGhost.style.rotate = new(new Rotate(
-                Mathf.Lerp(dragGhost.style.rotate.value.angle.value, 0, 10 * Time.deltaTime)
-            ));
-        }
+    }
 
-        dragGhost.style.left = lastPointerPos.x + 12f;
-        dragGhost.style.top = lastPointerPos.y + 12f;
+    [Client]
+    void HandleGeneratorWithInventoryFunc() {
+        if (interactableActive is not GeneratorWithInventory generator) return;
+        string text = $"{generator.ItemsLeft} items left";
+        generatorNumOfItemsLeft.ForEach(label => label.text = text);
     }
 
     [Command]
@@ -215,15 +286,28 @@ public class InventoryWindowController : NetworkBehaviour
         SetOpen(!isOpen);
     }
 
+    bool CanToggleInventory() {
+        return !isOpen && player.playerState == PlayerState.Default || isOpen && player.playerState == PlayerState.Interacting;
+    }
+
     [Client]
-    public void SetOpen(bool open, Generator generator = null)
+    public void SetOpen(bool open, InteractableActive interactableActive = null)
     {
         isOpen = open;
-        this.generator = generator;
+        if (!isOpen) UnbindGenEvents();
+        this.interactableActive = open ? interactableActive : null;       
+        if (isOpen) BindGenEvents(); 
 
         if (root != null)
             root.style.display = open ? DisplayStyle.Flex : DisplayStyle.None;
-        fuelGenerator.style.display = generator ? DisplayStyle.Flex : DisplayStyle.None;
+        fuelGenerator.style.display = interactableActive is Generator ? DisplayStyle.Flex : DisplayStyle.None;
+        bioGenerator.style.display = interactableActive is GeneratorWithInventory bioGen && bioGen.acceptableFuels.Contains(ItemFuelType.Bio) ? DisplayStyle.Flex : DisplayStyle.None;
+        steamGenerator.style.display = interactableActive is GeneratorWithInventory steamGen && steamGen.acceptableFuels.Contains(ItemFuelType.Heat) ? DisplayStyle.Flex : DisplayStyle.None;
+        steamGenOpenState = 0;
+        steamGeneratorClosure.style.rotate = new(new Rotate(0));
+        steamGeneratorDoor.style.scale = new(new Vector2(1, 1));
+        steamGeneratorClosure.style.visibility = UnityEngine.UIElements.Visibility.Visible;
+        RebuildGenWithInventory();
 
         UnityEngine.Cursor.visible = open;
         UnityEngine.Cursor.lockState = open ? CursorLockMode.None : CursorLockMode.Locked;
@@ -255,8 +339,7 @@ public class InventoryWindowController : NetworkBehaviour
 
                 clothesButton = clothesFrame.Q<Button>(SlotButtonName);
                 clothesImage = clothesFrame.Q<Image>(SlotImageName);
-                if (clothesImage == null)
-                    clothesImage = clothesFrame.Q<Image>();
+                clothesImage ??= clothesFrame.Q<Image>();
 
                 if (clothesButton != null)
                     clothesButton.text = string.Empty;
@@ -337,8 +420,7 @@ public class InventoryWindowController : NetworkBehaviour
         root.Add(dragGhost);
 
         dragGhostImage = dragGhost.Q<Image>(SlotImageName);
-        if (dragGhostImage == null)
-            dragGhostImage = dragGhost.Q<Image>();
+        dragGhostImage ??= dragGhost.Q<Image>();
     }
 
     private void BindInventoryEvents()
@@ -363,6 +445,18 @@ public class InventoryWindowController : NetworkBehaviour
     private void OnAnyInventoryChanged(List<ItemContainer> _) => Rebuild();
     private void OnAnyInventoryChanged(int _) => Rebuild();
     private void OnAnySlotChanged(ItemContainer _, int __) => Rebuild();
+
+    void BindGenEvents() {
+        if (interactableActive == null || interactableActive is not GeneratorWithInventory generator) return;
+        generator.onGenInventoryChanged.AddListener(OnGenInventoryChanged);
+    }
+
+    void UnbindGenEvents() {
+        if (interactableActive == null || interactableActive is not GeneratorWithInventory generator) return;
+        generator.onGenInventoryChanged.RemoveListener(OnGenInventoryChanged);
+    }
+
+    private void OnGenInventoryChanged() => RebuildGenWithInventory();
 
     private void OnRootPointerMove(PointerMoveEvent evt)
     {
@@ -455,8 +549,7 @@ public class InventoryWindowController : NetworkBehaviour
         if (button != null)
             button.text = string.Empty;
 
-        if (image == null)
-            image = slot.Q<Image>();
+        image ??= slot.Q<Image>();
 
         SetImage(image, item != null && item.itemData != null && item.itemData.itemIcon != null
             ? item.itemData.itemIcon.texture
@@ -497,6 +590,51 @@ public class InventoryWindowController : NetworkBehaviour
         return slot;
     }
 
+    VisualElement ActiveGenWithInventory => interactableActive is GeneratorWithInventory generator ?
+        generator.acceptableFuels.Contains(ItemFuelType.Bio) ? bioGenerator : steamGenerator :
+        null;
+
+    void RebuildGenWithInventory() {
+        genWithInventorySlots.ForEach(ve => ve.RemoveFromHierarchy());
+        if (interactableActive is not GeneratorWithInventory generator) return;
+        VisualElement parent = ActiveGenWithInventory.Q<VisualElement>(GeneratorWithInventoryDropZoneName);
+        bool shouldBuildSlots = steamGenerator.style.display != DisplayStyle.Flex || steamGenOpenState == 2;
+        if (shouldBuildSlots) Utils.Repeat(generator.slotsCount, i => {
+            ItemInstance item = generator.itemContainer.GetItem(i);
+            TemplateContainer slot = slotTemplate.CloneTree();
+            parent.Add(slot);
+
+            Image image = slot.Q<Image>(SlotImageName);
+            SetImage(image, item != null && item.itemData.itemIcon != null ? item.itemData.itemIcon.texture : null);
+
+            slot.RegisterCallback<PointerDownEvent>(evt => {
+                if (evt.button != 0) return;
+                if (item == null) return;
+
+                BeginDrag(DragKind.GeneratorSlot, EquipableContainerType.Custom, i, item, slot);
+                evt.StopPropagation();
+            }, TrickleDown.TrickleDown);
+
+            slot.RegisterCallback<PointerEnterEvent>(evt => {
+                if (!isDragging) return;
+
+                SetHoverTarget(new DropTarget {
+                    Kind = DragKind.GeneratorSlot,
+                    Type = EquipableContainerType.Custom,
+                    SlotIndex = i,
+                    Visual = slot
+                });
+            }, TrickleDown.TrickleDown);
+
+            slot.RegisterCallback<PointerLeaveEvent>(evt => {
+                if (!isDragging) return;
+                ClearHoverTargetIfMatches(DragKind.InventorySlot, EquipableContainerType.Custom, i);
+            }, TrickleDown.TrickleDown);
+
+            genWithInventorySlots.Add(slot);
+        });
+    }
+
     private void BeginDrag(DragKind kind, EquipableContainerType type, int slotIndex, ItemInstance item, VisualElement sourceVisual)
     {
         if (item == null || sourceVisual == null)
@@ -535,14 +673,12 @@ public class InventoryWindowController : NetworkBehaviour
         if (!isDragging)
             return;
 
-        if (hoveredVisual != null)
-            hoveredVisual.RemoveFromClassList("hovered");
+        hoveredVisual?.RemoveFromClassList("hovered");
 
         hoverTarget = target;
         hoveredVisual = target.Visual;
 
-        if (hoveredVisual != null)
-            hoveredVisual.AddToClassList("hovered");
+        hoveredVisual?.AddToClassList("hovered");
     }
 
     private void ClearHoverTargetIfMatches(DragKind kind, EquipableContainerType type, int slotIndex)
@@ -553,8 +689,7 @@ public class InventoryWindowController : NetworkBehaviour
         if (hoverTarget.Kind != kind || hoverTarget.Type != type || hoverTarget.SlotIndex != slotIndex)
             return;
 
-        if (hoveredVisual != null)
-            hoveredVisual.RemoveFromClassList("hovered");
+        hoveredVisual?.RemoveFromClassList("hovered");
 
         hoveredVisual = null;
         hoverTarget = DropTarget.Invalid;
@@ -606,6 +741,21 @@ public class InventoryWindowController : NetworkBehaviour
             int toSlot = hoverTarget.SlotIndex;
 
             action = () => inventory.CmdUnequipContainerToSlot(fromType, toType, toSlot);
+            targetVisual = hoverTarget.Visual;
+            return true;
+        }
+
+        if (dragSource.Kind == DragKind.InventorySlot && hoverTarget.Kind == DragKind.GeneratorSlot) {
+            GeneratorWithInventory generator = interactableActive as GeneratorWithInventory;
+            if (!generator.IsItemAcceptable(dragSource.Item)) return false;
+            action = () => generator.CmdTryTransferItemToSlot(player, dragSource.Item, hoverTarget.SlotIndex);
+            targetVisual = hoverTarget.Visual;
+            return true;
+        }
+
+        if (dragSource.Kind == DragKind.GeneratorSlot && hoverTarget.Kind == DragKind.InventorySlot) {
+            GeneratorWithInventory generator = interactableActive as GeneratorWithInventory;
+            action = () => generator.CmdTryReturnItemToInventory(player, dragSource.Item, hoverTarget.Type, hoverTarget.SlotIndex);
             targetVisual = hoverTarget.Visual;
             return true;
         }
@@ -695,7 +845,7 @@ public class InventoryWindowController : NetworkBehaviour
         if (dragGhost == null)
             yield break;
 
-        Vector2 startPos = new Vector2(dragGhost.resolvedStyle.left, dragGhost.resolvedStyle.top);
+        Vector2 startPos = new(dragGhost.resolvedStyle.left, dragGhost.resolvedStyle.top);
         float elapsed = 0f;
 
         while (elapsed < duration)
@@ -720,8 +870,7 @@ public class InventoryWindowController : NetworkBehaviour
         dragSource = DragSource.Invalid;
         hoverTarget = DropTarget.Invalid;
 
-        if (hoveredVisual != null)
-            hoveredVisual.RemoveFromClassList("hovered");
+        hoveredVisual?.RemoveFromClassList("hovered");
 
         hoveredVisual = null;
 
@@ -806,7 +955,7 @@ public class InventoryWindowController : NetworkBehaviour
     private ItemInstance GetEquippedItem(EquipableContainerType type)
     {
         ItemContainer container = GetContainer(type);
-        return container != null ? container.containerItem : null;
+        return container?.containerItem;
     }
 
     private bool TryGetEquipableData(ItemInstance item, out ItemPropertyEquipableContainer equipable)

@@ -320,9 +320,11 @@ public class PlayerController : NetworkBehaviour, ICharacterController
             // float distance = Vector3.Distance(groundPoint, characterBottom);
             currentVelocity += groundPoint - characterBottom; */
         }
-        Vector3 groundPoint = CharacterMotor.GroundingStatus.GroundPoint;
-        Vector3 characterBottom = transform.position + CharacterMotor.CharacterTransformToCapsuleBottom;
-        currentVelocity += groundPoint - characterBottom;
+        if (!CharacterMotor.MustUnground() && CharacterMotor.GroundingStatus.FoundAnyGround) {
+            Vector3 groundPoint = CharacterMotor.GroundingStatus.GroundPoint;
+            Vector3 characterBottom = transform.position + CharacterMotor.CharacterTransformToCapsuleBottom;
+            currentVelocity += groundPoint - characterBottom;
+        }
     }
 
     void HandleJump(ref Vector3 currentVelocity, float _) {

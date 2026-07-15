@@ -324,7 +324,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         if (!CharacterMotor.MustUnground() && CharacterMotor.GroundingStatus.FoundAnyGround) {
             Vector3 groundPoint = CharacterMotor.GroundingStatus.GroundPoint;
             Vector3 characterBottom = transform.position + CharacterMotor.CharacterTransformToCapsuleBottom;
-            currentVelocity += groundPoint - characterBottom;
+            currentVelocity += groundPoint.WithXZ(characterBottom) - characterBottom;
         }
     }
 

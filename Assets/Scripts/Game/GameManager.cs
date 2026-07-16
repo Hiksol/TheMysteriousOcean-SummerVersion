@@ -27,12 +27,12 @@ public class GameManager : SingletonNetworkBehaviour<GameManager>
             gameIsRunning = false;
             FindObjectsByType<Player>().ToList().ForEach(player => player.SetPlayerState(PlayerState.Dead));
             RpcSendNotificationToEveryone("You've lost", NotificationInstance.NotificationType.Danger);
-            Invoke(nameof(RestartGame), 5f);
+            Invoke(nameof(ExitGame), 5f);
         } else if (YachtManager.I.breaches.Count == 0) {
             gameIsRunning = false;
             FindObjectsByType<Player>().ToList().ForEach(player => player.SetPlayerState(PlayerState.Dead));
             RpcSendNotificationToEveryone("You've win", NotificationInstance.NotificationType.Info);
-            Invoke(nameof(RestartGame), 5f);
+            Invoke(nameof(ExitGame), 5f);
         }
     }
 
@@ -42,21 +42,31 @@ public class GameManager : SingletonNetworkBehaviour<GameManager>
     }
 
     [Server]
-    void RestartGame() {
-        RpcResetGame();
-        NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
-        ResetGame();
+    void ExitGame() {
+        RpcResetGame(true);
+        // NetworkManager.singleton.ServerChangeScene(mainMenuScene);
+        ResetGame(true);
     }
 
     [ClientRpc]
-    void RpcResetGame() {
-        ResetGame();
+    void RpcResetGame(bool disconnect) {
+        ResetGame(disconnect);
     }
 
-    void ResetGame() {
+    void ResetGame(bool disconnect = false) {
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
-        if (NetworkServer.active) NetworkManager.singleton.StopHost();
-        else NetworkManager.singleton.StopClient();
+        if (disconnect) {
+            if (NetworkServer.active) NetworkManager.singleton.StopHost();
+            else NetworkManager.singleton.StopClient();
+        } else if (isServer) NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void Exit() {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }

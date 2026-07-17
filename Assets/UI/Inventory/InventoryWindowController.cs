@@ -79,6 +79,8 @@ public class InventoryWindowController : NetworkBehaviour
 
     InteractableActive interactableActive;
 
+    InputAction menuAction;
+
     private sealed class RowBinding
     {
         public EquipableContainerType Type;
@@ -133,6 +135,10 @@ public class InventoryWindowController : NetworkBehaviour
             SlotIndex = -1,
             Visual = null
         };
+    }
+
+    void Awake() {
+        menuAction = InputSystem.actions.FindAction("Menu");
     }
 
     private void Reset()
@@ -231,6 +237,8 @@ public class InventoryWindowController : NetworkBehaviour
 
         if (Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame && CanToggleInventory())
             ToggleInventory();
+        else if (isOpen && menuAction.WasPressedThisFrame())
+            SetOpen(false);
 
 
         bool resetRotation = true;

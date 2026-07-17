@@ -6,6 +6,7 @@ using KinematicCharacterController;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Cinemachine;
+using System;
 
 [RequireComponent(typeof(Player))]
 [RequireComponent(typeof(KinematicCharacterMotor))]
@@ -323,7 +324,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         if (!CharacterMotor.MustUnground() && CharacterMotor.GroundingStatus.FoundAnyGround) {
             Vector3 groundPoint = CharacterMotor.GroundingStatus.GroundPoint;
             Vector3 characterBottom = transform.position + CharacterMotor.CharacterTransformToCapsuleBottom;
-            currentVelocity += groundPoint - characterBottom;
+            currentVelocity += groundPoint.WithXZ(characterBottom) - characterBottom;
         }
     }
 
@@ -350,6 +351,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     void CheckLadder() {
         if (!interactAction.WasPressedThisFrame()) return;
         // if (CharacterMotor.CharacterOverlap(CharacterMotor.TransientPosition, CharacterMotor.TransientRotation, probedColliders, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide) > 0) {
+        Array.Clear(probedColliders, 0, probedColliders.Length);
         if (CharacterMotor.CharacterOverlap(transform.position, transform.rotation, probedColliders, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide) > 0) {
             // if (probedColliders[0] == null) return;
             Collider collider = probedColliders.FirstOrDefault(col => col && col.TryGetComponent(out Ladder _));

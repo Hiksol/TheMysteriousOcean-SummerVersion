@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Mirror;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class CraftingManager : SingletonNetworkBehaviour<CraftingManager>
 {
@@ -19,8 +20,17 @@ public class CraftingManager : SingletonNetworkBehaviour<CraftingManager>
     public bool wasCursorVisible = false;
     public Interactable interactableInitiated;
 
+    InputAction menuAction;
+
     protected override void AwakeNew() {
         craftingRendererRoot.gameObject.SetActive(false);
+        menuAction = InputSystem.actions.FindAction("Menu");
+    }
+
+    void Update() {
+        if (isClient && isVisible && menuAction.WasPressedThisFrame()) {
+            Hide();
+        }
     }
 
     [Client]

@@ -25,6 +25,7 @@ public class ItemInstance : Interactable
 
     public override void OnStartServer() {
         // if (transform.parent != null) OnTransformParentChanged();
+        if (!didAwake) Awake();
         SetItemData(itemData);
     }
 

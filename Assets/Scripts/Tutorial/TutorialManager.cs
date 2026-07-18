@@ -3,10 +3,11 @@ using Mirror;
 using TMPro;
 using UnityEngine;
 
-public class TutorialManager : MonoBehaviour
+public class TutorialManager : SingletonMonoBehaviour<TutorialManager>
 {
     [SerializeReference, SubclassSelector] public List<TutorialState> tutorialStates = new();
     public TMP_Text tutorialText;
+    public TMP_Text additionalTutorialText;
     public Transform tutorialTextRoot;
 
     [Header("Debug")]
@@ -26,19 +27,31 @@ public class TutorialManager : MonoBehaviour
         ChangeState(tutorialStates[ind]);
     }
 
-    void Awake() {
+    override protected void AwakeNew() {
         NetworkManager.singleton.StartHost();
     }
 
     void Start() {
+        SetAdditionalText(null);
         ChangeState(currentStateInd);
     }
 
     void Update() {
+        currentState?.OnUpdate();
         if (currentState != null && currentState.IsComplete()) {
             if (++currentStateInd < tutorialStates.Count) {
                 ChangeState(currentStateInd);
             } else ChangeState(null);
+        }
+    }
+
+    public void SetAdditionalText(string text) {
+        if (!string.IsNullOrEmpty(text)) {
+            additionalTutorialText.text = text;
+            additionalTutorialText.enabled = true;
+        } else {
+            additionalTutorialText.text = "";
+            additionalTutorialText.enabled = false;
         }
     }
 }

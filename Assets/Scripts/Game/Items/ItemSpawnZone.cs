@@ -20,8 +20,7 @@ public class ItemSpawnZone : NetworkBehaviour
     public void SpawnRandomItem(Vector3 pos) {
         ItemWeightedList.ItemTier itemTier = GameManager.I.Rng.RandomWeightedItem(possibleItems.items, tier => tier.weight);
         ItemData itemData = GameManager.I.Rng.RandomItem(itemTier.itemDatas);
-        ItemInstance item = Instantiate(itemPrefab);
-        item.transform.SetPositionAndRotation(pos, transform.rotation);
+        ItemInstance item = Instantiate(itemPrefab, pos, transform.rotation);
         // StickToGround(item.gameObject);
         NetworkServer.Spawn(item.gameObject);
         ParentGameObjectToTransform(item.gameObject);

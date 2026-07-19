@@ -8,7 +8,7 @@ public class MainMenu : MonoBehaviour
 {
     [SerializedDictionary("SubMenu name", "SubMenu parent")]
     public SerializedDictionary<string, Transform> subMenus = new();
-    [Scene] public string mainGameScene;
+    [Scene] public string tutorialScene;
 
     public void SetSubMenu(string subMenuName) {
         if (subMenus.TryGetValue(subMenuName, out Transform _)) {
@@ -21,6 +21,11 @@ public class MainMenu : MonoBehaviour
     public void StartGameHost() => NetworkManager.singleton.StartHost();
 
     public void StartGameClient() => NetworkManager.singleton.StartClient();
+
+    public void StartTutorial() {
+        Destroy(NetworkManager.singleton.gameObject);
+        SceneManager.LoadScene(tutorialScene);
+    }
 
     public void SetNetworkAddress(string address) {
         NetworkManager.singleton.networkAddress = address;

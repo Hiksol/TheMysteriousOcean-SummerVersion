@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using Mirror;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
+[DefaultExecutionOrder(5)]
 public class TutorialManager : SingletonMonoBehaviour<TutorialManager>
 {
     [SerializeReference, SubclassSelector] public List<TutorialState> tutorialStates = new();
@@ -21,7 +23,10 @@ public class TutorialManager : SingletonMonoBehaviour<TutorialManager>
             tutorialTextRoot.gameObject.SetActive(true);
             tutorialText.text = currentState.tutorialText;
             currentState.OnEnter();
-        } else tutorialTextRoot.gameObject.SetActive(false);
+        } else {
+            // tutorialTextRoot.gameObject.SetActive(false);
+            tutorialText.text = "You completed tutorial!";
+        }
     }
     public void ChangeState(int ind) {
         ChangeState(tutorialStates[ind]);

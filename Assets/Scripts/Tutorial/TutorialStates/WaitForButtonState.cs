@@ -11,7 +11,6 @@ public class WaitForButtonState : TutorialState
 
     public override void OnEnter() {
         if (pointerTarget != null) TutorialPointer.I.PointTo(pointerTarget);
-        Debug.Log(inputActionRef.action.activeControl);
         TutorialManager.I.SetAdditionalText(inputActionRef.action.GetBindingDisplayString(
             InputBinding.MaskByGroup("Keyboard&Mouse"),
             InputBinding.DisplayStringOptions.DontUseShortDisplayNames

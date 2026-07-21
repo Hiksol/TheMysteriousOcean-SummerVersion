@@ -21,7 +21,11 @@ public class CollectItemFromGroundState : TutorialState
         if (itemToCollect == null) {
             Collider[] colliders = new Collider[8];
             Physics.OverlapSphereNonAlloc(pointToCheck.position, radiusToCheck, colliders);
-            Collider col = colliders.FirstOrDefault(col => col.TryGetComponent(out ItemInstance _));
+            // Collider col = colliders.FirstOrDefault(col => col.TryGetComponent(out ItemInstance _));
+            Collider col = colliders
+                .Where(col => col && col.TryGetComponent(out ItemInstance _))
+                .OrderBy(col => Vector3.Distance(col.transform.position, pointToCheck.position))
+                .FirstOrDefault();
             if (col != null) itemToCollect = col.GetComponent<ItemInstance>();
             TutorialPointer.I.PointTo(itemToCollect.transform);
         }

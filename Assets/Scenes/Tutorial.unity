@@ -1087,9 +1087,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6034134328446660172, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
       insertIndex: 0
       addedObject: {fileID: 181784179}
-    - targetCorrespondingSourceObject: {fileID: 6034134328446660172, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
-      insertIndex: 3
-      addedObject: {fileID: 938401514}
     - targetCorrespondingSourceObject: {fileID: 4404235884432675588, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
       insertIndex: -1
       addedObject: {fileID: 258378688}
@@ -1122,6 +1119,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 905611575}
   m_SourcePrefab: {fileID: 100100000, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+--- !u!4 &633331987 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6034134328446660172, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+  m_PrefabInstance: {fileID: 633331986}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &633331988 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4679220478076667410, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
@@ -1594,7 +1596,7 @@ MonoBehaviour:
       data:
         tutorialText: Water pump will consume energy to keep the boat afloat (can
           be turned on/off)
-        inputActionRef: {fileID: 1781555164194001046, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+        inputActionRef: {fileID: -7471211009204490832, guid: 052faaac586de48259a63d0c4782560b, type: 3}
         pointerTarget: {fileID: 633331988}
     - rid: 7021566382307540992
       type: {class: WaitForButtonState, ns: , asm: Assembly-CSharp}
@@ -1611,21 +1613,21 @@ MonoBehaviour:
     - rid: 7021566382307540994
       type: {class: CollectItemFromGroundState, ns: , asm: Assembly-CSharp}
       data:
-        tutorialText: Now go into the yacht and grab some items
+        tutorialText: Now go into the cabin and grab some items
         itemToCollect: {fileID: 0}
         pointToCheck: {fileID: 465177650}
         radiusToCheck: 1
     - rid: 7021566382307540995
       type: {class: CollectItemFromGroundState, ns: , asm: Assembly-CSharp}
       data:
-        tutorialText: Now go into the yacht and grab some items
+        tutorialText: Now go into the cabin and grab some items
         itemToCollect: {fileID: 0}
         pointToCheck: {fileID: 1390019808}
         radiusToCheck: 1
     - rid: 7021566382307540996
       type: {class: CollectItemFromGroundState, ns: , asm: Assembly-CSharp}
       data:
-        tutorialText: Now go into the yacht and grab some items
+        tutorialText: Now go into the cabin and grab some items
         itemToCollect: {fileID: 0}
         pointToCheck: {fileID: 332397066}
         radiusToCheck: 1

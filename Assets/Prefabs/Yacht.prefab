@@ -24324,6 +24324,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6034134328446660172}
   - component: {fileID: 2450581780160577848}
+  - component: {fileID: 5888473768354559848}
   - component: {fileID: 896153030778123873}
   - component: {fileID: 4928007434233813203}
   - component: {fileID: 2725637596824164945}
@@ -24382,13 +24383,27 @@ Rigidbody:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_ImplicitCom: 1
+  m_ImplicitCom: 0
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 2
+--- !u!114 &5888473768354559848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5422317015538361848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 075ccbe9837b0744985e09ba3f015b9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KinematicCharacterController.PhysicsMover
+  Rigidbody: {fileID: 2450581780160577848}
+  MoveWithPhysics: 1
 --- !u!114 &896153030778123873
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24426,6 +24441,8 @@ MonoBehaviour:
   endHeightOffset: -5
   currentSinkingProgress: 0
   breaches: []
+  targetPosition: {x: 0, y: 0, z: 0}
+  targetRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!114 &2725637596824164945
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24441,7 +24458,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  applyPositionAndRotation: 1
+  applyPositionAndRotation: 0
   sampleDistance: 0.5
   samplePoints: []
   waterLayer:
@@ -24468,7 +24485,7 @@ GameObject:
   - component: {fileID: 7794313713965001093}
   - component: {fileID: 8994165741880627726}
   m_Layer: 0
-  m_Name: Boat
+  m_Name: WaterMask
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

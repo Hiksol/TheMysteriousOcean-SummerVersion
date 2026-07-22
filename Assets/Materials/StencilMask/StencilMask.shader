@@ -16,6 +16,7 @@ Shader "Custom/StencilMask"
         Pass {
             Blend Zero One
             ZWrite Off
+            Offset -1, -1
             ColorMask 0
 
             Stencil {

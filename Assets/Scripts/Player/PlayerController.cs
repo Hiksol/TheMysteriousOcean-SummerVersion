@@ -77,8 +77,8 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     public Vector2 MoveInput => moveInput;
     bool JumpPressed => currentJumpBuffer > 0f;
     public bool IsDefault => state == PlayerControllerState.Default;
-    bool InWater => state == PlayerControllerState.Swimming;
-    bool IsClimbing => state == PlayerControllerState.Climbing;
+    public bool InWater => state == PlayerControllerState.Swimming;
+    public bool IsClimbing => state == PlayerControllerState.Climbing;
     Ladder activeLadder;
     float onLadderSegmentState;
     float anchoringTimer = 0f;

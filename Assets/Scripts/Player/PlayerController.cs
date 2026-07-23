@@ -77,8 +77,8 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     public Vector2 MoveInput => moveInput;
     bool JumpPressed => currentJumpBuffer > 0f;
     public bool IsDefault => state == PlayerControllerState.Default;
-    bool InWater => state == PlayerControllerState.Swimming;
-    bool IsClimbing => state == PlayerControllerState.Climbing;
+    public bool InWater => state == PlayerControllerState.Swimming;
+    public bool IsClimbing => state == PlayerControllerState.Climbing;
     Ladder activeLadder;
     float onLadderSegmentState;
     float anchoringTimer = 0f;
@@ -316,15 +316,13 @@ public class PlayerController : NetworkBehaviour, ICharacterController
             currentVelocity.y *= 1f / (1f + (airDrag * deltaTime));
         /* } else {
             Vector3 groundPoint = CharacterMotor.GroundingStatus.GroundPoint;
-            // Vector3 groundPoint = ;
             Vector3 characterBottom = transform.position + CharacterMotor.CharacterTransformToCapsuleBottom;
-            // float distance = Vector3.Distance(groundPoint, characterBottom);
             currentVelocity += groundPoint - characterBottom; */
         }
         if (!CharacterMotor.MustUnground() && CharacterMotor.GroundingStatus.FoundAnyGround) {
             Vector3 groundPoint = CharacterMotor.GroundingStatus.GroundPoint;
             Vector3 characterBottom = transform.position + CharacterMotor.CharacterTransformToCapsuleBottom;
-            currentVelocity += groundPoint.WithXZ(characterBottom) - characterBottom;
+            // currentVelocity += groundPoint.WithXZ(characterBottom) - characterBottom;
         }
     }
 

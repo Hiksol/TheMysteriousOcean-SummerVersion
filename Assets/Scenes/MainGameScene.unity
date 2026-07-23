@@ -13528,8 +13528,20 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 5995a0534d57ffe4190090b2431b32b1, type: 2}
     - target: {fileID: 4928007434233813203, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
-      propertyPath: maxSinkingProgress
-      value: 180
+      propertyPath: targetRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4928007434233813203, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: targetRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4928007434233813203, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: targetRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4928007434233813203, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
+      propertyPath: targetRotation.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5422317015538361848, guid: ffdadca607e340741b1a218c403be1cc, type: 3}
       propertyPath: m_Name

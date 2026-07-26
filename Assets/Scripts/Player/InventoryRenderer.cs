@@ -13,13 +13,14 @@ public class InventoryRenderer : NetworkBehaviour
     public TMP_Text interactTargetText;
     public Slider useItemSlider;
 
+    Player player;
     Inventory inventory;
     readonly List<InventoryRendererCell> handsCells = new();
     readonly List<InventoryRendererCell> inventoryCells = new();
 
-    void Awake()
-    {
-        inventory = transform.parent.GetComponent<Inventory>();
+    void Awake() {
+        player = transform.parent.GetComponent<Player>();
+        inventory = player.Inventory;
     }
 
     void Start()
@@ -43,35 +44,26 @@ public class InventoryRenderer : NetworkBehaviour
         OnInventoryCapacityChange(inventory.GetInventoryCapacity());
     }
 
-    void Update()
-    {
+    void Update() {
         // Текст взаимодействия
-        if (inventory.raycastInteractableTarget)
-        {
-            if (!interactTargetText.gameObject.activeSelf)
-                interactTargetText.gameObject.SetActive(true);
-
+        if (inventory.raycastInteractableTarget) {
+            if (!interactTargetText.gameObject.activeSelf) interactTargetText.gameObject.SetActive(true);
             interactTargetText.text = $"Press E to {(inventory.raycastInteractableTarget is ItemInstance ? "pickup" : "interact")}";
-        }
-        else if (interactTargetText.gameObject.activeSelf)
-        {
+        } else if (player.PlayerController.foundLadder != null) {
+            if (!interactTargetText.gameObject.activeSelf) interactTargetText.gameObject.SetActive(true);
+            interactTargetText.text = $"Press E to climb";
+        } else if (interactTargetText.gameObject.activeSelf) {
             interactTargetText.gameObject.SetActive(false);
         }
 
         // Слайдер использования предмета
-        if (inventory.IsUsingItem)
-        {
-            if (!useItemSlider.gameObject.activeSelf)
-                useItemSlider.gameObject.SetActive(true);
-
+        if (inventory.IsUsingItem) {
+            if (!useItemSlider.gameObject.activeSelf) useItemSlider.gameObject.SetActive(true);
             ItemInstance rightHandItem = inventory.GetItemInRightHand();
             useItemSlider.maxValue = rightHandItem != null ? rightHandItem.itemData.holdTimeToUse : 1f;
             useItemSlider.value = inventory.useHolding;
-        }
-        else
-        {
-            if (useItemSlider.gameObject.activeSelf)
-                useItemSlider.gameObject.SetActive(false);
+        } else {
+            if (useItemSlider.gameObject.activeSelf) useItemSlider.gameObject.SetActive(false);
         }
     }
 

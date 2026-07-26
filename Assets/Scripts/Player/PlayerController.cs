@@ -44,6 +44,7 @@ public class PlayerController : NetworkBehaviour, ICharacterController
 
     [Header("Input")]
     public float jumpBuffer = 0.1f;
+    public float interactBuffer = 0.1f;
 
     //Stamina
     [Header("UI")]
@@ -64,18 +65,21 @@ public class PlayerController : NetworkBehaviour, ICharacterController
 
     [Header("Debug")]
     public float currentJumpBuffer = 0f;
+    public float currentInteractBuffer = 0f;
     public float currentStamina = 10f;
     public bool isSprinting = false;
     public PlayerControllerState state = PlayerControllerState.Default;
     public ClimbingState climbingState = ClimbingState.Climbing;
     public Vector3 waterRaycastPos;
     public List<StaminaUseMult> staminaUseMults = new();
+    public Ladder foundLadder;
 
     float cameraXRotation = 0f;
     Vector2 lookInput;
     Vector2 moveInput;
     public Vector2 MoveInput => moveInput;
     bool JumpPressed => currentJumpBuffer > 0f;
+    bool InteractPressed => currentInteractBuffer > 0f;
     public bool IsDefault => state == PlayerControllerState.Default;
     public bool InWater => state == PlayerControllerState.Swimming;
     public bool IsClimbing => state == PlayerControllerState.Climbing;
@@ -259,6 +263,8 @@ public class PlayerController : NetworkBehaviour, ICharacterController
         moveInput = player.playerState == PlayerState.Default ? moveAction.ReadValue<Vector2>() : Vector2.zero;
         if (player.playerState == PlayerState.Default && jumpAction.WasPressedThisFrame()) currentJumpBuffer = jumpBuffer;
         else currentJumpBuffer = Mathf.Max(currentJumpBuffer - Time.deltaTime, 0);
+        if (player.playerState == PlayerState.Default && interactAction.WasPressedThisFrame()) currentInteractBuffer = interactBuffer;
+        else currentInteractBuffer = Mathf.Max(currentInteractBuffer - Time.deltaTime, 0);
         if (Keyboard.current.rKey.wasPressedThisFrame) {
             Cursor.visible = !Cursor.visible;
             Cursor.lockState = Cursor.visible ? CursorLockMode.None : CursorLockMode.Locked;
@@ -347,19 +353,20 @@ public class PlayerController : NetworkBehaviour, ICharacterController
     }
 
     void CheckLadder() {
-        if (!interactAction.WasPressedThisFrame()) return;
-        // if (CharacterMotor.CharacterOverlap(CharacterMotor.TransientPosition, CharacterMotor.TransientRotation, probedColliders, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide) > 0) {
+        foundLadder = null;
         Array.Clear(probedColliders, 0, probedColliders.Length);
-        if (CharacterMotor.CharacterOverlap(transform.position, transform.rotation, probedColliders, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide) > 0) {
-            // if (probedColliders[0] == null) return;
+        if (InteractPressed && IsClimbing) {
+            currentInteractBuffer = 0f;
+            ChangeClimbingState(ClimbingState.DeAnchoring);
+            ladderTargetPosition = CharacterMotor.TransientPosition;
+        } else if (CharacterMotor.CharacterOverlap(transform.position, transform.rotation, probedColliders, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Collide) > 0) {
             Collider collider = probedColliders.FirstOrDefault(col => col && col.TryGetComponent(out Ladder _));
             if (collider != null && collider.TryGetComponent(out Ladder ladder)) {
-                if (IsDefault) {
-                    activeLadder = ladder;
+                foundLadder = ladder;
+                if (InteractPressed && (IsDefault || InWater)) {
+                    currentInteractBuffer = 0f;
+                    activeLadder = foundLadder;
                     ChangeState(PlayerControllerState.Climbing);
-                } else if (IsClimbing) {
-                    ChangeClimbingState(ClimbingState.DeAnchoring);
-                    ladderTargetPosition = CharacterMotor.TransientPosition;
                 }
             }
         }

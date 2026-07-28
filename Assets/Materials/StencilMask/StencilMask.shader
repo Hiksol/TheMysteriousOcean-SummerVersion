@@ -22,7 +22,9 @@ Shader "Custom/StencilMask"
             Stencil {
                 Ref [_StencilRef]
                 Comp Always
-                Pass Replace
+                PassFront Replace
+                // ZFailFront Replace
+                ZFailBack Keep
             }
         }
     }

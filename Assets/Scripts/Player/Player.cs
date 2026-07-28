@@ -53,11 +53,11 @@ public class Player : NetworkBehaviour
 
     [Server]
     public void Die() {
-        RpcDie();
+        RpcDie(connectionToClient);
     }
 
-    [ClientRpc]
-    void RpcDie() {
+    [TargetRpc]
+    void RpcDie(NetworkConnectionToClient _) {
         SetPlayerState(PlayerState.Dead);
         NotificationManager.I.PrintNotification("Respawn in 5 seconds");
         Invoke(nameof(Respawn), 5f);

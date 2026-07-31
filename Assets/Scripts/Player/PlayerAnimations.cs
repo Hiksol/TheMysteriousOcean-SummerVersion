@@ -21,6 +21,7 @@ public class PlayerAnimations : NetworkBehaviour
     }
 
     void Update() {
+        if (!isLocalPlayer) return;
         animator.SetBool(IsMovingHash, player.PlayerController.MoveInput.sqrMagnitude >= 0.01f);
         animator.SetBool(IsSwimmingHash, player.PlayerController.InWater);
     }

@@ -441,12 +441,14 @@ MonoBehaviour:
   cameraSensivity: 15
   cameraVertialClamp: 80
   jumpBuffer: 0.1
+  interactBuffer: 0.1
   staminaSlider: {fileID: 211777076436279901}
   staminaIcon: {fileID: 5740093672309531750}
   staminaIconRotSpeed: 1080
   rotAcceleration: 3
   rotDeceleration: 2
   currentJumpBuffer: 0
+  currentInteractBuffer: 0
   currentStamina: 10
   isSprinting: 0
   state: 0
